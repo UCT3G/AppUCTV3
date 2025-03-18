@@ -70,6 +70,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        await TokenService.saveUserData(data['data_user']);
         return data['access_token'];
       } else {
         print('Error al renovar el token: ${response.statusCode}');

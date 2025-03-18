@@ -1,48 +1,12 @@
-import 'package:app_uct/screens/home_page.dart';
-import 'package:app_uct/screens/login_screen.dart';
-import 'package:app_uct/services/auth_service.dart';
-import 'package:app_uct/services/token_service.dart';
+import 'package:app_uct/routes/app_navigator.dart';
+import 'package:app_uct/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final initialRoute = await getInitialRoute();
+  final initialRoute = await AppNavigator.getInitialRoute();
   print('Ruta inicial: $initialRoute');
   runApp(MyApp(initialRoute: initialRoute));
-}
-
-Future<String> getInitialRoute() async {
-  final accessToken = await TokenService.getAccessToken();
-  final refreshToken = await TokenService.getRefreshToken();
-
-  print('Access Token: $accessToken');
-  print('Refresh Token: $refreshToken');
-
-  if (accessToken == null || refreshToken == null) {
-    print('No hay tokens, redirigiendo al login');
-    return '/login';
-  }
-
-  final isAccessTokenValid = await AuthService.checkTokenValidity(accessToken);
-  print('Access Token válido: $isAccessTokenValid');
-
-  if (isAccessTokenValid) {
-    print('Access Token válido, redirigiendo al home');
-    return '/home';
-  } else {
-    final newAccessToken = await AuthService.refreshAccessToken(refreshToken);
-
-    if (newAccessToken != null) {
-      print('Nuevo Access Token generado: $newAccessToken');
-      await TokenService.saveTokens(newAccessToken, refreshToken);
-      return '/home';
-    } else {
-      print('No se pudo renovar el Access Token, redirigiendo al login');
-      await AuthService.logout();
-      return '/login';
-    }
-  }
 }
 
 class MyApp extends StatefulWidget {
@@ -56,12 +20,18 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   String currentRoute = '/login';
+  AppLifecycleState? previousAppState;
+  bool wasPaused = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    currentRoute = widget.initialRoute;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
+        widget.initialRoute,
+      );
+    });
   }
 
   @override
@@ -72,18 +42,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      checkTokenAndUpdateRoute();
+    print('Estado actual: $state');
+    print('Estado anterior: $previousAppState');
+    if (state == AppLifecycleState.paused) {
+      wasPaused = true;
+    } else if (state == AppLifecycleState.resumed) {
+      if (wasPaused) {
+        AppNavigator.checkTokenAndUpdateRoute();
+        wasPaused = false;
+      }
     }
-  }
-
-  Future<void> checkTokenAndUpdateRoute() async {
-    final newRoute = await getInitialRoute();
-    if (newRoute != currentRoute) {
-      setState(() {
-        currentRoute = newRoute;
-      });
-    }
+    previousAppState = state;
   }
 
   // This widget is the root of your application.
@@ -95,11 +64,23 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      routes: {
-        '/home': (context) => HomePage(),
-        '/login': (context) => LoginScreen(),
+      navigatorKey: AppNavigator.navigatorKey,
+      onGenerateRoute: (settings) {
+        final routeBuilder = AppRoutes.routes[settings.name];
+        if (routeBuilder != null) {
+          return MaterialPageRoute(builder: routeBuilder, settings: settings);
+        }
+
+        return MaterialPageRoute(
+          builder:
+              (context) => Scaffold(
+                body: Center(
+                  child: Text('Ruta no encontrada: ${settings.name}'),
+                ),
+              ),
+        );
       },
-      initialRoute: currentRoute,
+      home: Container(),
     );
   }
 }
