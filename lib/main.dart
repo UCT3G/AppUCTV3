@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final initialRoute = await AppNavigator.getInitialRoute();
-  print('Ruta inicial: $initialRoute');
+  // print('Ruta inicial: $initialRoute');
   runApp(MyApp(initialRoute: initialRoute));
 }
 
@@ -42,8 +42,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('Estado actual: $state');
-    print('Estado anterior: $previousAppState');
+    // print('Estado actual: $state');
+    // print('Estado anterior: $previousAppState');
     if (state == AppLifecycleState.paused) {
       wasPaused = true;
     } else if (state == AppLifecycleState.resumed) {

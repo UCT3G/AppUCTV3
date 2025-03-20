@@ -1,4 +1,6 @@
+import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/services/auth_service.dart';
+import 'package:app_uct/services/token_service.dart';
 import 'package:app_uct/widgets/wave_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -18,11 +20,15 @@ class _LoginScreenState extends State<LoginScreen>
   late Animation<double> animation2;
   late AnimationController controller3;
   late Animation<double> animation3;
+  final AuthService authService = AuthService();
 
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   bool isLoading = false;
+  bool isBiometricAvailable = false;
+  bool hasStoredCredentials = false;
 
+  // METODO PARA INICIAR SESION CON CREDENCIALES
   void login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -40,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen>
       print(response);
 
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
       }
     } catch (e) {
       if (mounted) {
@@ -55,6 +61,55 @@ class _LoginScreenState extends State<LoginScreen>
         });
       }
     }
+  }
+
+  // METODO PARA VERIFICAR SI EL DISPOSITIVO SOPORTA AUTENTICACION BIOMETRICA
+  Future<void> checkBiometricAvailability() async {
+    bool isAvailable =
+        await authService.biometricService.isBiometricAvailable();
+
+    setState(() {
+      isBiometricAvailable = isAvailable;
+    });
+  }
+
+  // METODO PARA INICIAR SESION CON BIOMETRICOS
+  Future<void> loginWithBiometrics() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      bool isAuthenticated = await authService.loginWithBiometrics();
+
+      if (isAuthenticated) {
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Autenticación biométrica fallida')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  // METODO PARA VERIFICAR SI HAY CREDENCIALES GUARDADAS
+  Future<void> checkStoredCredentials() async {
+    bool hasCredentials = await TokenService.hasCredentials();
+    setState(() {
+      hasStoredCredentials = hasCredentials;
+    });
   }
 
   @override
@@ -90,6 +145,9 @@ class _LoginScreenState extends State<LoginScreen>
         setState(() {});
       });
     controller3.repeat();
+
+    checkStoredCredentials();
+    checkBiometricAvailability();
   }
 
   @override
@@ -268,6 +326,41 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                             ),
                   ),
+                  SizedBox(height: screenHeight * 0.04),
+                  if (isBiometricAvailable && hasStoredCredentials)
+                    ElevatedButton(
+                      onPressed: isLoading ? null : loginWithBiometrics,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child:
+                          isLoading
+                              ? CircularProgressIndicator()
+                              : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.fingerprint,
+                                    color: Colors.black87,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Ingresar con biométricos',
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                    ),
                 ],
               ),
             ),

@@ -36,4 +36,10 @@ class TokenService {
   static Future<String?> getRefreshToken() async {
     return await storage.read(key: 'refresh_token');
   }
+
+  static Future<bool> hasCredentials() async {
+    final username = await storage.read(key: 'username');
+    final password = await storage.read(key: 'password');
+    return username != null && password != null;
+  }
 }
