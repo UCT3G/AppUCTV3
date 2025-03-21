@@ -21,4 +21,14 @@ class BiometricService {
       return false;
     }
   }
+
+  // METODO PARA OBTENER LA LISTA DE TIPOS DE AUTENTICACION BIOMETRICA
+  Future<List<BiometricType>> getAvailableBiometrics() async {
+    try {
+      return await localAuthentication.getAvailableBiometrics();
+    } catch (e) {
+      print('Error al obtener biométricos: $e');
+      return [];
+    }
+  }
 }

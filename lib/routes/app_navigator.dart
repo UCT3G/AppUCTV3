@@ -8,14 +8,14 @@ class AppNavigator {
       GlobalKey<NavigatorState>();
 
   static Future<void> checkTokenAndUpdateRoute() async {
+    final navigator = navigatorKey.currentState;
+
+    if (navigator == null) return;
+
+    navigator.pushReplacementNamed(AppRoutes.loading);
+
     final newRoute = await getInitialRoute();
-    if (newRoute == AppRoutes.login) {
-      // print('Forzando el login');
-      navigatorKey.currentState?.pushReplacementNamed(AppRoutes.login);
-    } else if (newRoute == AppRoutes.home) {
-      // print('Redirigiendo al home.');
-      navigatorKey.currentState?.pushReplacementNamed(AppRoutes.home);
-    }
+    navigator.pushReplacementNamed(newRoute);
   }
 
   static Future<String> getInitialRoute() async {

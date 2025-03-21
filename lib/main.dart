@@ -19,7 +19,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  String currentRoute = '/login';
+  String currentRoute = AppRoutes.login;
   AppLifecycleState? previousAppState;
   bool wasPaused = false;
 
@@ -29,8 +29,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
-        widget.initialRoute,
+        AppRoutes.loading,
       );
+    });
+
+    Future.delayed(Duration(seconds: 1), () async {
+      final route = await AppNavigator.getInitialRoute();
+      AppNavigator.navigatorKey.currentState?.pushReplacementNamed(route);
     });
   }
 
@@ -42,13 +47,21 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // print('Estado actual: $state');
-    // print('Estado anterior: $previousAppState');
+    print('Estado actual: $state');
+    print('Estado anterior: $previousAppState');
     if (state == AppLifecycleState.paused) {
       wasPaused = true;
     } else if (state == AppLifecycleState.resumed) {
       if (wasPaused) {
-        AppNavigator.checkTokenAndUpdateRoute();
+        final navigator = AppNavigator.navigatorKey.currentState;
+
+        if (navigator != null) {
+          navigator.pushReplacementNamed(AppRoutes.loading);
+        }
+
+        Future.delayed(Duration(milliseconds: 300), () {
+          AppNavigator.checkTokenAndUpdateRoute();
+        });
         wasPaused = false;
       }
     }

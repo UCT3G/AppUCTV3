@@ -99,9 +99,13 @@ class AuthService {
   static Future<void> logout() async {
     await storage.delete(key: 'access_token');
     await storage.delete(key: 'refresh_token');
-    await storage.delete(key: 'username');
-    await storage.delete(key: 'password');
-    await storage.delete(key: 'userData');
+
+    final isEnabled = await isBiometricAuthEnabled();
+
+    if (!isEnabled) {
+      await storage.delete(key: 'username');
+      await storage.delete(key: 'password');
+    }
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('userData');

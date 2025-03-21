@@ -1,9 +1,11 @@
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/services/auth_service.dart';
+import 'package:app_uct/services/biometric_service.dart';
 import 'package:app_uct/services/token_service.dart';
 import 'package:app_uct/widgets/wave_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:local_auth/local_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,7 +26,8 @@ class _LoginScreenState extends State<LoginScreen>
 
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
-  bool isLoading = false;
+  bool isLoadingCredentials = false;
+  bool isLoadingBiometrics = false;
   bool isBiometricAvailable = false;
   bool hasStoredCredentials = false;
 
@@ -38,15 +41,27 @@ class _LoginScreenState extends State<LoginScreen>
     }
 
     setState(() {
-      isLoading = true;
+      isLoadingCredentials = true;
     });
 
     try {
       final response = await AuthService.login(username, password);
-      print(response);
 
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      if (response['access_token'] != null) {
+        final isBiometricAuthEnabled =
+            await AuthService.isBiometricAuthEnabled();
+
+        if (!isBiometricAuthEnabled && isBiometricAvailable) {
+          await showSaveCredentialsDialog();
+        }
+
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
+        }
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al iniciar sesión')));
       }
     } catch (e) {
       if (mounted) {
@@ -57,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen>
     } finally {
       if (mounted) {
         setState(() {
-          isLoading = false;
+          isLoadingCredentials = false;
         });
       }
     }
@@ -76,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen>
   // METODO PARA INICIAR SESION CON BIOMETRICOS
   Future<void> loginWithBiometrics() async {
     setState(() {
-      isLoading = true;
+      isLoadingBiometrics = true;
     });
 
     try {
@@ -98,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen>
     } finally {
       if (mounted) {
         setState(() {
-          isLoading = false;
+          isLoadingBiometrics = false;
         });
       }
     }
@@ -110,6 +125,67 @@ class _LoginScreenState extends State<LoginScreen>
     setState(() {
       hasStoredCredentials = hasCredentials;
     });
+  }
+
+  // METODO PARA ABRIR EL ALERT DIALOG PARA GUARDAR CREDENCIALES
+  Future<void> showSaveCredentialsDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('¿Guardar credenciales?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  '¿Deseas guardar tus credenciales para futuros inicios de sesión biométricos?',
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await AuthService.enableBiometricAuth();
+                Navigator.of(context).pop();
+              },
+              child: Text('Aceptar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await AuthService.disableBiometricAuth();
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancelar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // METODO PARA CHECAR SI SE ACTIVARON BIOMETRICOS O NO
+  Future<void> checkBiometricAuthEnabled() async {
+    final isEnabled = await AuthService.isBiometricAuthEnabled();
+    if (!isEnabled && isBiometricAvailable) {
+      await showSaveCredentialsDialog();
+    }
+  }
+
+  // METODO PRA OBTENER EL TIPO DE AUTENTICACION BIOMETRICA
+  Future<BiometricType?> getPrimaryBiometricType() async {
+    final availableBiometrics =
+        await authService.biometricService.getAvailableBiometrics();
+
+    if (availableBiometrics.contains(BiometricType.face)) {
+      return BiometricType.face;
+    } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+      return BiometricType.fingerprint;
+    } else if (availableBiometrics.contains(BiometricType.iris)) {
+      return BiometricType.iris;
+    }
+    return null;
   }
 
   @override
@@ -299,7 +375,7 @@ class _LoginScreenState extends State<LoginScreen>
                   SizedBox(height: screenHeight * 0.04),
                   ElevatedButton(
                     onPressed:
-                        isLoading
+                        isLoadingCredentials
                             ? null
                             : () => login(
                               usernameController.text,
@@ -316,7 +392,7 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                     ),
                     child:
-                        isLoading
+                        isLoadingCredentials
                             ? CircularProgressIndicator()
                             : Text(
                               'Ingresar',
@@ -328,38 +404,48 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                   SizedBox(height: screenHeight * 0.04),
                   if (isBiometricAvailable && hasStoredCredentials)
-                    ElevatedButton(
-                      onPressed: isLoading ? null : loginWithBiometrics,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 40,
-                          vertical: 10,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child:
-                          isLoading
-                              ? CircularProgressIndicator()
-                              : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.fingerprint,
-                                    color: Colors.black87,
+                    FutureBuilder<BiometricType?>(
+                      future: getPrimaryBiometricType(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+
+                        final biometricType = snapshot.data;
+
+                        return ElevatedButton(
+                          onPressed:
+                              isLoadingBiometrics ? null : loginWithBiometrics,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 10,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child:
+                              isLoadingBiometrics
+                                  ? CircularProgressIndicator()
+                                  : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        biometricType == BiometricType.face
+                                            ? Icons.face
+                                            : biometricType ==
+                                                BiometricType.iris
+                                            ? Icons.remove_red_eye
+                                            : Icons.fingerprint,
+                                        color: Colors.black,
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Ingresar con biométricos',
-                                    style: TextStyle(
-                                      color: Colors.black87,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                        );
+                      },
                     ),
                 ],
               ),
