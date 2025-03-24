@@ -5,7 +5,7 @@ import 'package:app_uct/screens/splash_screen.dart';
 class AppRoutes {
   static const String login = '/login';
   static const String home = '/home';
-  static const String loading = '/loading';
+  static const String loading = '/';
 
   static final routes = {
     login: (context) => LoginScreen(),

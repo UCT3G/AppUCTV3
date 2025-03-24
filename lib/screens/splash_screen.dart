@@ -1,4 +1,3 @@
-import 'package:app_uct/routes/app_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 

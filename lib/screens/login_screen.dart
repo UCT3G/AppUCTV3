@@ -1,6 +1,6 @@
 import 'package:app_uct/routes/app_routes.dart';
+import 'package:app_uct/screens/splash_screen.dart';
 import 'package:app_uct/services/auth_service.dart';
-import 'package:app_uct/services/biometric_service.dart';
 import 'package:app_uct/services/token_service.dart';
 import 'package:app_uct/widgets/wave_painter.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +23,8 @@ class _LoginScreenState extends State<LoginScreen>
   late AnimationController controller3;
   late Animation<double> animation3;
   final AuthService authService = AuthService();
+  BiometricType? biometricType;
+  Future<BiometricType?>? biometricTypeFuture;
 
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -44,8 +46,16 @@ class _LoginScreenState extends State<LoginScreen>
       isLoadingCredentials = true;
     });
 
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => PopScope(canPop: false, child: SplashScreen()),
+    );
+
     try {
       final response = await AuthService.login(username, password);
+
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (response['access_token'] != null) {
         final isBiometricAuthEnabled =
@@ -59,12 +69,16 @@ class _LoginScreenState extends State<LoginScreen>
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error al iniciar sesión')));
+        if (mounted) {
+          Navigator.of(context, rootNavigator: true).pop();
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error al iniciar sesión')));
+        }
       }
     } catch (e) {
       if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -94,22 +108,37 @@ class _LoginScreenState extends State<LoginScreen>
       isLoadingBiometrics = true;
     });
 
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => PopScope(canPop: false, child: SplashScreen()),
+    );
+
     try {
       bool isAuthenticated = await authService.loginWithBiometrics();
 
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+
       if (isAuthenticated) {
-        if (mounted) {
+        if (ModalRoute.of(context)?.settings.name != AppRoutes.home) {
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Autenticación biométrica fallida')),
-        );
+        if (mounted) {
+          Navigator.of(context, rootNavigator: true).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Autenticación biométrica fallida')),
+          );
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -175,17 +204,35 @@ class _LoginScreenState extends State<LoginScreen>
 
   // METODO PRA OBTENER EL TIPO DE AUTENTICACION BIOMETRICA
   Future<BiometricType?> getPrimaryBiometricType() async {
-    final availableBiometrics =
-        await authService.biometricService.getAvailableBiometrics();
+    try {
+      final availableBiometrics =
+          await authService.biometricService.getAvailableBiometrics();
 
-    if (availableBiometrics.contains(BiometricType.face)) {
-      return BiometricType.face;
-    } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
-      return BiometricType.fingerprint;
-    } else if (availableBiometrics.contains(BiometricType.iris)) {
-      return BiometricType.iris;
+      if (availableBiometrics.contains(BiometricType.face)) {
+        return BiometricType.face;
+      } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+        return BiometricType.fingerprint;
+      } else if (availableBiometrics.contains(BiometricType.iris)) {
+        return BiometricType.iris;
+      }
+
+      if (availableBiometrics.isNotEmpty) {
+        return availableBiometrics.first; // Devuelve el primero disponible
+      }
+
+      return null;
+    } catch (e) {
+      print('Error al obtener el tipo de biómetrico: $e');
+      return null;
     }
-    return null;
+  }
+
+  Future<void> loadBiometricType() async {
+    biometricTypeFuture = getPrimaryBiometricType();
+    biometricType = await biometricTypeFuture;
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -224,6 +271,7 @@ class _LoginScreenState extends State<LoginScreen>
 
     checkStoredCredentials();
     checkBiometricAvailability();
+    loadBiometricType();
   }
 
   @override
@@ -404,25 +452,13 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                   SizedBox(height: screenHeight * 0.04),
                   if (isBiometricAvailable && hasStoredCredentials)
-                    FutureBuilder<BiometricType?>(
-                      future: getPrimaryBiometricType(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        }
-
-                        final biometricType = snapshot.data;
-
-                        return ElevatedButton(
+                    biometricType != null
+                        ? ElevatedButton(
                           onPressed:
                               isLoadingBiometrics ? null : loginWithBiometrics,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 40,
-                              vertical: 10,
-                            ),
+                            padding: EdgeInsets.all(10),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -430,8 +466,7 @@ class _LoginScreenState extends State<LoginScreen>
                           child:
                               isLoadingBiometrics
                                   ? CircularProgressIndicator()
-                                  : Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                  : Column(
                                     children: [
                                       Icon(
                                         biometricType == BiometricType.face
@@ -441,12 +476,25 @@ class _LoginScreenState extends State<LoginScreen>
                                             ? Icons.remove_red_eye
                                             : Icons.fingerprint,
                                         color: Colors.black,
+                                        size: screenHeight * 0.08,
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        biometricType == BiometricType.face
+                                            ? 'Reconocimiento facial'
+                                            : biometricType ==
+                                                BiometricType.iris
+                                            ? 'Reconocimiento de iris'
+                                            : 'Huella dactilar',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        ),
                                       ),
                                     ],
                                   ),
-                        );
-                      },
-                    ),
+                        )
+                        : CircularProgressIndicator(),
                 ],
               ),
             ),

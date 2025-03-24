@@ -4,39 +4,35 @@ import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final initialRoute = await AppNavigator.getInitialRoute();
-  // print('Ruta inicial: $initialRoute');
-  runApp(MyApp(initialRoute: initialRoute));
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  final String initialRoute;
-
-  const MyApp({super.key, required this.initialRoute});
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  String currentRoute = AppRoutes.login;
   AppLifecycleState? previousAppState;
   bool wasPaused = false;
+
+  Future<void> initializeApp() async {
+    AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
+      AppRoutes.loading,
+    );
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    AppNavigator.checkTokenAndUpdateRoute();
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
-        AppRoutes.loading,
-      );
-    });
-
-    Future.delayed(Duration(seconds: 1), () async {
-      final route = await AppNavigator.getInitialRoute();
-      AppNavigator.navigatorKey.currentState?.pushReplacementNamed(route);
-    });
+    initializeApp();
   }
 
   @override
@@ -47,18 +43,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('Estado actual: $state');
-    print('Estado anterior: $previousAppState');
     if (state == AppLifecycleState.paused) {
       wasPaused = true;
+      AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
+        AppRoutes.loading,
+      );
     } else if (state == AppLifecycleState.resumed) {
       if (wasPaused) {
-        final navigator = AppNavigator.navigatorKey.currentState;
-
-        if (navigator != null) {
-          navigator.pushReplacementNamed(AppRoutes.loading);
-        }
-
         Future.delayed(Duration(milliseconds: 300), () {
           AppNavigator.checkTokenAndUpdateRoute();
         });
@@ -78,6 +69,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       navigatorKey: AppNavigator.navigatorKey,
+      initialRoute: AppRoutes.loading,
       onGenerateRoute: (settings) {
         final routeBuilder = AppRoutes.routes[settings.name];
         if (routeBuilder != null) {
@@ -93,7 +85,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               ),
         );
       },
-      home: Container(),
     );
   }
 }

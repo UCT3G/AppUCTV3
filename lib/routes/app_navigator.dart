@@ -12,8 +12,6 @@ class AppNavigator {
 
     if (navigator == null) return;
 
-    navigator.pushReplacementNamed(AppRoutes.loading);
-
     final newRoute = await getInitialRoute();
     navigator.pushReplacementNamed(newRoute);
   }
@@ -22,34 +20,27 @@ class AppNavigator {
     final accessToken = await TokenService.getAccessToken();
     final refreshToken = await TokenService.getRefreshToken();
 
-    // print('Access Token: $accessToken');
-    // print('Refresh Token: $refreshToken');
-
     if (accessToken == null || refreshToken == null) {
-      // print('No hay tokens, redirigiendo al login');
       return AppRoutes.login;
     }
 
     final isAccessTokenValid = await AuthService.checkTokenValidity(
       accessToken,
     );
-    // print('Access Token válido: $isAccessTokenValid');
-
     if (isAccessTokenValid) {
-      // print('Access Token válido, redirigiendo al home');
       return AppRoutes.home;
-    } else {
-      final newAccessToken = await AuthService.refreshAccessToken(refreshToken);
+    }
 
+    try {
+      final newAccessToken = await AuthService.refreshAccessToken(refreshToken);
       if (newAccessToken != null) {
-        // print('Nuevo Access Token generado: $newAccessToken');
         await TokenService.saveTokens(newAccessToken, refreshToken);
         return AppRoutes.home;
-      } else {
-        // print('No se pudo renovar el Access Token, redirigiendo al login');
-        await AuthService.logout();
-        return AppRoutes.login;
       }
+    } catch (e) {
+      print('Error al renovar token: $e');
     }
+    await AuthService.logout();
+    return AppRoutes.login;
   }
 }
