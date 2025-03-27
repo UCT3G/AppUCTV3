@@ -1,3 +1,4 @@
+import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/screens/splash_screen.dart';
 import 'package:app_uct/services/auth_service.dart';
@@ -6,6 +7,7 @@ import 'package:app_uct/widgets/wave_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,8 +35,15 @@ class _LoginScreenState extends State<LoginScreen>
   bool isBiometricAvailable = false;
   bool hasStoredCredentials = false;
 
+  AuthProvider get authProvider =>
+      Provider.of<AuthProvider>(context, listen: false);
+
   // METODO PARA INICIAR SESION CON CREDENCIALES
-  void login(String username, String password) async {
+  void login(
+    String username,
+    String password,
+    AuthProvider authProvider,
+  ) async {
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Por favor, ingrese usuario y contraseña')),
@@ -53,7 +62,11 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     try {
-      final response = await AuthService.login(username, password);
+      final response = await AuthService.login(
+        username,
+        password,
+        authProvider,
+      );
 
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
@@ -64,6 +77,9 @@ class _LoginScreenState extends State<LoginScreen>
         if (!isBiometricAuthEnabled && isBiometricAvailable) {
           await showSaveCredentialsDialog();
         }
+
+        await authProvider.updateAccessToken(response['access_token']);
+        await authProvider.updateRefreshToken(response['refresh_token']);
 
         if (mounted) {
           Navigator.pushReplacementNamed(context, AppRoutes.home);
@@ -103,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   // METODO PARA INICIAR SESION CON BIOMETRICOS
-  Future<void> loginWithBiometrics() async {
+  Future<void> loginWithBiometrics(AuthProvider authProvider) async {
     setState(() {
       isLoadingBiometrics = true;
     });
@@ -115,7 +131,9 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     try {
-      bool isAuthenticated = await authService.loginWithBiometrics();
+      bool isAuthenticated = await authService.loginWithBiometrics(
+        authProvider,
+      );
 
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
@@ -192,14 +210,6 @@ class _LoginScreenState extends State<LoginScreen>
         );
       },
     );
-  }
-
-  // METODO PARA CHECAR SI SE ACTIVARON BIOMETRICOS O NO
-  Future<void> checkBiometricAuthEnabled() async {
-    final isEnabled = await AuthService.isBiometricAuthEnabled();
-    if (!isEnabled && isBiometricAvailable) {
-      await showSaveCredentialsDialog();
-    }
   }
 
   // METODO PRA OBTENER EL TIPO DE AUTENTICACION BIOMETRICA
@@ -284,6 +294,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -428,6 +439,7 @@ class _LoginScreenState extends State<LoginScreen>
                             : () => login(
                               usernameController.text,
                               passwordController.text,
+                              authProvider,
                             ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -455,7 +467,9 @@ class _LoginScreenState extends State<LoginScreen>
                     biometricType != null
                         ? ElevatedButton(
                           onPressed:
-                              isLoadingBiometrics ? null : loginWithBiometrics,
+                              isLoadingBiometrics
+                                  ? null
+                                  : () => loginWithBiometrics(authProvider),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             padding: EdgeInsets.all(10),

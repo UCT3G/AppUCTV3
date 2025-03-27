@@ -1,10 +1,17 @@
+import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_navigator.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -25,7 +32,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
     await Future.delayed(const Duration(milliseconds: 300));
 
-    AppNavigator.checkTokenAndUpdateRoute();
+    if (mounted) AppNavigator.checkTokenAndUpdateRoute(context);
   }
 
   @override
@@ -51,7 +58,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     } else if (state == AppLifecycleState.resumed) {
       if (wasPaused) {
         Future.delayed(Duration(milliseconds: 300), () {
-          AppNavigator.checkTokenAndUpdateRoute();
+          if (mounted) AppNavigator.checkTokenAndUpdateRoute(context);
         });
         wasPaused = false;
       }

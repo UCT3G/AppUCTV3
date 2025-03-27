@@ -1,46 +1,49 @@
+import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/services/auth_service.dart';
-import 'package:app_uct/services/token_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 class AppNavigator {
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
-  static Future<void> checkTokenAndUpdateRoute() async {
+  static Future<void> checkTokenAndUpdateRoute(BuildContext context) async {
     final navigator = navigatorKey.currentState;
 
     if (navigator == null) return;
 
-    final newRoute = await getInitialRoute();
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final newRoute = await getInitialRoute(authProvider);
     navigator.pushReplacementNamed(newRoute);
   }
 
-  static Future<String> getInitialRoute() async {
-    final accessToken = await TokenService.getAccessToken();
-    final refreshToken = await TokenService.getRefreshToken();
-
-    if (accessToken == null || refreshToken == null) {
+  static Future<String> getInitialRoute(AuthProvider authProvider) async {
+    if (authProvider.accessToken == null || authProvider.refreshToken == null) {
+      await authProvider.loadTokens();
       return AppRoutes.login;
     }
 
     final isAccessTokenValid = await AuthService.checkTokenValidity(
-      accessToken,
+      authProvider.accessToken!,
     );
     if (isAccessTokenValid) {
       return AppRoutes.home;
     }
 
     try {
-      final newAccessToken = await AuthService.refreshAccessToken(refreshToken);
+      final newAccessToken = await AuthService.refreshAccessToken(
+        authProvider.refreshToken!,
+        authProvider,
+      );
       if (newAccessToken != null) {
-        await TokenService.saveTokens(newAccessToken, refreshToken);
+        await authProvider.updateAccessToken(newAccessToken);
         return AppRoutes.home;
       }
     } catch (e) {
-      print('Error al renovar token: $e');
+      debugPrint('Error al renovar token: $e');
     }
-    await AuthService.logout();
+    await AuthService.logout(authProvider);
     return AppRoutes.login;
   }
 }

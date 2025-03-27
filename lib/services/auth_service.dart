@@ -1,4 +1,6 @@
+import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/services/biometric_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -18,19 +20,26 @@ class AuthService {
   static Future<Map<String, dynamic>> login(
     String username,
     String password,
+    AuthProvider authProvider,
   ) async {
     try {
       final encodeUsername = encodeBase64(username);
       final encodePassword = encodeBase64(password);
 
-      final response = await ApiService.post('USUARIO/LoginApp', {
-        'username': encodeUsername,
-        'password': encodePassword,
-      });
+      final url = Uri.parse('${ApiService.baseURL}/USUARIO/LoginApp');
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'username': encodeUsername,
+          'password': encodePassword,
+        }),
+      );
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        await TokenService.saveTokens(
+        await authProvider.saveTokens(
           responseData['access_token'],
           responseData['refresh_token'],
         );
@@ -46,27 +55,20 @@ class AuthService {
   }
 
   // METODO PARA INICIAR SESION CON BIOMETRICOS
-  Future<bool> loginWithBiometrics() async {
+  Future<bool> loginWithBiometrics(AuthProvider authProvider) async {
     try {
-      if (!await biometricService.isBiometricAvailable()) {
-        throw Exception('El dispositivo no soporta autenticación biométrica');
-      }
-
       if (!await TokenService.hasCredentials()) {
         throw Exception('No se encontraron credenciales guardadas');
       }
 
-      bool isAuthenticated = await localAuth.authenticate(
-        localizedReason: 'Por favor, autentícate para acceder',
-        options: const AuthenticationOptions(biometricOnly: true),
-      );
+      bool isAuthenticated = await biometricService.authenticate();
 
       if (isAuthenticated) {
         final username = await storage.read(key: 'username');
         final password = await storage.read(key: 'password');
 
         if (username != null && password != null) {
-          await login(username, password);
+          await login(username, password, authProvider);
           return true;
         } else {
           throw Exception('No se encontraron credenciales guardadas');
@@ -96,7 +98,7 @@ class AuthService {
   }
 
   // METODO PARA CERRAR SESION
-  static Future<void> logout() async {
+  static Future<void> logout(AuthProvider authProvider) async {
     await storage.delete(key: 'access_token');
     await storage.delete(key: 'refresh_token');
 
@@ -109,10 +111,15 @@ class AuthService {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('userData');
+
+    await authProvider.saveTokens("", "");
   }
 
   // METODO PARA RENOVAR EL ACCESS TOKEN
-  static Future<String?> refreshAccessToken(String refreshToken) async {
+  static Future<String?> refreshAccessToken(
+    String refreshToken,
+    AuthProvider authProvider,
+  ) async {
     try {
       final body = json.encode({'token': refreshToken});
 
@@ -126,14 +133,15 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        await authProvider.updateAccessToken(data['access_token']);
         await TokenService.saveUserData(data['data_user']);
         return data['access_token'];
       } else {
-        print('Error al renovar el token: ${response.statusCode}');
+        debugPrint('Error al renovar el token: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Error en la solicitud de renovación: $e');
+      debugPrint('Error en la solicitud de renovación: $e');
       return null;
     }
   }
@@ -141,9 +149,9 @@ class AuthService {
   // METODO PARA VERIFICAR SI EL ACCESS TOKEN ES VALIDO
   static Future<bool> checkTokenValidity(String accessToken) async {
     try {
-      final response = await ApiService.getToken(
-        'USUARIO/VerificarToken',
-        accessToken,
+      final response = await http.get(
+        Uri.parse('${ApiService.baseURL}/USUARIO/VerificarToken'),
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
       return response.statusCode == 200;
     } catch (e) {

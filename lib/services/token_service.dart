@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenService {
   static const storage = FlutterSecureStorage();
+  static String? _accessToken;
+  static String? _refreshToken;
 
   // METODO PARA GUARDAR LOS TOKENS EN EL ALMACENAMIENTO SEGURO
   static Future<void> saveTokens(
@@ -29,12 +31,14 @@ class TokenService {
 
   // METODO PARA OBTENER EL ACCESS TOKEN
   static Future<String?> getAccessToken() async {
-    return await storage.read(key: 'access_token');
+    _accessToken ??= await storage.read(key: 'access_token');
+    return _accessToken;
   }
 
   // METODO PARA OBTENER EL REFRESH TOKEN
   static Future<String?> getRefreshToken() async {
-    return await storage.read(key: 'refresh_token');
+    _refreshToken ??= await storage.read(key: 'refresh_token');
+    return _refreshToken;
   }
 
   static Future<bool> hasCredentials() async {
