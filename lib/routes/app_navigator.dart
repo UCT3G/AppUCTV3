@@ -28,7 +28,7 @@ class AppNavigator {
       authProvider.accessToken!,
     );
     if (isAccessTokenValid) {
-      return AppRoutes.home;
+      return AppRoutes.welcome;
     }
 
     try {
@@ -38,7 +38,7 @@ class AppNavigator {
       );
       if (newAccessToken != null) {
         await authProvider.updateAccessToken(newAccessToken);
-        return AppRoutes.home;
+        return AppRoutes.welcome;
       }
     } catch (e) {
       debugPrint('Error al renovar token: $e');

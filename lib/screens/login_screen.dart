@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen>
         await authProvider.updateRefreshToken(response['refresh_token']);
 
         if (mounted) {
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
+          Navigator.pushReplacementNamed(context, AppRoutes.welcome);
         }
       } else {
         if (mounted) {
@@ -139,8 +139,8 @@ class _LoginScreenState extends State<LoginScreen>
       Navigator.of(context, rootNavigator: true).pop();
 
       if (isAuthenticated) {
-        if (ModalRoute.of(context)?.settings.name != AppRoutes.home) {
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
+        if (ModalRoute.of(context)?.settings.name != AppRoutes.welcome) {
+          Navigator.pushReplacementNamed(context, AppRoutes.welcome);
         }
       } else {
         if (mounted) {

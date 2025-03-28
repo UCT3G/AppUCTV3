@@ -50,6 +50,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    debugPrint('Estado actual: $state');
+    debugPrint('Estado anterior: $previousAppState');
+    debugPrint('wasPaused: $wasPaused');
     if (state == AppLifecycleState.paused) {
       wasPaused = true;
       AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
