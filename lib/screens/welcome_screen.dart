@@ -1,7 +1,10 @@
+import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
+import 'package:app_uct/services/course_service.dart';
 import 'package:app_uct/widgets/painter_welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -16,10 +19,32 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   late Animation<double> animation1;
   late AnimationController controller2;
   late Animation<double> animation2;
+  String comentario = "";
+  Map<String, dynamic>? ultimaCompetencia;
+
+  Future<void> loadCompetencia() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final accessToken = authProvider.accessToken;
+
+    try {
+      final competenciaData = await CourseService.getCompetenciaActual(
+        accessToken!,
+      );
+      print('ESTA ES LA COMPETENCIA: $competenciaData');
+
+      setState(() {
+        comentario = competenciaData['comentario'];
+        ultimaCompetencia = competenciaData['ultima_competencia'];
+      });
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    loadCompetencia();
 
     controller1 = AnimationController(
       vsync: this,
@@ -169,76 +194,103 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 8),
-                      Text(
-                        "Tienes una competencia pendiente:",
-                        style: TextStyle(
-                          color: Color(0xFF4D4D4D),
-                          fontSize: screenSize.height * 0.025,
-                          height: 1.0,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                        ), // Para evitar que se corte el texto
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: screenSize.width * 0.8,
-                          ),
-                          child: Text(
-                            "'Aplicación de un Check para aumentar la Eficiencia Operacional'",
-                            style: TextStyle(
-                              color: Color(0xFF4D4D4D),
-                              fontSize: screenSize.height * 0.025,
-                              fontStyle: FontStyle.italic,
-                              height: 1.2,
+                      if (comentario == 'No hay competencias pendientes.')
+                        Column(
+                          children: [
+                            Text(
+                              "No hay competencias pendientes.",
+                              style: TextStyle(
+                                color: Color(0xFF4D4D4D),
+                                fontSize: screenSize.height * 0.025,
+                                height: 1.0,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                            maxLines: 4,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                            SizedBox(height: 50),
+                          ],
                         ),
-                      ),
-                      SizedBox(height: 50),
-                      SizedBox(
-                        width: screenSize.width * 0.4,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              AppRoutes.home,
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                      if (comentario ==
+                              'Curso actual obtenido correctamente.' ||
+                          comentario == 'Curso nuevo obtenido correctamente.')
+                        Column(
+                          children: [
+                            Text(
+                              comentario ==
+                                      'Curso actual obtenido correctamente.'
+                                  ? "Estás trabajando en:"
+                                  : "Tienes una competencia pendiente:",
+                              style: TextStyle(
+                                color: Color(0xFF4D4D4D),
+                                fontSize: screenSize.height * 0.025,
+                                height: 1.0,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Ink(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color(0xFF86CBC8),
-                                    Color(0xFF574293),
-                                  ],
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                              ), // Para evitar que se corte el texto
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: screenSize.width * 0.8,
                                 ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 12),
-                                alignment: Alignment.center,
-                                child: Text('Continuar'),
+                                child: Text(
+                                  ultimaCompetencia?['titulo_curso'] ?? '',
+                                  style: TextStyle(
+                                    color: Color(0xFF4D4D4D),
+                                    fontSize: screenSize.height * 0.025,
+                                    fontStyle: FontStyle.italic,
+                                    height: 1.2,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
-                          ),
+                            SizedBox(height: 50),
+                            SizedBox(
+                              width: screenSize.width * 0.4,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    AppRoutes.home,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  padding: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Ink(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color(0xFF86CBC8),
+                                          Color(0xFF574293),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 12,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text('Continuar'),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                          ],
                         ),
-                      ),
-                      SizedBox(height: 10),
                       SizedBox(
                         width: screenSize.width * 0.4,
                         child: ElevatedButton(
