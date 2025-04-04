@@ -198,11 +198,21 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         Column(
                           children: [
                             Text(
-                              "No hay competencias pendientes.",
+                              "¡FELICIDADES! No tienes competencias pendientes.",
                               style: TextStyle(
                                 color: Color(0xFF4D4D4D),
                                 fontSize: screenSize.height * 0.025,
                                 height: 1.0,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              'Tu aprendizaje no termina aquí. Revisa la app periódicamente para nuevos contenidos.',
+                              style: TextStyle(
+                                color: Color(0xFF4D4D4D),
+                                fontSize: screenSize.height * 0.025,
+                                fontStyle: FontStyle.italic,
+                                height: 1.2,
                               ),
                               textAlign: TextAlign.center,
                             ),
