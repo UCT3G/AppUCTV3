@@ -2,14 +2,14 @@
 // import 'dart:convert';
 
 class ApiService {
-  // static const String baseURL = 'http://10.10.31.18:8000';
+  static const String baseURL = 'http://10.10.31.18:8000';
   // static const String baseURL = 'http://172.29.16.1:8000';
   // static const String baseURL = 'http://10.10.47.189:8000';
   // static const String baseURL = 'http://192.168.1.231:8000';
   // static const String baseURL = 'http://192.168.1.189:8000';
   // static const String baseURL = 'http://192.168.137.1:8000';
   // static const String baseURL = 'http://10.10.31.18:8000';
-  static const String baseURL = 'http://192.168.1.124:8000';
+  // static const String baseURL = 'http://192.168.1.124:8000';
 
   // METODO PARA HACER SOLICITUDES GET
   // static Future<http.Response> get(String endpoint) async {
