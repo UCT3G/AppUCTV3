@@ -265,7 +265,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 onPressed: () {
                                   Navigator.pushReplacementNamed(
                                     context,
-                                    AppRoutes.home,
+                                    AppRoutes.temario,
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(

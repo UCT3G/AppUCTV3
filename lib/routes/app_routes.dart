@@ -3,6 +3,7 @@ import 'package:app_uct/screens/content/video_screen.dart';
 import 'package:app_uct/screens/home_screen.dart';
 import 'package:app_uct/screens/login_screen.dart';
 import 'package:app_uct/screens/splash_screen.dart';
+import 'package:app_uct/screens/temario_screen.dart';
 import 'package:app_uct/screens/welcome_screen.dart';
 import 'package:flutter/widgets.dart';
 
@@ -13,6 +14,7 @@ class AppRoutes {
   static const String welcome = '/welcome';
   static const String interactive = '/interactive-content';
   static const String video = '/video-content';
+  static const String temario = '/temario';
 
   static final routes = {
     login: (context) => LoginScreen(),
@@ -29,5 +31,6 @@ class AppRoutes {
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       return VideoScreen(tema: tema);
     },
+    temario: (context) => TemarioScreen(),
   };
 }
