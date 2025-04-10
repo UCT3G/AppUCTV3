@@ -1,5 +1,6 @@
 import 'package:app_uct/widgets/flull_text_temario.dart';
 import 'package:app_uct/widgets/normal_view_temario.dart';
+import 'package:app_uct/widgets/road_segment.dart';
 import 'package:flutter/material.dart';
 import 'package:app_uct/widgets/painter_temario.dart';
 
@@ -12,12 +13,6 @@ class TemarioScreen extends StatefulWidget {
 
 class _TemarioScreenState extends State<TemarioScreen> {
   bool showFullText = false;
-  final List<String> competencias = [
-    "ISO 27001",
-    "Seguridad de la información",
-    "Protección de datos",
-    "Auditoría de sistemas",
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +28,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
             child: Column(
               children: [
                 SizedBox(height: gradientHeight + 20),
-                RoadSegment(type: SegmentType.start),
-
-                // 🧩 Curvas intermedias
-                ...List.generate(competencias.length, (index) {
-                  final isEven = index % 2 == 0;
-                  return RoadSegment(
-                    type: isEven ? SegmentType.left : SegmentType.right,
-                    title: competencias[index],
-                  );
-                }),
-
-                // 🏁 Carretera de final
-                RoadSegment(type: SegmentType.end),
+                ...buildRoadSegments(),
               ],
             ),
           ),
@@ -133,45 +116,83 @@ class _TemarioScreenState extends State<TemarioScreen> {
   }
 }
 
-enum SegmentType { start, left, right, end }
+enum SegmentType { start, left, right, endLeft, endRight }
 
-class RoadSegment extends StatelessWidget {
-  final SegmentType type;
-  final String? title;
+List<Widget> buildRoadSegments() {
+  List<Widget> segments = [];
+  bool nextCurveIsLeft = true;
+  int totalTemas = 0;
 
-  const RoadSegment({required this.type, this.title});
+  final unidades = [
+    {
+      "id_unidad": 1103,
+      "titulo": "Antecedentes del servicio",
+      "orden": 1,
+      "temas": [
+        {
+          "id_tema": 3735,
+          "titulo": "Bienvenida del Director",
+          "descripcion": "Descripcion del tema",
+          "orden": 1,
+        },
+        {
+          "id_tema": 3736,
+          "titulo": "Bienvenida y presentación",
+          "descripcion": "Descripcion del tema",
+          "orden": 2,
+        },
+        {
+          "id_tema": 3737,
+          "titulo": "Por que ADN del Servicio Tresguerras",
+          "descripcion": "Descripcion del tema",
+          "orden": 3,
+        },
+      ],
+      "id_curso_fk": 1012,
+    },
+    {
+      "id_unidad": 1104,
+      "titulo": "Atención de Excelencia",
+      "orden": 2,
+      "temas": [
+        {
+          "id_tema": 3747,
+          "titulo": "5 elementos de una empresa exitosa",
+          "descripcion": "Descripcion del tema",
+          "orden": 1,
+        },
+      ],
+      "id_curso_fk": 1012,
+    },
+  ];
 
-  String get assetPath {
-    switch (type) {
-      case SegmentType.start:
-        return 'assets/images/CarreteraInicio.png';
-      case SegmentType.left:
-        return 'assets/images/CarreteraDerecha.png';
-      case SegmentType.right:
-        return 'assets/images/CarreteraIzquierda.png';
-      case SegmentType.end:
-        return 'assets/images/CarreteraFinal.png';
+  for (var unidad in unidades) {
+    totalTemas += (unidad['temas'] as List).length;
+  }
+
+  bool isTotalPar = totalTemas % 2 == 0;
+
+  for (var unidad in unidades) {
+    final temas = unidad['temas'] as List; // Accede como mapa
+    for (var tema in temas) {
+      SegmentType type;
+      if (segments.isEmpty) {
+        type = SegmentType.start;
+      } else if (unidad == unidades.last && tema == temas.last) {
+        print('CURVA IZQUIERDA: $nextCurveIsLeft');
+        type = isTotalPar ? SegmentType.endLeft : SegmentType.endRight;
+      } else {
+        type = nextCurveIsLeft ? SegmentType.left : SegmentType.right;
+        nextCurveIsLeft = !nextCurveIsLeft;
+      }
+      segments.add(
+        RoadSegment(
+          type: type,
+          titulo: tema['titulo'] as String, // Accede como mapa
+        ),
+      );
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Image.asset(assetPath, fit: BoxFit.cover, width: double.infinity),
-        if (title != null)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 60),
-            child: Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(title!, style: TextStyle(fontSize: 16)),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
+  return segments;
 }
