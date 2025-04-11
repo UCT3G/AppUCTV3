@@ -28,6 +28,11 @@ class _TemarioScreenState extends State<TemarioScreen> {
             child: Column(
               children: [
                 SizedBox(height: gradientHeight + 20),
+                Image.asset(
+                  'assets/images/Lineainicio.png',
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
                 ...buildRoadSegments(),
               ],
             ),
@@ -94,7 +99,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
                           });
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 25),
+                          padding: EdgeInsets.only(right: 25),
                           child: AnimatedSwitcher(
                             duration: Duration(microseconds: 300),
                             child:
@@ -143,7 +148,8 @@ List<Widget> buildRoadSegments() {
         },
         {
           "id_tema": 3737,
-          "titulo": "Por que ADN del Servicio Tresguerras",
+          "titulo":
+              "TEMA 1 PRES POLÍTICAS Y REGLAMENTO PARA UNIDADES DE REPARTO - ESTIBADOR DE CAMIONETA",
           "descripcion": "Descripcion del tema",
           "orden": 3,
         },
@@ -158,6 +164,20 @@ List<Widget> buildRoadSegments() {
         {
           "id_tema": 3747,
           "titulo": "5 elementos de una empresa exitosa",
+          "descripcion": "Descripcion del tema",
+          "orden": 1,
+        },
+      ],
+      "id_curso_fk": 1012,
+    },
+    {
+      "id_unidad": 1104,
+      "titulo": "Atención de Excelencia",
+      "orden": 2,
+      "temas": [
+        {
+          "id_tema": 3747,
+          "titulo": "PRES COMUNICACIÓN - ASISTENTE RECURSOS HUMANOS/CALIDAD",
           "descripcion": "Descripcion del tema",
           "orden": 1,
         },

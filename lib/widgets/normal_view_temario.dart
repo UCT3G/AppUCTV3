@@ -4,13 +4,11 @@ Widget buildNormalView(Size screenSize) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.end,
     children: [
-      SizedBox(
+      Image.asset(
+        "assets/images/Yowi2.png",
         width: screenSize.width * 0.35,
-        child: Image.asset(
-          "assets/images/Yowi.png",
-          width: screenSize.width * 0.35,
-          height: screenSize.width * 0.35,
-        ),
+        height: screenSize.width * 0.35,
+        alignment: Alignment.centerLeft,
       ),
       SizedBox(width: 10),
       Expanded(
