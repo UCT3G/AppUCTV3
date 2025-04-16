@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 
 class BiometricService {
-  final LocalAuthentication localAuthentication = LocalAuthentication();
+  final LocalAuthentication _localAuthentication = LocalAuthentication();
 
   // METODO QUE VERIFICA SI EL DISPOSITIVO SOPORTA AUTENTICACION BIOMETRICA
   Future<bool> isBiometricAvailable() async {
-    bool canCheck = await localAuthentication.canCheckBiometrics;
+    bool canCheck = await _localAuthentication.canCheckBiometrics;
     List<BiometricType> availableBiometrics =
-        await localAuthentication.getAvailableBiometrics();
+        await _localAuthentication.getAvailableBiometrics();
     return canCheck && availableBiometrics.isNotEmpty;
   }
 
@@ -18,7 +18,7 @@ class BiometricService {
       if (!await isBiometricAvailable()) {
         throw Exception('El dispositivo no tiene biometría configurada');
       }
-      return await localAuthentication.authenticate(
+      return await _localAuthentication.authenticate(
         localizedReason: 'Por favor, autentícate para acceder',
         options: const AuthenticationOptions(biometricOnly: true),
       );
@@ -31,7 +31,7 @@ class BiometricService {
   // METODO PARA OBTENER LA LISTA DE TIPOS DE AUTENTICACION BIOMETRICA
   Future<List<BiometricType>> getAvailableBiometrics() async {
     try {
-      return await localAuthentication.getAvailableBiometrics();
+      return await _localAuthentication.getAvailableBiometrics();
     } catch (e) {
       debugPrint('Error al obtener biométricos: $e');
       return [];

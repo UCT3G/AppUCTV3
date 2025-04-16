@@ -8,12 +8,10 @@ import 'package:app_uct/services/api_service.dart';
 import 'package:app_uct/services/token_service.dart';
 import 'package:app_uct/utils/utils.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static final storage = FlutterSecureStorage();
-  static final localAuth = LocalAuthentication();
+  static final _storage = FlutterSecureStorage();
   final BiometricService biometricService = BiometricService();
 
   // METODO PARA INICIAR SESION
@@ -64,8 +62,8 @@ class AuthService {
       bool isAuthenticated = await biometricService.authenticate();
 
       if (isAuthenticated) {
-        final username = await storage.read(key: 'username');
-        final password = await storage.read(key: 'password');
+        final username = await _storage.read(key: 'username');
+        final password = await _storage.read(key: 'password');
 
         if (username != null && password != null) {
           await login(username, password, authProvider);
@@ -83,30 +81,30 @@ class AuthService {
 
   // METODO PARA HABILITAR LA AUTENTICACION BIOMETRICA
   static Future<void> enableBiometricAuth() async {
-    await storage.write(key: 'biometric_auth_enabled', value: 'true');
+    await _storage.write(key: 'biometric_auth_enabled', value: 'true');
   }
 
   // METODO PARA DESHABILITAR LA AUTENTICACION BIOMETRICA
   static Future<void> disableBiometricAuth() async {
-    await storage.write(key: 'biometric_auth_enabled', value: 'false');
+    await _storage.write(key: 'biometric_auth_enabled', value: 'false');
   }
 
   // METODO PARA VERIFICAR SI LA AUTENTICACION BIOMETRICA ESTA HABILITADA
   static Future<bool> isBiometricAuthEnabled() async {
-    final value = await storage.read(key: 'biometric_auth_enabled');
+    final value = await _storage.read(key: 'biometric_auth_enabled');
     return value == 'true';
   }
 
   // METODO PARA CERRAR SESION
   static Future<void> logout(AuthProvider authProvider) async {
-    await storage.delete(key: 'access_token');
-    await storage.delete(key: 'refresh_token');
+    await _storage.delete(key: 'access_token');
+    await _storage.delete(key: 'refresh_token');
 
     final isEnabled = await isBiometricAuthEnabled();
 
     if (!isEnabled) {
-      await storage.delete(key: 'username');
-      await storage.delete(key: 'password');
+      await _storage.delete(key: 'username');
+      await _storage.delete(key: 'password');
     }
 
     final prefs = await SharedPreferences.getInstance();

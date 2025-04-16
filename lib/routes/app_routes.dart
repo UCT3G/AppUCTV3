@@ -1,3 +1,4 @@
+import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/screens/content/interactive_screen.dart';
 import 'package:app_uct/screens/content/video_screen.dart';
 import 'package:app_uct/screens/home_screen.dart';
@@ -27,10 +28,13 @@ class AppRoutes {
       return InteractiveScreen(tema: tema);
     },
     video: (context) {
-      final tema =
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
       return VideoScreen(tema: tema);
     },
-    temario: (context) => TemarioScreen(),
+    temario: (context) {
+      final curso =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      return TemarioScreen(curso: curso);
+    },
   };
 }

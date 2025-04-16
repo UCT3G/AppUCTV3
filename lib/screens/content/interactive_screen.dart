@@ -13,14 +13,14 @@ class InteractiveScreen extends StatefulWidget {
 }
 
 class _InteractiveScreenState extends State<InteractiveScreen> {
-  late final WebViewController webViewController;
-  bool isLoading = true;
+  late final WebViewController _webViewController;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
 
-    webViewController =
+    _webViewController =
         WebViewController()
           ..setJavaScriptMode(JavaScriptMode.unrestricted)
           ..setNavigationDelegate(
@@ -30,12 +30,12 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
               },
               onPageStarted: (String url) {
                 setState(() {
-                  isLoading = true;
+                  _isLoading = true;
                 });
               },
               onPageFinished: (String url) {
                 setState(() {
-                  isLoading = false;
+                  _isLoading = false;
                 });
               },
               onWebResourceError: (WebResourceError error) {
@@ -61,8 +61,8 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
       ),
       body: Stack(
         children: [
-          WebViewWidget(controller: webViewController),
-          if (isLoading) const Center(child: CircularProgressIndicator()),
+          WebViewWidget(controller: _webViewController),
+          if (_isLoading) const Center(child: CircularProgressIndicator()),
         ],
       ),
     );

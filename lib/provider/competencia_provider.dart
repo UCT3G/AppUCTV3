@@ -1,0 +1,39 @@
+import 'package:app_uct/models/unidad_model.dart';
+import 'package:app_uct/services/course_service.dart';
+import 'package:flutter/material.dart';
+
+class CompetenciaProvider with ChangeNotifier {
+  List<Unidad> _unidades = [];
+  bool _loading = false;
+  String _error = '';
+
+  List<Unidad> get unidades => _unidades;
+  bool get loading => _loading;
+  String get error => _error;
+
+  // static const List<List<Color>> _predefinedGradients = [
+  //   [Color(0xFF574293), Color(0xFF86CBC8)],
+  //   [Color(0xFF05696E), Color(0xFF6DB75E)],
+  //   [Color(0xFFF6A431), Color(0xFFCC151A)],
+  //   [Color(0xFF7B2884), Color(0xFF7C8AC4)],
+  // ];
+
+  Future<void> fetchTemario(int idCurso, String accesToken) async {
+    if (_loading) return;
+
+    _loading = true;
+    // notifyListeners();
+
+    try {
+      final response = await CourseService.getTemario(idCurso, accesToken);
+      _unidades = response.map((json) => Unidad.fromJson(json)).toList();
+      _error = '';
+    } catch (e) {
+      _error = 'Error al cargar el temario: ${e.toString()}';
+      _unidades = [];
+    } finally {
+      _loading = false;
+      // notifyListeners();
+    }
+  }
+}

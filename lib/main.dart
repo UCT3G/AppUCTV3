@@ -1,4 +1,5 @@
 import 'package:app_uct/provider/auth_provider.dart';
+import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_navigator.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => CompetenciaProvider()),
+      ],
       child: MyApp(),
     ),
   );

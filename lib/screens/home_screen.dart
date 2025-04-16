@@ -9,7 +9,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> temas = [
+    final List<Map<String, dynamic>> _temas = [
       {
         'titulo': 'Interactivo HTML',
         'tipo': 'INTERACTIVO',
@@ -40,9 +40,9 @@ class HomeScreen extends StatelessWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(15.0),
-        itemCount: temas.length,
+        itemCount: _temas.length,
         itemBuilder: (context, index) {
-          final tema = temas[index];
+          final tema = _temas[index];
           return Card(
             elevation: 4,
             margin: const EdgeInsets.only(bottom: 15),

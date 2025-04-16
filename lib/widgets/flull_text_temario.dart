@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 
-Widget buildFullText() {
+Widget buildFullText(String titulo) {
   return Container(
-    padding: EdgeInsets.only(bottom: 20),
+    padding: EdgeInsets.only(bottom: 20, left: 20),
     child: Text(
-      'FACULTAD DE CAMIONETAS - ESTIBADORES Y OPERADORES DE CAMIONETA (ALINEACIÓN)'
-          .toUpperCase(),
+      titulo.toUpperCase(),
       textAlign: TextAlign.center,
       style: TextStyle(
         color: Colors.white,
-        fontSize: 25,
+        fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
     ),

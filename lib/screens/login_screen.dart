@@ -18,22 +18,22 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
-  late AnimationController controller1;
-  late Animation<double> animation1;
-  late AnimationController controller2;
-  late Animation<double> animation2;
-  late AnimationController controller3;
-  late Animation<double> animation3;
-  final AuthService authService = AuthService();
-  BiometricType? biometricType;
-  Future<BiometricType?>? biometricTypeFuture;
+  late AnimationController _controller1;
+  late Animation<double> _animation1;
+  late AnimationController _controller2;
+  late Animation<double> _animation2;
+  late AnimationController _controller3;
+  late Animation<double> _animation3;
+  final AuthService _authService = AuthService();
+  BiometricType? _biometricType;
+  Future<BiometricType?>? _biometricTypeFuture;
 
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
-  bool isLoadingCredentials = false;
-  bool isLoadingBiometrics = false;
-  bool isBiometricAvailable = false;
-  bool hasStoredCredentials = false;
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoadingCredentials = false;
+  bool _isLoadingBiometrics = false;
+  bool _isBiometricAvailable = false;
+  bool _hasStoredCredentials = false;
 
   AuthProvider get authProvider =>
       Provider.of<AuthProvider>(context, listen: false);
@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen>
     }
 
     setState(() {
-      isLoadingCredentials = true;
+      _isLoadingCredentials = true;
     });
 
     showDialog(
@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen>
         final isBiometricAuthEnabled =
             await AuthService.isBiometricAuthEnabled();
 
-        if (!isBiometricAuthEnabled && isBiometricAvailable) {
+        if (!isBiometricAuthEnabled && _isBiometricAvailable) {
           await showSaveCredentialsDialog();
         }
 
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen>
     } finally {
       if (mounted) {
         setState(() {
-          isLoadingCredentials = false;
+          _isLoadingCredentials = false;
         });
       }
     }
@@ -111,17 +111,17 @@ class _LoginScreenState extends State<LoginScreen>
   // METODO PARA VERIFICAR SI EL DISPOSITIVO SOPORTA AUTENTICACION BIOMETRICA
   Future<void> checkBiometricAvailability() async {
     bool isAvailable =
-        await authService.biometricService.isBiometricAvailable();
+        await _authService.biometricService.isBiometricAvailable();
 
     setState(() {
-      isBiometricAvailable = isAvailable;
+      _isBiometricAvailable = isAvailable;
     });
   }
 
   // METODO PARA INICIAR SESION CON BIOMETRICOS
   Future<void> loginWithBiometrics(AuthProvider authProvider) async {
     setState(() {
-      isLoadingBiometrics = true;
+      _isLoadingBiometrics = true;
     });
 
     showDialog(
@@ -131,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     try {
-      bool isAuthenticated = await authService.loginWithBiometrics(
+      bool isAuthenticated = await _authService.loginWithBiometrics(
         authProvider,
       );
 
@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen>
     } finally {
       if (mounted) {
         setState(() {
-          isLoadingBiometrics = false;
+          _isLoadingBiometrics = false;
         });
       }
     }
@@ -170,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen>
   Future<void> checkStoredCredentials() async {
     bool hasCredentials = await TokenService.hasCredentials();
     setState(() {
-      hasStoredCredentials = hasCredentials;
+      _hasStoredCredentials = hasCredentials;
     });
   }
 
@@ -216,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen>
   Future<BiometricType?> getPrimaryBiometricType() async {
     try {
       final availableBiometrics =
-          await authService.biometricService.getAvailableBiometrics();
+          await _authService.biometricService.getAvailableBiometrics();
 
       if (availableBiometrics.contains(BiometricType.face)) {
         return BiometricType.face;
@@ -238,8 +238,8 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Future<void> loadBiometricType() async {
-    biometricTypeFuture = getPrimaryBiometricType();
-    biometricType = await biometricTypeFuture;
+    _biometricTypeFuture = getPrimaryBiometricType();
+    _biometricType = await _biometricTypeFuture;
     if (mounted) {
       setState(() {});
     }
@@ -249,35 +249,35 @@ class _LoginScreenState extends State<LoginScreen>
   void initState() {
     super.initState();
 
-    controller1 = AnimationController(
+    _controller1 = AnimationController(
       vsync: this,
       duration: Duration(seconds: 20),
     );
-    animation1 = Tween<double>(begin: -100, end: 500).animate(controller1)
+    _animation1 = Tween<double>(begin: -100, end: 500).animate(_controller1)
       ..addListener(() {
         setState(() {});
       });
-    controller1.repeat();
+    _controller1.repeat();
 
-    controller2 = AnimationController(
+    _controller2 = AnimationController(
       vsync: this,
       duration: Duration(seconds: 60),
     );
-    animation2 = Tween<double>(begin: -100, end: 500).animate(controller2)
+    _animation2 = Tween<double>(begin: -100, end: 500).animate(_controller2)
       ..addListener(() {
         setState(() {});
       });
-    controller2.repeat();
+    _controller2.repeat();
 
-    controller3 = AnimationController(
+    _controller3 = AnimationController(
       vsync: this,
       duration: Duration(seconds: 30),
     );
-    animation3 = Tween<double>(begin: -100, end: 500).animate(controller3)
+    _animation3 = Tween<double>(begin: -100, end: 500).animate(_controller3)
       ..addListener(() {
         setState(() {});
       });
-    controller3.repeat();
+    _controller3.repeat();
 
     checkStoredCredentials();
     checkBiometricAvailability();
@@ -286,9 +286,9 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void dispose() {
-    controller1.dispose();
-    controller2.dispose();
-    controller3.dispose();
+    _controller1.dispose();
+    _controller2.dispose();
+    _controller3.dispose();
     super.dispose();
   }
 
@@ -316,7 +316,7 @@ class _LoginScreenState extends State<LoginScreen>
           Positioned.fill(child: CustomPaint(painter: WavePainter())),
           Positioned(
             top: screenHeight * 0.05,
-            right: animation1.value,
+            right: _animation1.value,
             child: Image.asset(
               "assets/images/lil_claud.png",
               width: screenWidth * 0.2,
@@ -324,7 +324,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           Positioned(
             top: screenHeight * 0.25,
-            left: animation2.value,
+            left: _animation2.value,
             child: Image.asset(
               "assets/images/big_claud.png",
               width: screenWidth * 0.5,
@@ -332,7 +332,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           Positioned(
             top: screenHeight * 0.4,
-            right: animation3.value,
+            right: _animation3.value,
             child: Image.asset(
               "assets/images/medium_claud.png",
               width: screenWidth * 0.4,
@@ -356,7 +356,7 @@ class _LoginScreenState extends State<LoginScreen>
                   FractionallySizedBox(
                     widthFactor: 0.8,
                     child: TextFormField(
-                      controller: usernameController,
+                      controller: _usernameController,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -395,7 +395,7 @@ class _LoginScreenState extends State<LoginScreen>
                   FractionallySizedBox(
                     widthFactor: 0.8,
                     child: TextFormField(
-                      controller: passwordController,
+                      controller: _passwordController,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -434,11 +434,11 @@ class _LoginScreenState extends State<LoginScreen>
                   SizedBox(height: screenHeight * 0.04),
                   ElevatedButton(
                     onPressed:
-                        isLoadingCredentials
+                        _isLoadingCredentials
                             ? null
                             : () => login(
-                              usernameController.text,
-                              passwordController.text,
+                              _usernameController.text,
+                              _passwordController.text,
                               authProvider,
                             ),
                     style: ElevatedButton.styleFrom(
@@ -452,7 +452,7 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                     ),
                     child:
-                        isLoadingCredentials
+                        _isLoadingCredentials
                             ? CircularProgressIndicator()
                             : Text(
                               'Ingresar',
@@ -463,11 +463,11 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                   ),
                   SizedBox(height: screenHeight * 0.04),
-                  if (isBiometricAvailable && hasStoredCredentials)
-                    biometricType != null
+                  if (_isBiometricAvailable && _hasStoredCredentials)
+                    _biometricType != null
                         ? ElevatedButton(
                           onPressed:
-                              isLoadingBiometrics
+                              _isLoadingBiometrics
                                   ? null
                                   : () => loginWithBiometrics(authProvider),
                           style: ElevatedButton.styleFrom(
@@ -478,14 +478,14 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                           ),
                           child:
-                              isLoadingBiometrics
+                              _isLoadingBiometrics
                                   ? CircularProgressIndicator()
                                   : Column(
                                     children: [
                                       Icon(
-                                        biometricType == BiometricType.face
+                                        _biometricType == BiometricType.face
                                             ? Icons.face
-                                            : biometricType ==
+                                            : _biometricType ==
                                                 BiometricType.iris
                                             ? Icons.remove_red_eye
                                             : Icons.fingerprint,
@@ -494,9 +494,9 @@ class _LoginScreenState extends State<LoginScreen>
                                       ),
                                       SizedBox(height: 5),
                                       Text(
-                                        biometricType == BiometricType.face
+                                        _biometricType == BiometricType.face
                                             ? 'Reconocimiento facial'
-                                            : biometricType ==
+                                            : _biometricType ==
                                                 BiometricType.iris
                                             ? 'Reconocimiento de iris'
                                             : 'Huella dactilar',

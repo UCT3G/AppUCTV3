@@ -15,12 +15,12 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen>
     with TickerProviderStateMixin {
-  late AnimationController controller1;
-  late Animation<double> animation1;
-  late AnimationController controller2;
-  late Animation<double> animation2;
-  String comentario = "";
-  Map<String, dynamic>? ultimaCompetencia;
+  late AnimationController _controller1;
+  late Animation<double> _animation1;
+  late AnimationController _controller2;
+  late Animation<double> _animation2;
+  String _comentario = "";
+  Map<String, dynamic>? _ultimaCompetencia;
 
   Future<void> loadCompetencia() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -33,8 +33,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       print('ESTA ES LA COMPETENCIA: $competenciaData');
 
       setState(() {
-        comentario = competenciaData['comentario'];
-        ultimaCompetencia = competenciaData['ultima_competencia'];
+        _comentario = competenciaData['comentario'];
+        _ultimaCompetencia = competenciaData['ultima_competencia'];
       });
     } catch (e) {
       debugPrint('Error: $e');
@@ -46,33 +46,33 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.initState();
     loadCompetencia();
 
-    controller1 = AnimationController(
+    _controller1 = AnimationController(
       vsync: this,
       duration: Duration(seconds: 20),
     );
 
-    animation1 = Tween<double>(begin: -100, end: 500).animate(controller1)
+    _animation1 = Tween<double>(begin: -100, end: 500).animate(_controller1)
       ..addListener(() {
         setState(() {});
       });
-    controller1.repeat();
+    _controller1.repeat();
 
-    controller2 = AnimationController(
+    _controller2 = AnimationController(
       vsync: this,
       duration: Duration(seconds: 30),
     );
 
-    animation2 = Tween<double>(begin: -100, end: 500).animate(controller2)
+    _animation2 = Tween<double>(begin: -100, end: 500).animate(_controller2)
       ..addListener(() {
         setState(() {});
       });
-    controller2.repeat();
+    _controller2.repeat();
   }
 
   @override
   void dispose() {
-    controller1.dispose();
-    controller2.dispose();
+    _controller1.dispose();
+    _controller2.dispose();
     super.dispose();
   }
 
@@ -86,7 +86,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           Positioned.fill(child: CustomPaint(painter: PainterWelcome())),
           Positioned(
             top: screenSize.height * 0.05,
-            right: animation1.value,
+            right: _animation1.value,
             child: Image.asset(
               "assets/images/lil_claud.png",
               width: screenSize.width * 0.2,
@@ -94,7 +94,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           ),
           Positioned(
             top: screenSize.height * 0.2,
-            left: animation2.value,
+            left: _animation2.value,
             child: Image.asset(
               "assets/images/medium_claud.png",
               width: screenSize.width * 0.4,
@@ -194,7 +194,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 8),
-                      if (comentario == 'No hay competencias pendientes.')
+                      if (_comentario == 'No hay competencias pendientes.')
                         Column(
                           children: [
                             Text(
@@ -219,13 +219,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             SizedBox(height: 50),
                           ],
                         ),
-                      if (comentario ==
+                      if (_comentario ==
                               'Curso actual obtenido correctamente.' ||
-                          comentario == 'Curso nuevo obtenido correctamente.')
+                          _comentario == 'Curso nuevo obtenido correctamente.')
                         Column(
                           children: [
                             Text(
-                              comentario ==
+                              _comentario ==
                                       'Curso actual obtenido correctamente.'
                                   ? "Estás trabajando en:"
                                   : "Tienes una competencia pendiente:",
@@ -245,7 +245,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   maxWidth: screenSize.width * 0.8,
                                 ),
                                 child: Text(
-                                  ultimaCompetencia?['titulo_curso'] ?? '',
+                                  _ultimaCompetencia?['titulo_curso'] ?? '',
                                   style: TextStyle(
                                     color: Color(0xFF4D4D4D),
                                     fontSize: screenSize.height * 0.025,
@@ -266,6 +266,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   Navigator.pushReplacementNamed(
                                     context,
                                     AppRoutes.temario,
+                                    arguments: _ultimaCompetencia,
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(

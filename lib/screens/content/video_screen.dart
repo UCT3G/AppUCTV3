@@ -1,9 +1,10 @@
+import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoScreen extends StatefulWidget {
-  final Map<String, dynamic> tema;
+  final Tema tema;
 
   const VideoScreen({super.key, required this.tema});
 
@@ -12,24 +13,26 @@ class VideoScreen extends StatefulWidget {
 }
 
 class _VideoScreenState extends State<VideoScreen> {
-  late VideoPlayerController controller;
+  late VideoPlayerController _controller;
   late Future<void> initializeVideoPlayerFuture;
 
   @override
   void initState() {
     super.initState();
 
-    final videoURL = Uri.parse('${ApiService.baseURL}/video/1061/1163/4103');
+    final videoURL = Uri.parse(
+      '${ApiService.baseURL}/video/${widget.tema.idCurso}/${widget.tema.idUnidad}/${widget.tema.idTema}',
+    );
 
-    controller = VideoPlayerController.networkUrl(videoURL);
-    initializeVideoPlayerFuture = controller.initialize().then((_) {
+    _controller = VideoPlayerController.networkUrl(videoURL);
+    initializeVideoPlayerFuture = _controller.initialize().then((_) {
       setState(() {});
     });
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -37,7 +40,7 @@ class _VideoScreenState extends State<VideoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.tema['titulo']),
+        title: Text(widget.tema.titulo),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
@@ -48,8 +51,8 @@ class _VideoScreenState extends State<VideoScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: VideoPlayer(controller),
+              aspectRatio: _controller.value.aspectRatio,
+              child: VideoPlayer(_controller),
             );
           } else {
             return const Center(child: CircularProgressIndicator());
@@ -59,15 +62,15 @@ class _VideoScreenState extends State<VideoScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            if (controller.value.isPlaying) {
-              controller.pause();
+            if (_controller.value.isPlaying) {
+              _controller.pause();
             } else {
-              controller.play();
+              _controller.play();
             }
           });
         },
         child: Icon(
-          controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
         ),
       ),
     );

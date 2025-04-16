@@ -1,20 +1,43 @@
+import 'dart:math';
+
+import 'package:app_uct/models/tema_model.dart';
+import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/screens/temario_screen.dart';
 import 'package:flutter/material.dart';
 
 class RoadSegment extends StatefulWidget {
   final SegmentType type;
-  final String titulo;
+  final Tema tema;
+  final bool esSiguienteTema;
 
-  const RoadSegment({super.key, required this.type, required this.titulo});
+  const RoadSegment({
+    super.key,
+    required this.type,
+    required this.tema,
+    required this.esSiguienteTema,
+  });
 
   @override
   State<RoadSegment> createState() => _RoadSegmentState();
 }
 
 class _RoadSegmentState extends State<RoadSegment> {
-  bool isExpanded = false;
+  static const Map<String, IconData> _resourceIcons = {
+    'ARCHIVO': Icons.insert_drive_file,
+    'ARTICULO': Icons.article,
+    'DOCUMENTO': Icons.description,
+    'ENCUESTA': Icons.assignment,
+    'EVALUACION': Icons.quiz,
+    'IMAGEN': Icons.image,
+    'INTERACTIVO': Icons.html,
+    'PDF': Icons.picture_as_pdf,
+    'PRACTICA': Icons.science,
+    'PRESENCIAL': Icons.person,
+    'PRESENTACION': Icons.slideshow,
+    'VIDEO': Icons.videocam,
+  };
 
-  String get assetPath {
+  String get _assetPath {
     switch (widget.type) {
       case SegmentType.start:
         return 'assets/images/Continuacioninicio.png';
@@ -26,6 +49,86 @@ class _RoadSegmentState extends State<RoadSegment> {
         return 'assets/images/Finalizq.png';
       case SegmentType.endRight:
         return 'assets/images/Finalder.png';
+    }
+  }
+
+  static const List<String> _randomImages = [
+    'assets/images/CajaAbierta.png',
+    'assets/images/Cajas.png',
+    'assets/images/CamionDetras.png',
+    'assets/images/CamionFrente.png',
+  ];
+
+  late bool _showExtraImage;
+  late String? _extraImagePath;
+  late bool _isImageAbove; // true = arriba, false = abajo (contenedor)
+
+  Future<void> showTemarioDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            widget.tema.titulo,
+            style: TextStyle(
+              fontSize: 20,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey.shade600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(widget.tema.intentosConsumidos.toString()),
+                    SizedBox(width: 10),
+                    Icon(Icons.remove_red_eye),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                switch (widget.tema.recursoBasicoTipo) {
+                  case 'VIDEO':
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.video,
+                      arguments: widget.tema,
+                    );
+                    break;
+                }
+              },
+              child: Text('Ver tema'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final random = Random();
+
+    _showExtraImage = random.nextBool();
+
+    if (_showExtraImage) {
+      _extraImagePath = _randomImages[random.nextInt(_randomImages.length)];
+      _isImageAbove = random.nextBool();
+    } else {
+      _extraImagePath = null;
+      _isImageAbove = false;
     }
   }
 
@@ -68,22 +171,22 @@ class _RoadSegmentState extends State<RoadSegment> {
 
     return Stack(
       children: [
-        Image.asset(assetPath, fit: BoxFit.cover, width: double.infinity),
+        Image.asset(_assetPath, fit: BoxFit.cover, width: double.infinity),
         Positioned(
           top: screenSize.height * 0.02,
           left: isCardOnRight ? null : 50,
           right: isCardOnRight ? 50 : null,
           child: GestureDetector(
-            onTap: () => setState(() => isExpanded = !isExpanded),
+            onTap: () {
+              showTemarioDialog();
+            },
             child: SizedBox(
               width: screenSize.width * 0.7,
-              height:
-                  isExpanded
-                      ? screenSize.height * 0.2
-                      : screenSize.height * 0.13,
+              height: screenSize.height * 0.13,
               child: Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
+                  side: BorderSide(width: 1, color: Colors.grey.shade400),
                 ),
                 elevation: 5,
                 child: Padding(
@@ -95,23 +198,42 @@ class _RoadSegmentState extends State<RoadSegment> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        widget.titulo,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                        maxLines: isExpanded ? null : 4,
-                        overflow: isExpanded ? null : TextOverflow.ellipsis,
-                      ),
-                      if (isExpanded)
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('0'),
-                            SizedBox(width: 10),
-                            Icon(Icons.remove_red_eye),
-                          ],
+                      ShaderMask(
+                        shaderCallback: (Rect bounds) {
+                          if (widget.tema.intentosConsumidos > 0 &&
+                              widget.tema.resultado > 0) {
+                            return LinearGradient(
+                              colors: [Color(0xFF00c01a), Color(0xFF0077e9)],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ).createShader(bounds);
+                          } else if (widget.esSiguienteTema) {
+                            return LinearGradient(
+                              colors: [Color(0xFFd40017), Color(0xFF9a3d77)],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ).createShader(bounds);
+                          } else {
+                            return LinearGradient(
+                              colors: [
+                                Colors.grey.shade700,
+                                Colors.grey.shade700,
+                              ],
+                            ).createShader(bounds);
+                          }
+                        },
+                        blendMode: BlendMode.srcIn,
+                        child: Text(
+                          widget.tema.titulo,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
                         ),
+                      ),
                     ],
                   ),
                 ),
@@ -126,9 +248,25 @@ class _RoadSegmentState extends State<RoadSegment> {
           child: CircleAvatar(
             radius: 30,
             backgroundColor: Color(0xFFCC151A),
-            child: Icon(Icons.video_file, color: Colors.white),
+            child: Icon(
+              _resourceIcons[widget.tema.recursoBasicoTipo] ??
+                  Icons.note_rounded,
+              color: Colors.white,
+            ),
           ),
         ),
+        if (_showExtraImage && _extraImagePath != null)
+          Positioned(
+            top: _isImageAbove ? 0 : null,
+            bottom: _isImageAbove ? null : 0,
+            left: isCardOnRight ? null : 0,
+            right: isCardOnRight ? 0 : null,
+            child: Image.asset(
+              _extraImagePath!,
+              width: screenSize.width * 0.18,
+              fit: BoxFit.contain,
+            ),
+          ),
       ],
     );
   }

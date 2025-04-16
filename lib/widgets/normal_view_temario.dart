@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget buildNormalView(Size screenSize) {
+Widget buildNormalView(Size screenSize, String titulo) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.end,
     children: [
@@ -15,8 +15,7 @@ Widget buildNormalView(Size screenSize) {
         child: Padding(
           padding: EdgeInsets.only(bottom: 10),
           child: Text(
-            'FACULTAD DE CAMIONETAS -  ESTIBADORES Y OPERADORES DE CAMIONETA (ALINEACIÓN)'
-                .toUpperCase(),
+            titulo.toUpperCase(),
             textAlign: TextAlign.center,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,

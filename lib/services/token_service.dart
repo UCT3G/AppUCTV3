@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenService {
-  static const storage = FlutterSecureStorage();
+  static const _storage = FlutterSecureStorage();
   static String? _accessToken;
   static String? _refreshToken;
 
@@ -13,14 +13,14 @@ class TokenService {
     String accessToken,
     String refreshToken,
   ) async {
-    await storage.write(key: 'access_token', value: accessToken);
-    await storage.write(key: 'refresh_token', value: refreshToken);
+    await _storage.write(key: 'access_token', value: accessToken);
+    await _storage.write(key: 'refresh_token', value: refreshToken);
   }
 
   // METODO PARA GUARDAR LAS CREDENCIALES DE MANERA SEGURA
   static Future<void> saveCredentials(String username, String password) async {
-    await storage.write(key: 'username', value: username);
-    await storage.write(key: 'password', value: password);
+    await _storage.write(key: 'username', value: username);
+    await _storage.write(key: 'password', value: password);
   }
 
   // METODO PRA GUARDAR LOS DATOS DEL USUARIO
@@ -31,19 +31,19 @@ class TokenService {
 
   // METODO PARA OBTENER EL ACCESS TOKEN
   static Future<String?> getAccessToken() async {
-    _accessToken ??= await storage.read(key: 'access_token');
+    _accessToken ??= await _storage.read(key: 'access_token');
     return _accessToken;
   }
 
   // METODO PARA OBTENER EL REFRESH TOKEN
   static Future<String?> getRefreshToken() async {
-    _refreshToken ??= await storage.read(key: 'refresh_token');
+    _refreshToken ??= await _storage.read(key: 'refresh_token');
     return _refreshToken;
   }
 
   static Future<bool> hasCredentials() async {
-    final username = await storage.read(key: 'username');
-    final password = await storage.read(key: 'password');
+    final username = await _storage.read(key: 'username');
+    final password = await _storage.read(key: 'password');
     return username != null && password != null;
   }
 }
