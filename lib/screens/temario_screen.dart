@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
@@ -7,6 +10,7 @@ import 'package:app_uct/widgets/road_segment.dart';
 import 'package:flutter/material.dart';
 import 'package:app_uct/widgets/painter_temario.dart';
 import 'package:provider/provider.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class TemarioScreen extends StatefulWidget {
   final Map<String, dynamic> curso;
@@ -20,10 +24,8 @@ class TemarioScreen extends StatefulWidget {
 class _TemarioScreenState extends State<TemarioScreen> {
   bool _showFullText = false;
   bool _initialLoad = true;
-  late ScrollController _scrollController;
   late int _currentUnidadIndex;
-
-  List<GlobalKey> _unidadKeys = [];
+  Timer? _debounce;
 
   static const List<List<Color>> _predefinedGradients = [
     [Color(0xFF574293), Color(0xFF86CBC8)],
@@ -39,62 +41,25 @@ class _TemarioScreenState extends State<TemarioScreen> {
     await Provider.of<CompetenciaProvider>(
       context,
       listen: false,
-    ).fetchTemario(widget.curso['id_curso_fk'], accessToken!);
-
-    final unidades =
-        Provider.of<CompetenciaProvider>(context, listen: false).unidades;
+    ).fetchTemario(1012, accessToken!);
 
     setState(() {
-      _unidadKeys = List.generate(unidades.length, (_) => GlobalKey());
       _initialLoad = false;
     });
-  }
-
-  void handleScroll() {
-    if (!mounted) return;
-
-    double minDistance = double.infinity;
-    int closestIndex = _currentUnidadIndex;
-
-    for (int i = 0; i < _unidadKeys.length; i++) {
-      final key = _unidadKeys[i];
-      final contextUnidad = key.currentContext;
-      if (contextUnidad == null) continue;
-
-      final box = contextUnidad.findRenderObject() as RenderBox;
-      final position = box.localToGlobal(Offset.zero);
-      final screenHeight = MediaQuery.of(context).size.height;
-
-      // Calcula la distancia del centro de la unidad al centro de la pantalla
-      final unidadCenterY = position.dy + box.size.height / 2;
-      final screenCenterY = screenHeight / 2;
-      final distanceToCenter = (unidadCenterY - screenCenterY).abs();
-
-      if (distanceToCenter < minDistance) {
-        minDistance = distanceToCenter;
-        closestIndex = i;
-      }
-    }
-
-    if (closestIndex != _currentUnidadIndex) {
-      setState(() => _currentUnidadIndex = closestIndex);
-    }
   }
 
   @override
   void initState() {
     super.initState();
     _currentUnidadIndex = 0;
-    _scrollController = ScrollController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadTemario();
-      _scrollController.addListener(handleScroll);
     });
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -117,7 +82,6 @@ class _TemarioScreenState extends State<TemarioScreen> {
         children: [
           // Parte scrollable (carretera y contenido)
           SingleChildScrollView(
-            controller: _scrollController,
             physics: BouncingScrollPhysics(),
             child: Column(
               children: [
@@ -127,7 +91,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
                   fit: BoxFit.cover,
                   width: double.infinity,
                 ),
-                ...buildRoadSegments(competenciaProvider, _unidadKeys),
+                ...buildRoadSegments(competenciaProvider),
               ],
             ),
           ),
@@ -138,7 +102,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
                 height: gradientHeight,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: _predefinedGradients[_currentUnidadIndex],
+                    colors: _predefinedGradients[_currentUnidadIndex % 4],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
@@ -218,72 +182,72 @@ class _TemarioScreenState extends State<TemarioScreen> {
       ),
     );
   }
+
+  List<Widget> buildRoadSegments(CompetenciaProvider competenciaProvider) {
+    List<Widget> segments = [];
+    bool nextCurveIsLeft = true;
+    int totalTemas = competenciaProvider.unidades.fold(
+      0,
+      (sum, unidad) => sum + unidad.temas.length,
+    );
+    bool isTotalPar = totalTemas % 2 == 0;
+    int temaGlobalIndex = 0;
+
+    bool esSoloUnTema =
+        competenciaProvider.unidades.length == 1 &&
+        competenciaProvider.unidades[0].temas.length == 1;
+
+    Tema? siguienteTema = obtenerSiguienteTema(competenciaProvider);
+
+    _currentUnidadIndex = siguienteTema!.idUnidad;
+
+    for (
+      int unidadIndex = 0;
+      unidadIndex < competenciaProvider.unidades.length;
+      unidadIndex++
+    ) {
+      var unidad = competenciaProvider.unidades[unidadIndex];
+
+      for (var tema in unidad.temas) {
+        SegmentType type;
+
+        if (esSoloUnTema) {
+          type = SegmentType.endRight;
+        } else if (temaGlobalIndex == 0) {
+          // Solo para el PRIMER tema de TODOS
+          type = SegmentType.start;
+        } else if (temaGlobalIndex == totalTemas - 1) {
+          // Último tema
+          type = isTotalPar ? SegmentType.endLeft : SegmentType.endRight;
+        } else {
+          type = nextCurveIsLeft ? SegmentType.left : SegmentType.right;
+          nextCurveIsLeft = !nextCurveIsLeft;
+        }
+
+        segments.add(
+          RoadSegment(
+            type: type,
+            tema: tema,
+            esSiguienteTema: tema == siguienteTema,
+          ),
+        );
+        temaGlobalIndex++; // Incrementa el contador GLOBAL de temas
+      }
+    }
+
+    return segments;
+  }
+
+  Tema? obtenerSiguienteTema(CompetenciaProvider competenciaProvider) {
+    for (var unidad in competenciaProvider.unidades) {
+      for (var tema in unidad.temas) {
+        if (tema.resultado == 0) {
+          return tema;
+        }
+      }
+    }
+    return null;
+  }
 }
 
 enum SegmentType { start, left, right, endLeft, endRight }
-
-List<Widget> buildRoadSegments(
-  CompetenciaProvider competenciaProvider,
-  List<GlobalKey> unidadKeys,
-) {
-  List<Widget> segments = [];
-  bool nextCurveIsLeft = true;
-  int totalTemas = competenciaProvider.unidades.fold(
-    0,
-    (sum, unidad) => sum + unidad.temas.length,
-  );
-  bool isTotalPar = totalTemas % 2 == 0;
-  int temaGlobalIndex = 0;
-
-  bool esSoloUnTema =
-      competenciaProvider.unidades.length == 1 &&
-      competenciaProvider.unidades[0].temas.length == 1;
-
-  Tema? siguienteTema = obtenerSiguienteTema(competenciaProvider);
-
-  for (
-    int unidadIndex = 0;
-    unidadIndex < competenciaProvider.unidades.length;
-    unidadIndex++
-  ) {
-    var unidad = competenciaProvider.unidades[unidadIndex];
-    GlobalKey unidadKey = unidadKeys[unidadIndex];
-    List<Widget> unidadTemas = [];
-
-    for (var tema in unidad.temas) {
-      SegmentType type;
-      if (esSoloUnTema) {
-        type = SegmentType.endRight; // Camino especial para 1 tema/1 unidad
-      } else if (segments.isEmpty) {
-        type = SegmentType.start;
-      } else if (temaGlobalIndex == totalTemas - 1) {
-        type = isTotalPar ? SegmentType.endLeft : SegmentType.endRight;
-      } else {
-        type = nextCurveIsLeft ? SegmentType.left : SegmentType.right;
-        nextCurveIsLeft = !nextCurveIsLeft;
-      }
-      bool esSiguienteTema = tema == siguienteTema;
-
-      segments.add(
-        RoadSegment(type: type, tema: tema, esSiguienteTema: esSiguienteTema),
-      );
-      temaGlobalIndex++;
-    }
-    segments.add(
-      Container(key: unidadKey, child: Column(children: unidadTemas)),
-    );
-  }
-
-  return segments;
-}
-
-Tema? obtenerSiguienteTema(CompetenciaProvider competenciaProvider) {
-  for (var unidad in competenciaProvider.unidades) {
-    for (var tema in unidad.temas) {
-      if (tema.resultado == 0) {
-        return tema;
-      }
-    }
-  }
-  return null;
-}

@@ -68,48 +68,131 @@ class _RoadSegmentState extends State<RoadSegment> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            widget.tema.titulo,
-            style: TextStyle(
-              fontSize: 20,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey.shade600,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(widget.tema.intentosConsumidos.toString()),
-                    SizedBox(width: 10),
-                    Icon(Icons.remove_red_eye),
+        final imageHeight = MediaQuery.of(context).size.height * 0.15;
+
+        return Center(
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.topCenter,
+            children: [
+              Container(
+                margin: EdgeInsets.only(
+                  top: imageHeight / 2,
+                ), // Espacio para la imagen
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
                   ],
                 ),
-              ],
-            ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.tema.titulo,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      // Contador de intentos
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.grey.shade700,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${widget.tema.intentosConsumidos} visualizaciones',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Botones de acción
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey.shade600,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: const Text('Cerrar'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              switch (widget.tema.recursoBasicoTipo) {
+                                case 'VIDEO':
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.video,
+                                    arguments: widget.tema,
+                                  );
+                                  break;
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: const Text('Ver tema'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Imagen que sobresale (posición absoluta)
+              Positioned(
+                top: -(imageHeight / 2), // Hace que la imagen sobresalga
+                child: SizedBox(
+                  height: imageHeight,
+                  child: Image.asset(
+                    'assets/images/YowMitad.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                switch (widget.tema.recursoBasicoTipo) {
-                  case 'VIDEO':
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.video,
-                      arguments: widget.tema,
-                    );
-                    break;
-                }
-              },
-              child: Text('Ver tema'),
-            ),
-          ],
         );
       },
     );
