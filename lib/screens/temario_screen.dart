@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/provider/auth_provider.dart';
@@ -10,7 +9,7 @@ import 'package:app_uct/widgets/road_segment.dart';
 import 'package:flutter/material.dart';
 import 'package:app_uct/widgets/painter_temario.dart';
 import 'package:provider/provider.dart';
-import 'package:visibility_detector/visibility_detector.dart';
+import 'package:app_uct/routes/app_routes.dart';
 
 class TemarioScreen extends StatefulWidget {
   final Map<String, dynamic> curso;
@@ -122,7 +121,12 @@ class _TemarioScreenState extends State<TemarioScreen> {
                       left: 10,
                       top: MediaQuery.of(context).padding.top,
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            AppRoutes.home,
+                          );
+                        },
                         icon: Icon(Icons.arrow_back, color: Colors.white),
                       ),
                     ),
@@ -199,7 +203,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
 
     Tema? siguienteTema = obtenerSiguienteTema(competenciaProvider);
 
-    _currentUnidadIndex = siguienteTema!.idUnidad;
+    _currentUnidadIndex = siguienteTema?.idUnidad ?? 1;
 
     for (
       int unidadIndex = 0;
