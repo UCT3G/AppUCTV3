@@ -1,5 +1,7 @@
 import 'package:app_uct/models/tema_model.dart';
+import 'package:app_uct/screens/content/imagen_screen.dart';
 import 'package:app_uct/screens/content/interactive_screen.dart';
+import 'package:app_uct/screens/content/pdf_screen.dart';
 import 'package:app_uct/screens/content/video_screen.dart';
 import 'package:app_uct/screens/home_screen.dart';
 import 'package:app_uct/screens/login_screen.dart';
@@ -16,6 +18,8 @@ class AppRoutes {
   static const String interactive = '/interactive-content';
   static const String video = '/video-content';
   static const String temario = '/temario';
+  static const String imagen = '/imagen';
+  static const String pdf = '/pdf';
 
   static final routes = {
     login: (context) => LoginScreen(),
@@ -35,6 +39,14 @@ class AppRoutes {
       final curso =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       return TemarioScreen(curso: curso);
+    },
+    imagen: (context) {
+      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
+      return ImagenScreen(tema: tema);
+    },
+    pdf: (context) {
+      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
+      return PdfScreen(tema: tema);
     },
   };
 }

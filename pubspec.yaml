@@ -53,6 +53,7 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   google_fonts: ^6.2.1
   visibility_detector: ^0.4.0+2
+  syncfusion_flutter_pdfviewer: ^29.1.40
 
 dev_dependencies:
   flutter_test:

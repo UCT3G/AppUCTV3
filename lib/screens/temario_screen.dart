@@ -9,7 +9,10 @@ import 'package:app_uct/widgets/road_segment.dart';
 import 'package:flutter/material.dart';
 import 'package:app_uct/widgets/painter_temario.dart';
 import 'package:provider/provider.dart';
+<<<<<<< Updated upstream
 import 'package:app_uct/routes/app_routes.dart';
+=======
+>>>>>>> Stashed changes
 
 class TemarioScreen extends StatefulWidget {
   final Map<String, dynamic> curso;
@@ -68,6 +71,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
     final screenSize = MediaQuery.of(context).size;
     final gradientHeight = screenSize.height * 0.25;
 
+    log('$competenciaProvider');
     if (_initialLoad) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }

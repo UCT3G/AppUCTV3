@@ -159,6 +159,20 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     arguments: widget.tema,
                                   );
                                   break;
+                                case 'IMAGEN':
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.imagen,
+                                    arguments: widget.tema,
+                                  );
+                                  break;
+                                case 'DOCUMENTO':
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.pdf,
+                                    arguments: widget.tema,
+                                  );
+                                  break;
                               }
                             },
                             style: ElevatedButton.styleFrom(
