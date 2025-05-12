@@ -1,6 +1,7 @@
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/services/course_service.dart';
+import 'package:app_uct/utils/session_helper.dart';
 import 'package:app_uct/widgets/painter_welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -44,6 +45,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void initState() {
     super.initState();
+    SessionHelper.updateLastActive();
     loadCompetencia();
 
     _controller1 = AnimationController(

@@ -24,7 +24,11 @@ class AppRoutes {
   static final routes = {
     login: (context) => LoginScreen(),
     home: (context) => HomeScreen(),
-    loading: (context) => SplashScreen(),
+    loading: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      final isInitialLoad = args is bool ? args : true;
+      return SplashScreen(isInitialLoad: isInitialLoad);
+    },
     welcome: (context) => WelcomeScreen(),
     interactive: (context) {
       final tema =

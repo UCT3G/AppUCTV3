@@ -281,6 +281,13 @@ class _RoadSegmentState extends State<RoadSegment> {
               width: screenSize.width * 0.7,
               height: screenSize.height * 0.13,
               child: Card(
+                color:
+                    (widget.tema.intentosConsumidos > 0 &&
+                            widget.tema.resultado > 0)
+                        ? Color.fromRGBO(184, 255, 102, 1)
+                        : widget.esSiguienteTema
+                        ? Color.fromRGBO(255, 44, 80, 1)
+                        : Colors.grey[300],
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                   side: BorderSide(width: 1, color: Colors.grey.shade400),
@@ -295,41 +302,22 @@ class _RoadSegmentState extends State<RoadSegment> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ShaderMask(
-                        shaderCallback: (Rect bounds) {
-                          if (widget.tema.intentosConsumidos > 0 &&
-                              widget.tema.resultado > 0) {
-                            return LinearGradient(
-                              colors: [Color(0xFF00c01a), Color(0xFF0077e9)],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ).createShader(bounds);
-                          } else if (widget.esSiguienteTema) {
-                            return LinearGradient(
-                              colors: [Color(0xFFd40017), Color(0xFF9a3d77)],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ).createShader(bounds);
-                          } else {
-                            return LinearGradient(
-                              colors: [
-                                Colors.grey.shade700,
-                                Colors.grey.shade700,
-                              ],
-                            ).createShader(bounds);
-                          }
-                        },
-                        blendMode: BlendMode.srcIn,
-                        child: Text(
-                          widget.tema.titulo,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 4,
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        widget.tema.titulo,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                          color:
+                              (widget.tema.intentosConsumidos > 0 &&
+                                      widget.tema.resultado > 0)
+                                  ? Color.fromRGBO(19, 79, 8, 1)
+                                  : widget.esSiguienteTema
+                                  ? Color.fromRGBO(66, 5, 5, 1)
+                                  : Colors.grey[600],
                         ),
+                        textAlign: TextAlign.center,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

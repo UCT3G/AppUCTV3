@@ -3,16 +3,14 @@ import 'dart:async';
 import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
+import 'package:app_uct/utils/session_helper.dart';
 import 'package:app_uct/widgets/flull_text_temario.dart';
 import 'package:app_uct/widgets/normal_view_temario.dart';
 import 'package:app_uct/widgets/road_segment.dart';
 import 'package:flutter/material.dart';
 import 'package:app_uct/widgets/painter_temario.dart';
 import 'package:provider/provider.dart';
-<<<<<<< Updated upstream
 import 'package:app_uct/routes/app_routes.dart';
-=======
->>>>>>> Stashed changes
 
 class TemarioScreen extends StatefulWidget {
   final Map<String, dynamic> curso;
@@ -43,7 +41,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
     await Provider.of<CompetenciaProvider>(
       context,
       listen: false,
-    ).fetchTemario(1012, accessToken!);
+    ).fetchTemario(widget.curso['id_curso_fk'], accessToken!);
 
     setState(() {
       _initialLoad = false;
@@ -53,6 +51,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
   @override
   void initState() {
     super.initState();
+    SessionHelper.updateLastActive();
     _currentUnidadIndex = 0;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadTemario();
@@ -71,7 +70,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
     final screenSize = MediaQuery.of(context).size;
     final gradientHeight = screenSize.height * 0.25;
 
-    log('$competenciaProvider');
+    // log('$competenciaProvider');
     if (_initialLoad) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }

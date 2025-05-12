@@ -1,12 +1,14 @@
+import 'dart:developer';
+
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_navigator.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
   runApp(
     MultiProvider(
       providers: [
@@ -19,66 +21,83 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  AppLifecycleState? previousAppState;
-  bool wasPaused = false;
-
-  Future<void> initializeApp() async {
-    AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
-      AppRoutes.loading,
-    );
-
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    if (mounted) AppNavigator.checkTokenAndUpdateRoute(context);
-  }
+  late SharedPreferences _preferences;
+  bool _wasPaused = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    initializeApp();
+    initPreferences();
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
+  Future<void> initPreferences() async {
+    _preferences = await SharedPreferences.getInstance();
   }
+
+  // Future<void> loadLoginState() async {
+  //   _preferences = await SharedPreferences.getInstance();
+  //   final lastPausedString = _preferences.getString('lastPausedTime');
+  //   if (lastPausedString != null) {
+  //     final lastPausedString = _preferences.getString('lastPausedTime');
+  //     if (lastPausedString != null) {
+  //       final lastPaused = DateTime.parse(lastPausedString);
+  //       final difference = DateTime.now().difference(lastPaused);
+  //       if (difference.inMinutes >= 1) {
+  //         if (mounted)
+  //           Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+  //       }
+  //     }
+  //   } else {
+  //     if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
+  //   }
+  // }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    debugPrint('Estado actual: $state');
-    debugPrint('Estado anterior: $previousAppState');
-    debugPrint('wasPaused: $wasPaused');
+    log('Cambio de estado: $state');
+    final currentRoute = ModalRoute.of(context)?.settings.name;
     if (state == AppLifecycleState.paused) {
-      wasPaused = true;
-      AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
-        AppRoutes.loading,
+      _wasPaused = true;
+      _preferences.setString(
+        'lastPausedTime',
+        DateTime.now().toIso8601String(),
       );
-    } else if (state == AppLifecycleState.resumed) {
-      if (wasPaused) {
-        Future.delayed(Duration(milliseconds: 300), () {
-          if (mounted) AppNavigator.checkTokenAndUpdateRoute(context);
-        });
-        wasPaused = false;
+      if (currentRoute != AppRoutes.loading &&
+          currentRoute != AppRoutes.login) {
+        _preferences.setString('lastScreen', currentRoute ?? '/welcome');
+      }
+    } else if (state == AppLifecycleState.resumed && _wasPaused) {
+      _wasPaused = false;
+      final lastPausedString = _preferences.getString('lastPausedTime');
+      if (lastPausedString != null) {
+        final lastPaused = DateTime.parse(lastPausedString);
+        final difference = DateTime.now().difference(lastPaused);
+        if (difference.inMinutes >= 1) {
+          if (mounted) {
+            AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
+              AppRoutes.welcome,
+            );
+          }
+        }
+      } else {
+        AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
+          AppRoutes.login,
+        );
       }
     }
-    previousAppState = state;
   }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'APP UCT',
+      title: 'App UCT',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
@@ -100,5 +119,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 }

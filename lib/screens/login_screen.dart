@@ -58,7 +58,11 @@ class _LoginScreenState extends State<LoginScreen>
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (context) => PopScope(canPop: false, child: SplashScreen()),
+      builder:
+          (context) => PopScope(
+            canPop: false,
+            child: SplashScreen(isInitialLoad: false),
+          ),
     );
 
     try {
@@ -127,7 +131,11 @@ class _LoginScreenState extends State<LoginScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => PopScope(canPop: false, child: SplashScreen()),
+      builder:
+          (context) => PopScope(
+            canPop: false,
+            child: SplashScreen(isInitialLoad: false),
+          ),
     );
 
     try {
