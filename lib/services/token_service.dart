@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:app_uct/models/usuario_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,9 +25,9 @@ class TokenService {
   }
 
   // METODO PRA GUARDAR LOS DATOS DEL USUARIO
-  static Future<void> saveUserData(Map<String, dynamic> userData) async {
+  static Future<void> saveUserData(Usuario usuario) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('userData', json.encode(userData));
+    prefs.setString('userData', json.encode(usuario.toJson()));
   }
 
   // METODO PARA OBTENER EL ACCESS TOKEN
@@ -39,6 +40,14 @@ class TokenService {
   static Future<String?> getRefreshToken() async {
     _refreshToken ??= await _storage.read(key: 'refresh_token');
     return _refreshToken;
+  }
+
+  static Future<Usuario?> getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString('userData');
+    if (jsonString == null) return null;
+    final jsonData = json.decode(jsonString);
+    return Usuario.fromJson(jsonData);
   }
 
   static Future<bool> hasCredentials() async {

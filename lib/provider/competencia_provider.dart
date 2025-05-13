@@ -1,12 +1,15 @@
+import 'package:app_uct/models/competencia_model.dart';
 import 'package:app_uct/models/unidad_model.dart';
 import 'package:app_uct/services/course_service.dart';
 import 'package:flutter/material.dart';
 
 class CompetenciaProvider with ChangeNotifier {
   List<Unidad> _unidades = [];
+  Competencia? _competencia;
   bool _loading = false;
   String _error = '';
 
+  Competencia? get competencia => _competencia;
   List<Unidad> get unidades => _unidades;
   bool get loading => _loading;
   String get error => _error;
@@ -35,5 +38,25 @@ class CompetenciaProvider with ChangeNotifier {
       _loading = false;
       // notifyListeners();
     }
+  }
+
+  Future<void> fetchCompetenciaActual(String token) async {
+    _loading = true;
+    notifyListeners();
+
+    try {
+      final response = await CourseService.getCompetenciaActual(token);
+      _competencia = Competencia.fromJson(response['ultima_competencia']);
+    } catch (e) {
+      _error = 'Error al cargar la competencia actual: ${e.toString()}';
+    }
+
+    _loading = false;
+    notifyListeners();
+  }
+
+  void clear() {
+    _competencia = null;
+    notifyListeners();
   }
 }

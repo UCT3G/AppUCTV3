@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 
 class BiometricService {
   final LocalAuthentication _localAuthentication = LocalAuthentication();
+  static final _storage = FlutterSecureStorage();
 
   // METODO QUE VERIFICA SI EL DISPOSITIVO SOPORTA AUTENTICACION BIOMETRICA
   Future<bool> isBiometricAvailable() async {
@@ -36,5 +38,25 @@ class BiometricService {
       debugPrint('Error al obtener biométricos: $e');
       return [];
     }
+  }
+
+  // METODO PARA HABILITAR LA AUTENTICACION BIOMETRICA
+  static Future<void> enableBiometricAuth() async {
+    await _storage.write(key: 'biometric_auth_enabled', value: 'true');
+  }
+
+  // METODO PARA DESHABILITAR LA AUTENTICACION BIOMETRICA
+  static Future<void> disableBiometricAuth() async {
+    await _storage.write(key: 'biometric_auth_enabled', value: 'false');
+  }
+
+  // METODO PARA VERIFICAR SI LA AUTENTICACION BIOMETRICA ESTA HABILITADA
+  static Future<bool> isBiometricAuthEnabled() async {
+    final value = await _storage.read(key: 'biometric_auth_enabled');
+    return value == 'true';
+  }
+
+  static Future<String?> getBiometricAuthPreference() async {
+    return await _storage.read(key: 'biometric_auth_enabled');
   }
 }

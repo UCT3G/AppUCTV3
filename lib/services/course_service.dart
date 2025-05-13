@@ -9,7 +9,7 @@ class CourseService {
     final url = Uri.parse(
       '${ApiService.baseURL}/CURSOS_MOVIL/getCompetenciaActual',
     );
-    print(url);
+
     try {
       final response = await http.get(
         url,

@@ -1,6 +1,5 @@
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
-import 'package:app_uct/services/auth_service.dart';
 import 'package:app_uct/utils/session_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 context,
                 listen: false,
               );
-              await AuthService.logout(authProvider);
+              await authProvider.logout();
               Navigator.pushReplacementNamed(context, AppRoutes.login);
             },
             icon: Icon(Icons.logout),

@@ -1,7 +1,6 @@
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/screens/splash_screen.dart';
-import 'package:app_uct/services/auth_service.dart';
 import 'package:app_uct/services/token_service.dart';
 import 'package:app_uct/widgets/wave_painter.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen>
   late Animation<double> _animation2;
   late AnimationController _controller3;
   late Animation<double> _animation3;
-  final AuthService _authService = AuthService();
   BiometricType? _biometricType;
   Future<BiometricType?>? _biometricTypeFuture;
 
@@ -39,11 +37,7 @@ class _LoginScreenState extends State<LoginScreen>
       Provider.of<AuthProvider>(context, listen: false);
 
   // METODO PARA INICIAR SESION CON CREDENCIALES
-  void login(
-    String username,
-    String password,
-    AuthProvider authProvider,
-  ) async {
+  void login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Por favor, ingrese usuario y contraseña')),
@@ -66,31 +60,26 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     try {
-      final response = await AuthService.login(
-        username,
-        password,
-        authProvider,
-      );
+      final response = await authProvider.login(username, password);
 
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (response['access_token'] != null) {
         final isBiometricAuthEnabled =
-            await AuthService.isBiometricAuthEnabled();
+            await authProvider.hasBiometricPreference();
 
         if (!isBiometricAuthEnabled && _isBiometricAvailable) {
           await showSaveCredentialsDialog();
         }
 
-        await authProvider.updateAccessToken(response['access_token']);
-        await authProvider.updateRefreshToken(response['refresh_token']);
-
         if (mounted) {
           Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(response['message'])));
         }
       } else {
         if (mounted) {
-          Navigator.of(context, rootNavigator: true).pop();
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text('Error al iniciar sesión')));
@@ -114,8 +103,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   // METODO PARA VERIFICAR SI EL DISPOSITIVO SOPORTA AUTENTICACION BIOMETRICA
   Future<void> checkBiometricAvailability() async {
-    bool isAvailable =
-        await _authService.biometricService.isBiometricAvailable();
+    bool isAvailable = await authProvider.isBiometricAuthEnabled();
 
     setState(() {
       _isBiometricAvailable = isAvailable;
@@ -123,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   // METODO PARA INICIAR SESION CON BIOMETRICOS
-  Future<void> loginWithBiometrics(AuthProvider authProvider) async {
+  Future<void> loginWithBiometrics() async {
     setState(() {
       _isLoadingBiometrics = true;
     });
@@ -139,20 +127,18 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     try {
-      bool isAuthenticated = await _authService.loginWithBiometrics(
-        authProvider,
-      );
+      final response = await authProvider.loginWithBiometrics();
 
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
 
-      if (isAuthenticated) {
-        if (ModalRoute.of(context)?.settings.name != AppRoutes.welcome) {
-          Navigator.pushReplacementNamed(context, AppRoutes.welcome);
-        }
+      if (response['access_token'] != null) {
+        Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(response['message'])));
       } else {
         if (mounted) {
-          Navigator.of(context, rootNavigator: true).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Autenticación biométrica fallida')),
           );
@@ -202,14 +188,14 @@ class _LoginScreenState extends State<LoginScreen>
           actions: [
             TextButton(
               onPressed: () async {
-                await AuthService.enableBiometricAuth();
+                await authProvider.enableBiometricAuth();
                 Navigator.of(context).pop();
               },
               child: Text('Aceptar'),
             ),
             TextButton(
               onPressed: () async {
-                await AuthService.disableBiometricAuth();
+                await authProvider.disableBiometricAuth();
                 Navigator.of(context).pop();
               },
               child: Text('Cancelar'),
@@ -223,8 +209,7 @@ class _LoginScreenState extends State<LoginScreen>
   // METODO PRA OBTENER EL TIPO DE AUTENTICACION BIOMETRICA
   Future<BiometricType?> getPrimaryBiometricType() async {
     try {
-      final availableBiometrics =
-          await _authService.biometricService.getAvailableBiometrics();
+      final availableBiometrics = await authProvider.getAvailableBiometrics();
 
       if (availableBiometrics.contains(BiometricType.face)) {
         return BiometricType.face;
@@ -240,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen>
 
       return null;
     } catch (e) {
-      print('Error al obtener el tipo de biómetrico: $e');
+      debugPrint('Error al obtener el tipo de biómetrico: $e');
       return null;
     }
   }
@@ -302,7 +287,6 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -447,7 +431,6 @@ class _LoginScreenState extends State<LoginScreen>
                             : () => login(
                               _usernameController.text,
                               _passwordController.text,
-                              authProvider,
                             ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -477,7 +460,7 @@ class _LoginScreenState extends State<LoginScreen>
                           onPressed:
                               _isLoadingBiometrics
                                   ? null
-                                  : () => loginWithBiometrics(authProvider),
+                                  : () => loginWithBiometrics(),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             padding: EdgeInsets.all(10),

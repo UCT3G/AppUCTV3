@@ -31,19 +31,13 @@ class AppNavigator {
       return AppRoutes.welcome;
     }
 
-    try {
-      final newAccessToken = await AuthService.refreshAccessToken(
-        authProvider.refreshToken!,
-        authProvider,
-      );
-      if (newAccessToken != null) {
-        await authProvider.updateAccessToken(newAccessToken);
-        return AppRoutes.welcome;
-      }
-    } catch (e) {
-      debugPrint('Error al renovar token: $e');
+    final refreshed = await authProvider.refreshAccessToken();
+
+    if (refreshed) {
+      return AppRoutes.welcome;
     }
-    await AuthService.logout(authProvider);
+
+    await authProvider.logout();
     return AppRoutes.login;
   }
 }
