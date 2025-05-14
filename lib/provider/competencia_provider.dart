@@ -40,19 +40,25 @@ class CompetenciaProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchCompetenciaActual(String token) async {
+  Future<Map<String, dynamic>> fetchCompetenciaActual(String token) async {
     _loading = true;
+    
     notifyListeners();
 
     try {
       final response = await CourseService.getCompetenciaActual(token);
-      _competencia = Competencia.fromJson(response['ultima_competencia']);
+      if (response['ultima_competencia'] != null) {
+        _competencia = Competencia.fromJson(response['ultima_competencia']);
+      } else {
+        _competencia = null;
+      }
+      return response;
     } catch (e) {
-      _error = 'Error al cargar la competencia actual: ${e.toString()}';
+      throw Exception('Error al cargar la competencia actual: ${e.toString()}');
+    } finally {
+      _loading = false;
+      notifyListeners();
     }
-
-    _loading = false;
-    notifyListeners();
   }
 
   void clear() {

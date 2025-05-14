@@ -111,4 +111,11 @@ class AuthProvider extends ChangeNotifier {
   Future<List<BiometricType>> getAvailableBiometrics() async {
     return await _authService.biometricService.getAvailableBiometrics();
   }
+
+  //METODO PARA SABER SI UN USUARIO ESTA LOGUEADO
+  bool get isLoggedIn {
+    return _accessToken != null &&
+        _accessToken!.isNotEmpty &&
+        _currentUsuario != null;
+  }
 }

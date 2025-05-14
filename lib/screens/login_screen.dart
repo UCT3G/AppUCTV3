@@ -5,6 +5,7 @@ import 'package:app_uct/services/token_service.dart';
 import 'package:app_uct/widgets/wave_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +41,16 @@ class _LoginScreenState extends State<LoginScreen>
   void login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor, ingrese usuario y contraseña')),
+        SnackBar(
+          backgroundColor: Colors.white,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            'Por favor, ingrese usuario y contraseña',
+            style: GoogleFonts.montserrat(
+              textStyle: TextStyle(color: Colors.redAccent, fontSize: 14),
+            ),
+          ),
+        ),
       );
       return;
     }
@@ -74,23 +84,49 @@ class _LoginScreenState extends State<LoginScreen>
 
         if (mounted) {
           Navigator.pushReplacementNamed(context, AppRoutes.welcome);
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(response['message'])));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.teal,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                response['message'],
+                style: GoogleFonts.montserrat(
+                  textStyle: TextStyle(color: Colors.white, fontSize: 14),
+                ),
+              ),
+            ),
+          );
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error al iniciar sesión')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.white,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Error al iniciar sesión',
+                style: GoogleFonts.montserrat(
+                  textStyle: TextStyle(color: Colors.redAccent, fontSize: 14),
+                ),
+              ),
+            ),
+          );
         }
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error: $e',
+              style: GoogleFonts.montserrat(
+                textStyle: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -134,22 +170,48 @@ class _LoginScreenState extends State<LoginScreen>
 
       if (response['access_token'] != null) {
         Navigator.pushReplacementNamed(context, AppRoutes.welcome);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(response['message'])));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.teal,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              response['message'],
+              style: GoogleFonts.montserrat(
+                textStyle: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ),
+          ),
+        );
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Autenticación biométrica fallida')),
+            SnackBar(
+              backgroundColor: Colors.white,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Autenticación biométrica fallida',
+                style: GoogleFonts.montserrat(
+                  textStyle: TextStyle(color: Colors.redAccent, fontSize: 14),
+                ),
+              ),
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error: $e',
+              style: GoogleFonts.montserrat(
+                textStyle: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+            ),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -173,14 +235,20 @@ class _LoginScreenState extends State<LoginScreen>
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text('¿Guardar credenciales?'),
+          title: Text(
+            '¿Guardar credenciales?',
+            style: GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15)),
+          ),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(
                   '¿Deseas guardar tus credenciales para futuros inicios de sesión biométricos?',
+                  style: GoogleFonts.montserrat(
+                    textStyle: TextStyle(fontSize: 13),
+                  ),
                 ),
               ],
             ),
@@ -189,16 +257,30 @@ class _LoginScreenState extends State<LoginScreen>
             TextButton(
               onPressed: () async {
                 await authProvider.enableBiometricAuth();
-                Navigator.of(context).pop();
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
+                }
               },
-              child: Text('Aceptar'),
+              child: Text(
+                'Aceptar',
+                style: GoogleFonts.montserrat(
+                  textStyle: TextStyle(fontSize: 12),
+                ),
+              ),
             ),
             TextButton(
               onPressed: () async {
                 await authProvider.disableBiometricAuth();
-                Navigator.of(context).pop();
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
+                }
               },
-              child: Text('Cancelar'),
+              child: Text(
+                'Cancelar',
+                style: GoogleFonts.montserrat(
+                  textStyle: TextStyle(fontSize: 12),
+                ),
+              ),
             ),
           ],
         );
@@ -349,10 +431,12 @@ class _LoginScreenState extends State<LoginScreen>
                     widthFactor: 0.8,
                     child: TextFormField(
                       controller: _usernameController,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
+                      style: GoogleFonts.montserrat(
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                       decoration: InputDecoration(
                         filled: true,
@@ -376,9 +460,11 @@ class _LoginScreenState extends State<LoginScreen>
                           color: Color.fromRGBO(128, 185, 204, 1),
                         ),
                         hintText: 'Usuario',
-                        hintStyle: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
+                        hintStyle: GoogleFonts.montserrat(
+                          textStyle: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -388,10 +474,12 @@ class _LoginScreenState extends State<LoginScreen>
                     widthFactor: 0.8,
                     child: TextFormField(
                       controller: _passwordController,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
+                      style: GoogleFonts.montserrat(
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                       decoration: InputDecoration(
                         filled: true,
@@ -415,9 +503,11 @@ class _LoginScreenState extends State<LoginScreen>
                           color: Color.fromRGBO(128, 185, 204, 1),
                         ),
                         hintText: 'Contraseña',
-                        hintStyle: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
+                        hintStyle: GoogleFonts.montserrat(
+                          textStyle: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       obscureText: true,
@@ -447,9 +537,11 @@ class _LoginScreenState extends State<LoginScreen>
                             ? CircularProgressIndicator()
                             : Text(
                               'Ingresar',
-                              style: TextStyle(
-                                color: Colors.black87,
-                                fontSize: 20,
+                              style: GoogleFonts.montserrat(
+                                textStyle: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 20,
+                                ),
                               ),
                             ),
                   ),
@@ -491,9 +583,11 @@ class _LoginScreenState extends State<LoginScreen>
                                                 BiometricType.iris
                                             ? 'Reconocimiento de iris'
                                             : 'Huella dactilar',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
+                                        style: GoogleFonts.montserrat(
+                                          textStyle: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                          ),
                                         ),
                                       ),
                                     ],

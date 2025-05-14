@@ -1,8 +1,10 @@
 import 'dart:developer';
 
+import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -27,8 +29,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> checkLoginState() async {
     _preferences = await SharedPreferences.getInstance();
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     final lastPausedString = _preferences.getString('lastPausedTime');
     final lastScreenString = _preferences.getString('lastScreen');
+
+    if (!authProvider.isLoggedIn) {
+      if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
+      return;
+    }
+    
     if (lastPausedString != null) {
       final lastPaused = DateTime.parse(lastPausedString);
       final difference = DateTime.now().difference(lastPaused);

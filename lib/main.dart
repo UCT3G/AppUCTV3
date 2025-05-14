@@ -21,6 +21,8 @@ void main() {
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
@@ -40,28 +42,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     _preferences = await SharedPreferences.getInstance();
   }
 
-  // Future<void> loadLoginState() async {
-  //   _preferences = await SharedPreferences.getInstance();
-  //   final lastPausedString = _preferences.getString('lastPausedTime');
-  //   if (lastPausedString != null) {
-  //     final lastPausedString = _preferences.getString('lastPausedTime');
-  //     if (lastPausedString != null) {
-  //       final lastPaused = DateTime.parse(lastPausedString);
-  //       final difference = DateTime.now().difference(lastPaused);
-  //       if (difference.inMinutes >= 1) {
-  //         if (mounted)
-  //           Navigator.pushReplacementNamed(context, AppRoutes.welcome);
-  //       }
-  //     }
-  //   } else {
-  //     if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
-  //   }
-  // }
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     log('Cambio de estado: $state');
     final currentRoute = ModalRoute.of(context)?.settings.name;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (state == AppLifecycleState.paused) {
       _wasPaused = true;
       _preferences.setString(
@@ -74,6 +59,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       }
     } else if (state == AppLifecycleState.resumed && _wasPaused) {
       _wasPaused = false;
+      if (!authProvider.isLoggedIn) {
+        AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
+          AppRoutes.login,
+        );
+        return;
+      }
       final lastPausedString = _preferences.getString('lastPausedTime');
       if (lastPausedString != null) {
         final lastPaused = DateTime.parse(lastPausedString);
