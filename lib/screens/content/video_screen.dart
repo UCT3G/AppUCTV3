@@ -21,7 +21,7 @@ class _VideoScreenState extends State<VideoScreen> {
     super.initState();
 
     final videoURL = Uri.parse(
-      '${ApiService.baseURL}/video/${widget.tema.idCurso}/${widget.tema.idUnidad}/${widget.tema.idTema}',
+      '${ApiService.baseURL}/video_movil/${widget.tema.idCurso}/${widget.tema.idUnidad}/${widget.tema.idTema}',
     );
 
     _controller = VideoPlayerController.networkUrl(videoURL);

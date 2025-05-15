@@ -23,14 +23,16 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     if (widget.isInitialLoad) {
-      checkLoginState();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        checkLoginState();
+      });
     }
   }
 
   Future<void> checkLoginState() async {
-    _preferences = await SharedPreferences.getInstance();
-
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    _preferences = await SharedPreferences.getInstance();
 
     final lastPausedString = _preferences.getString('lastPausedTime');
     final lastScreenString = _preferences.getString('lastScreen');
@@ -39,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
       return;
     }
-    
+
     if (lastPausedString != null) {
       final lastPaused = DateTime.parse(lastPausedString);
       final difference = DateTime.now().difference(lastPaused);
@@ -61,14 +63,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
         child: Lottie.asset(
           "assets/animations/3g-tracto.json",
           fit: BoxFit.cover,
-          width: 300,
-          height: 300,
+          width: screenSize.width * 0.6,
+          height: screenSize.width * 0.6,
         ),
       ),
     );

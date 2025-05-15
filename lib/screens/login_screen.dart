@@ -5,7 +5,6 @@ import 'package:app_uct/services/token_service.dart';
 import 'package:app_uct/widgets/wave_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -46,8 +45,10 @@ class _LoginScreenState extends State<LoginScreen>
           behavior: SnackBarBehavior.floating,
           content: Text(
             'Por favor, ingrese usuario y contraseña',
-            style: GoogleFonts.montserrat(
-              textStyle: TextStyle(color: Colors.redAccent, fontSize: 14),
+            style: TextStyle(
+              fontFamily: 'Montserrat',
+              color: Colors.redAccent,
+              fontSize: 14,
             ),
           ),
         ),
@@ -90,8 +91,10 @@ class _LoginScreenState extends State<LoginScreen>
               behavior: SnackBarBehavior.floating,
               content: Text(
                 response['message'],
-                style: GoogleFonts.montserrat(
-                  textStyle: TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.white,
+                  fontSize: 14,
                 ),
               ),
             ),
@@ -105,8 +108,10 @@ class _LoginScreenState extends State<LoginScreen>
               behavior: SnackBarBehavior.floating,
               content: Text(
                 'Error al iniciar sesión',
-                style: GoogleFonts.montserrat(
-                  textStyle: TextStyle(color: Colors.redAccent, fontSize: 14),
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.redAccent,
+                  fontSize: 14,
                 ),
               ),
             ),
@@ -121,8 +126,10 @@ class _LoginScreenState extends State<LoginScreen>
             behavior: SnackBarBehavior.floating,
             content: Text(
               'Error: $e',
-              style: GoogleFonts.montserrat(
-                textStyle: TextStyle(color: Colors.white, fontSize: 14),
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
               ),
             ),
           ),
@@ -176,8 +183,10 @@ class _LoginScreenState extends State<LoginScreen>
             behavior: SnackBarBehavior.floating,
             content: Text(
               response['message'],
-              style: GoogleFonts.montserrat(
-                textStyle: TextStyle(color: Colors.white, fontSize: 14),
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
               ),
             ),
           ),
@@ -190,8 +199,10 @@ class _LoginScreenState extends State<LoginScreen>
               behavior: SnackBarBehavior.floating,
               content: Text(
                 'Autenticación biométrica fallida',
-                style: GoogleFonts.montserrat(
-                  textStyle: TextStyle(color: Colors.redAccent, fontSize: 14),
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.redAccent,
+                  fontSize: 14,
                 ),
               ),
             ),
@@ -206,8 +217,10 @@ class _LoginScreenState extends State<LoginScreen>
             behavior: SnackBarBehavior.floating,
             content: Text(
               'Error: $e',
-              style: GoogleFonts.montserrat(
-                textStyle: TextStyle(color: Colors.white, fontSize: 14),
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
               ),
             ),
           ),
@@ -239,16 +252,14 @@ class _LoginScreenState extends State<LoginScreen>
         return AlertDialog(
           title: Text(
             '¿Guardar credenciales?',
-            style: GoogleFonts.montserrat(textStyle: TextStyle(fontSize: 15)),
+            style: TextStyle(fontFamily: 'Montserrat', fontSize: 15),
           ),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(
                   '¿Deseas guardar tus credenciales para futuros inicios de sesión biométricos?',
-                  style: GoogleFonts.montserrat(
-                    textStyle: TextStyle(fontSize: 13),
-                  ),
+                  style: TextStyle(fontSize: 13, fontFamily: 'Montserrat'),
                 ),
               ],
             ),
@@ -263,9 +274,7 @@ class _LoginScreenState extends State<LoginScreen>
               },
               child: Text(
                 'Aceptar',
-                style: GoogleFonts.montserrat(
-                  textStyle: TextStyle(fontSize: 12),
-                ),
+                style: TextStyle(fontSize: 12, fontFamily: 'Montserrat'),
               ),
             ),
             TextButton(
@@ -277,9 +286,7 @@ class _LoginScreenState extends State<LoginScreen>
               },
               child: Text(
                 'Cancelar',
-                style: GoogleFonts.montserrat(
-                  textStyle: TextStyle(fontSize: 12),
-                ),
+                style: TextStyle(fontSize: 12, fontFamily: 'Montserrat'),
               ),
             ),
           ],
@@ -431,12 +438,11 @@ class _LoginScreenState extends State<LoginScreen>
                     widthFactor: 0.8,
                     child: TextFormField(
                       controller: _usernameController,
-                      style: GoogleFonts.montserrat(
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Montserrat',
                       ),
                       decoration: InputDecoration(
                         filled: true,
@@ -460,11 +466,10 @@ class _LoginScreenState extends State<LoginScreen>
                           color: Color.fromRGBO(128, 185, 204, 1),
                         ),
                         hintText: 'Usuario',
-                        hintStyle: GoogleFonts.montserrat(
-                          textStyle: TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        hintStyle: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
                         ),
                       ),
                     ),
@@ -474,12 +479,11 @@ class _LoginScreenState extends State<LoginScreen>
                     widthFactor: 0.8,
                     child: TextFormField(
                       controller: _passwordController,
-                      style: GoogleFonts.montserrat(
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Montserrat',
                       ),
                       decoration: InputDecoration(
                         filled: true,
@@ -503,11 +507,10 @@ class _LoginScreenState extends State<LoginScreen>
                           color: Color.fromRGBO(128, 185, 204, 1),
                         ),
                         hintText: 'Contraseña',
-                        hintStyle: GoogleFonts.montserrat(
-                          textStyle: TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        hintStyle: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
                         ),
                       ),
                       obscureText: true,
@@ -537,11 +540,10 @@ class _LoginScreenState extends State<LoginScreen>
                             ? CircularProgressIndicator()
                             : Text(
                               'Ingresar',
-                              style: GoogleFonts.montserrat(
-                                textStyle: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 20,
-                                ),
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: 20,
+                                fontFamily: 'Montserrat',
                               ),
                             ),
                   ),
@@ -583,11 +585,10 @@ class _LoginScreenState extends State<LoginScreen>
                                                 BiometricType.iris
                                             ? 'Reconocimiento de iris'
                                             : 'Huella dactilar',
-                                        style: GoogleFonts.montserrat(
-                                          textStyle: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                          ),
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontFamily: 'Montserrat',
                                         ),
                                       ),
                                     ],

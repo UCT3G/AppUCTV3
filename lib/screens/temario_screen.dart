@@ -9,13 +9,12 @@ import 'package:app_uct/widgets/normal_view_temario.dart';
 import 'package:app_uct/widgets/road_segment.dart';
 import 'package:flutter/material.dart';
 import 'package:app_uct/widgets/painter_temario.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 
 class TemarioScreen extends StatefulWidget {
-  final Map<String, dynamic> curso;
-
-  const TemarioScreen({super.key, required this.curso});
+  const TemarioScreen({super.key});
 
   @override
   State<TemarioScreen> createState() => _TemarioScreenState();
@@ -23,7 +22,6 @@ class TemarioScreen extends StatefulWidget {
 
 class _TemarioScreenState extends State<TemarioScreen> {
   bool _showFullText = false;
-  bool _initialLoad = true;
   late int _currentUnidadIndex;
   Timer? _debounce;
 
@@ -36,16 +34,57 @@ class _TemarioScreenState extends State<TemarioScreen> {
 
   Future<void> loadTemario() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final accessToken = authProvider.accessToken;
-
-    await Provider.of<CompetenciaProvider>(
+    final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
       listen: false,
-    ).fetchTemario(widget.curso['id_curso_fk'], accessToken!);
+    );
 
-    setState(() {
-      _initialLoad = false;
-    });
+    final accessToken = authProvider.accessToken;
+    // final idCurso = competenciaProvider.competencia?.idCurso;
+    final idCurso = 19;
+
+    if (accessToken != null && idCurso != null) {
+      try {
+        final response = await competenciaProvider.fetchTemario(
+          idCurso,
+          accessToken,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.teal,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                response['comentario'],
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontFamily: 'Montserrat',
+                ),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        debugPrint('Error: $e');
+        if (mounted) {
+          Navigator.of(context, rootNavigator: true).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Error: $e',
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -67,16 +106,23 @@ class _TemarioScreenState extends State<TemarioScreen> {
   @override
   Widget build(BuildContext context) {
     final competenciaProvider = Provider.of<CompetenciaProvider>(context);
+    final competencia = competenciaProvider.competencia;
     final screenSize = MediaQuery.of(context).size;
     final gradientHeight = screenSize.height * 0.25;
 
     // log('$competenciaProvider');
-    if (_initialLoad) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    if (competenciaProvider.error.isNotEmpty) {
-      return Scaffold(body: Center(child: Text(competenciaProvider.error)));
+    if (competenciaProvider.loading) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Lottie.asset(
+            "assets/animations/3g-tracto.json",
+            fit: BoxFit.cover,
+            width: screenSize.width * 0.6,
+            height: screenSize.width * 0.6,
+          ),
+        ),
+      );
     }
 
     return Scaffold(
@@ -166,15 +212,22 @@ class _TemarioScreenState extends State<TemarioScreen> {
                         child: Padding(
                           padding: EdgeInsets.only(right: 25),
                           child: AnimatedSwitcher(
-                            duration: Duration(microseconds: 300),
+                            duration: Duration(milliseconds: 300),
+                            transitionBuilder:
+                                (child, animation) => FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                ),
                             child:
                                 _showFullText
                                     ? buildFullText(
-                                      widget.curso['titulo_curso'],
+                                      competencia?.tituloCurso ??
+                                          'Titulo curso',
                                     )
                                     : buildNormalView(
                                       screenSize,
-                                      widget.curso['titulo_curso'],
+                                      competencia?.tituloCurso ??
+                                          'Titulo curso',
                                     ),
                           ),
                         ),

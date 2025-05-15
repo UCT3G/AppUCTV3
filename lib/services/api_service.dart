@@ -3,8 +3,9 @@
 
 class ApiService {
   // static const String baseURL = 'http://192.168.1.189:8000';
-  // static const String baseURL = 'http://192.168.1.209:8000';10.10.31.103
-  static const String baseURL = 'http://10.10.31.103:8000';
+  // static const String baseURL = 'http://192.168.1.209:8000';
+  // static const String baseURL = 'http://10.10.31.103:8000';
+  static const String baseURL = 'http://192.168.1.140:8000';
 
   // METODO PARA HACER SOLICITUDES GET
   // static Future<http.Response> get(String endpoint) async {

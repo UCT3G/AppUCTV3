@@ -1,7 +1,8 @@
+import 'dart:developer';
+
 import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/services/api_service.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 class ImagenScreen extends StatefulWidget {
   final Tema tema;
@@ -15,6 +16,13 @@ class ImagenScreen extends StatefulWidget {
 class _ImagenScreenState extends State<ImagenScreen> {
   @override
   Widget build(BuildContext context) {
+    final nombreArchivo = widget.tema.rutaRecurso.split('/').last;
+    log(nombreArchivo);
+
+    final imagenURL = Uri.parse(
+      '${ApiService.baseURL}/imagen_movil/${widget.tema.idCurso}/${widget.tema.idUnidad}/${widget.tema.idTema}/$nombreArchivo',
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.tema.titulo),
@@ -24,10 +32,15 @@ class _ImagenScreenState extends State<ImagenScreen> {
         ),
       ),
       body: Center(
-        child: Image.asset(
-          'assets/images/recurso_basico.jpg',
-          fit: BoxFit.cover,
-          width: double.infinity,
+        child: InteractiveViewer(
+          boundaryMargin: EdgeInsets.all(20),
+          minScale: 0.5,
+          maxScale: 4.0,
+          child: Image.network(
+            imagenURL.toString(),
+            fit: BoxFit.cover,
+            width: double.infinity,
+          ),
         ),
       ),
     );

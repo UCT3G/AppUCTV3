@@ -8,11 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final authProvider = AuthProvider();
+  await authProvider.loadTokens();
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => authProvider),
         ChangeNotifierProvider(create: (_) => CompetenciaProvider()),
       ],
       child: MyApp(),

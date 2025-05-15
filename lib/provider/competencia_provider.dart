@@ -21,28 +21,32 @@ class CompetenciaProvider with ChangeNotifier {
   //   [Color(0xFF7B2884), Color(0xFF7C8AC4)],
   // ];
 
-  Future<void> fetchTemario(int idCurso, String accesToken) async {
-    if (_loading) return;
-
+  Future<Map<String, dynamic>> fetchTemario(
+    int idCurso,
+    String accessToken,
+  ) async {
     _loading = true;
-    // notifyListeners();
+
+    notifyListeners();
 
     try {
-      final response = await CourseService.getTemario(idCurso, accesToken);
-      _unidades = response.map((json) => Unidad.fromJson(json)).toList();
-      _error = '';
+      final response = await CourseService.getTemario(idCurso, accessToken);
+      final unidadesJson = response['unidades'] as List;
+      _unidades = unidadesJson.map((json) => Unidad.fromJson(json)).toList();
+      return response;
     } catch (e) {
-      _error = 'Error al cargar el temario: ${e.toString()}';
-      _unidades = [];
+      throw Exception(
+        'Error al cargar el temario de la competencia: ${e.toString()}',
+      );
     } finally {
       _loading = false;
-      // notifyListeners();
+      notifyListeners();
     }
   }
 
   Future<Map<String, dynamic>> fetchCompetenciaActual(String token) async {
     _loading = true;
-    
+
     notifyListeners();
 
     try {

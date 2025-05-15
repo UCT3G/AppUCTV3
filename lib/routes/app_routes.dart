@@ -39,11 +39,7 @@ class AppRoutes {
       final tema = ModalRoute.of(context)!.settings.arguments as Tema;
       return VideoScreen(tema: tema);
     },
-    temario: (context) {
-      final curso =
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-      return TemarioScreen(curso: curso);
-    },
+    temario: (context) => TemarioScreen(),
     imagen: (context) {
       final tema = ModalRoute.of(context)!.settings.arguments as Tema;
       return ImagenScreen(tema: tema);

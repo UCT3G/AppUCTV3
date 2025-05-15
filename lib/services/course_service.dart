@@ -31,17 +31,13 @@ class CourseService {
     }
   }
 
-  static Future<List<dynamic>> getTemario(
+  static Future<Map<String, dynamic>> getTemario(
     int idCurso,
     String accessToken,
   ) async {
-    final url = Uri.parse(
-      '${ApiService.baseURL}/CURSOS_MOVIL/getTemarioCompetencia',
-    );
-
     try {
       final response = await http.post(
-        url,
+        Uri.parse('${ApiService.baseURL}/CURSOS_MOVIL/getTemarioCompetencia'),
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
@@ -52,7 +48,7 @@ class CourseService {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return data['unidades'] as List;
+        return data;
       } else if (response.statusCode == 401) {
         throw Exception('Token expirado o inválido');
       } else {

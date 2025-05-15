@@ -2,10 +2,10 @@
 
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
+import 'package:app_uct/routes/app_navigator.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/painter_welcome.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
 
@@ -30,6 +30,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       context,
       listen: false,
     );
+
     final accessToken = authProvider.accessToken;
 
     try {
@@ -48,14 +49,32 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             behavior: SnackBarBehavior.floating,
             content: Text(
               competenciaData['comentario'],
-              style: GoogleFonts.montserrat(
-                textStyle: TextStyle(color: Colors.white, fontSize: 14),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'Montserrat',
               ),
             ),
           ),
         );
       }
     } catch (e) {
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error: $e',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      }
       debugPrint('Error: $e');
     }
   }
@@ -111,8 +130,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           child: Lottie.asset(
             "assets/animations/3g-tracto.json",
             fit: BoxFit.cover,
-            width: 300,
-            height: 300,
+            width: screenSize.width * 0.6,
+            height: screenSize.width * 0.6,
           ),
         ),
       );
@@ -198,38 +217,35 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     children: [
                       Text(
                         "BIENVENIDO",
-                        style: GoogleFonts.montserrat(
-                          textStyle: TextStyle(
-                            color: Color(0xFF574293),
-                            fontSize: screenSize.height * 0.05,
-                            fontStyle: FontStyle.italic,
-                            fontWeight: FontWeight.w900,
-                            height: 1.0,
-                          ),
+                        style: TextStyle(
+                          color: Color(0xFF574293),
+                          fontSize: screenSize.height * 0.05,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w900,
+                          height: 1.0,
+                          fontFamily: 'Montserrat',
                         ),
                         textAlign: TextAlign.center,
                       ),
                       Text(
                         "a la app de",
-                        style: GoogleFonts.montserrat(
-                          textStyle: TextStyle(
-                            color: Color(0xFF574293),
-                            fontSize: screenSize.height * 0.025,
-                            height: 1.0,
-                          ),
+                        style: TextStyle(
+                          color: Color(0xFF574293),
+                          fontSize: screenSize.height * 0.025,
+                          height: 1.0,
+                          fontFamily: 'Montserrat',
                         ),
                         textAlign: TextAlign.center,
                       ),
                       Text(
                         "UCT",
-                        style: GoogleFonts.montserrat(
-                          textStyle: TextStyle(
-                            color: Color(0xFF574293),
-                            fontSize: screenSize.height * 0.05,
-                            fontStyle: FontStyle.italic,
-                            fontWeight: FontWeight.w900,
-                            height: 1.0,
-                          ),
+                        style: TextStyle(
+                          color: Color(0xFF574293),
+                          fontSize: screenSize.height * 0.05,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w900,
+                          height: 1.0,
+                          fontFamily: 'Montserrat',
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -239,24 +255,22 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           children: [
                             Text(
                               "¡FELICIDADES! No tienes competencias pendientes.",
-                              style: GoogleFonts.montserrat(
-                                textStyle: TextStyle(
-                                  color: Color(0xFF4D4D4D),
-                                  fontSize: screenSize.height * 0.025,
-                                  height: 1.0,
-                                ),
+                              style: TextStyle(
+                                color: Color(0xFF4D4D4D),
+                                fontSize: screenSize.height * 0.025,
+                                height: 1.0,
+                                fontFamily: 'Montserrat',
                               ),
                               textAlign: TextAlign.center,
                             ),
                             Text(
                               'Tu aprendizaje no termina aquí. Revisa la app periódicamente para nuevos contenidos.',
-                              style: GoogleFonts.montserrat(
-                                textStyle: TextStyle(
-                                  color: Color(0xFF4D4D4D),
-                                  fontSize: screenSize.height * 0.025,
-                                  fontStyle: FontStyle.italic,
-                                  height: 1.2,
-                                ),
+                              style: TextStyle(
+                                color: Color(0xFF4D4D4D),
+                                fontSize: screenSize.height * 0.025,
+                                fontStyle: FontStyle.italic,
+                                height: 1.2,
+                                fontFamily: 'Montserrat',
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -273,12 +287,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                       'Curso actual obtenido correctamente.'
                                   ? "Estás trabajando en:"
                                   : "Tienes una competencia pendiente:",
-                              style: GoogleFonts.montserrat(
-                                textStyle: TextStyle(
-                                  color: Color(0xFF4D4D4D),
-                                  fontSize: screenSize.height * 0.025,
-                                  height: 1.0,
-                                ),
+                              style: TextStyle(
+                                color: Color(0xFF4D4D4D),
+                                fontSize: screenSize.height * 0.025,
+                                height: 1.0,
+                                fontFamily: 'Montserrat',
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -292,13 +305,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 ),
                                 child: Text(
                                   competencia?.tituloCurso ?? '',
-                                  style: GoogleFonts.montserrat(
-                                    textStyle: TextStyle(
-                                      color: Color(0xFF4D4D4D),
-                                      fontSize: screenSize.height * 0.025,
-                                      fontStyle: FontStyle.italic,
-                                      height: 1.2,
-                                    ),
+                                  style: TextStyle(
+                                    color: Color(0xFF4D4D4D),
+                                    fontSize: screenSize.height * 0.025,
+                                    fontStyle: FontStyle.italic,
+                                    height: 1.2,
+                                    fontFamily: 'Montserrat',
                                   ),
                                   textAlign: TextAlign.center,
                                   maxLines: 4,
@@ -342,7 +354,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                       alignment: Alignment.center,
                                       child: Text(
                                         'Continuar',
-                                        style: GoogleFonts.montserrat(),
+                                        style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -382,7 +396,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 SizedBox(width: 5),
                                 Text(
                                   'Competencias',
-                                  style: GoogleFonts.montserrat(),
+                                  style: TextStyle(fontFamily: 'Montserrat'),
                                 ),
                               ],
                             ),

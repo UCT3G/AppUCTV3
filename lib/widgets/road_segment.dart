@@ -284,9 +284,14 @@ class _RoadSegmentState extends State<RoadSegment> {
                 color:
                     (widget.tema.intentosConsumidos > 0 &&
                             widget.tema.resultado > 0)
-                        ? Color.fromRGBO(184, 255, 102, 1)
+                        ? Color.fromRGBO(
+                          184,
+                          255,
+                          102,
+                          1,
+                        ).withValues(alpha: 0.6)
                         : widget.esSiguienteTema
-                        ? Color.fromRGBO(255, 44, 80, 1)
+                        ? Color.fromRGBO(255, 44, 80, 1).withValues(alpha: 0.6)
                         : Colors.grey[300],
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
