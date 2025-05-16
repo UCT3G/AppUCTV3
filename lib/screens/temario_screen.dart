@@ -40,8 +40,8 @@ class _TemarioScreenState extends State<TemarioScreen> {
     );
 
     final accessToken = authProvider.accessToken;
-    // final idCurso = competenciaProvider.competencia?.idCurso;
-    final idCurso = 19;
+    final idCurso = competenciaProvider.competencia?.idCurso;
+    // final idCurso = 19;
 
     if (accessToken != null && idCurso != null) {
       try {

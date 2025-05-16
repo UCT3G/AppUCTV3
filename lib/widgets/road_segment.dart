@@ -289,7 +289,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                           255,
                           102,
                           1,
-                        ).withValues(alpha: 0.6)
+                        ).withValues(alpha: 0.5)
                         : widget.esSiguienteTema
                         ? Color.fromRGBO(255, 44, 80, 1).withValues(alpha: 0.6)
                         : Colors.grey[300],
