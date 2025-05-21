@@ -28,9 +28,12 @@ class _LoginScreenState extends State<LoginScreen>
 
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  bool _supportsBiometric = false;
+  bool _isBiometricEnabled = false;
   bool _isLoadingCredentials = false;
-  bool _isLoadingBiometrics = false;
   bool _isBiometricAvailable = false;
+  bool _isLoadingBiometrics = false;
   bool _hasStoredCredentials = false;
 
   AuthProvider get authProvider =>
@@ -76,10 +79,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (response['access_token'] != null) {
-        final isBiometricAuthEnabled =
-            await authProvider.hasBiometricPreference();
-
-        if (!isBiometricAuthEnabled && _isBiometricAvailable) {
+        if (_supportsBiometric && !_isBiometricEnabled) {
           await showSaveCredentialsDialog();
         }
 
@@ -146,10 +146,14 @@ class _LoginScreenState extends State<LoginScreen>
 
   // METODO PARA VERIFICAR SI EL DISPOSITIVO SOPORTA AUTENTICACION BIOMETRICA
   Future<void> checkBiometricAvailability() async {
-    bool isAvailable = await authProvider.isBiometricAuthEnabled();
+    final supportsBiometric = await authProvider.checkBiometricSupport();
+    final isEnabled = await authProvider.isBiometricAuthEnabled();
+    final isBiometricAvailable = await authProvider.hasBiometricPreference();
 
     setState(() {
-      _isBiometricAvailable = isAvailable;
+      _supportsBiometric = supportsBiometric;
+      _isBiometricEnabled = isEnabled;
+      _isBiometricAvailable = isBiometricAvailable;
     });
   }
 

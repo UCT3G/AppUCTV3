@@ -69,9 +69,9 @@ class AuthService {
     await _storage.delete(key: 'access_token');
     await _storage.delete(key: 'refresh_token');
 
-    final isEnabled = await BiometricService.isBiometricAuthEnabled();
+    final value = await BiometricService.getBiometricAuthPreference();
 
-    if (!isEnabled) {
+    if (value?.toLowerCase() == 'false') {
       await _storage.delete(key: 'username');
       await _storage.delete(key: 'password');
     }
@@ -90,7 +90,8 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final data = json.decode(response.body);
+        return data['access_token'];
       } else {
         debugPrint('Error al renovar el token: ${response.statusCode}');
         return null;

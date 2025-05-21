@@ -1,8 +1,6 @@
 // import 'dart:developer';
 
-import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
-import 'package:app_uct/routes/app_navigator.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/painter_welcome.dart';
 import 'package:flutter/material.dart';
@@ -25,18 +23,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   String _comentario = "";
 
   Future<void> loadCompetencia() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
       listen: false,
     );
 
-    final accessToken = authProvider.accessToken;
-
     try {
-      final competenciaData = await competenciaProvider.fetchCompetenciaActual(
-        accessToken!,
-      );
+      final competenciaData =
+          await competenciaProvider.fetchCompetenciaActual();
 
       setState(() {
         _comentario = competenciaData['comentario'];
@@ -59,6 +53,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         );
       }
     } catch (e) {
+      if (e.toString().contains('Sesión expirada.')) {
+        if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
+        return;
+      }
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(

@@ -53,7 +53,7 @@ class BiometricService {
   // METODO PARA VERIFICAR SI LA AUTENTICACION BIOMETRICA ESTA HABILITADA
   static Future<bool> isBiometricAuthEnabled() async {
     final value = await _storage.read(key: 'biometric_auth_enabled');
-    return value == 'true';
+    return value != null;
   }
 
   static Future<String?> getBiometricAuthPreference() async {

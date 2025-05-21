@@ -18,7 +18,12 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => authProvider),
-        ChangeNotifierProvider(create: (_) => CompetenciaProvider()),
+        ChangeNotifierProxyProvider<AuthProvider, CompetenciaProvider>(
+          create: (_) => CompetenciaProvider(authProvider),
+          update:
+              (_, auth, competenciaProvider) =>
+                  competenciaProvider!..updateAuth(auth),
+        ),
       ],
       child: MyApp(),
     ),

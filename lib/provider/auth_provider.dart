@@ -7,6 +7,7 @@ import 'package:local_auth/local_auth.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
+  final BiometricService _biometricService = BiometricService();
   String? _accessToken;
   String? _refreshToken;
   Usuario? _currentUsuario;
@@ -93,7 +94,7 @@ class AuthProvider extends ChangeNotifier {
   //METODO PARA HABILITAR/DESHABILITAR AUTENTICACION BIOMETRICA
   Future<bool> hasBiometricPreference() async {
     final value = await BiometricService.getBiometricAuthPreference();
-    return value != null;
+    return value?.toLowerCase() == 'true';
   }
 
   Future<void> enableBiometricAuth() async {
@@ -110,6 +111,10 @@ class AuthProvider extends ChangeNotifier {
 
   Future<List<BiometricType>> getAvailableBiometrics() async {
     return await _authService.biometricService.getAvailableBiometrics();
+  }
+
+  Future<bool> checkBiometricSupport() async {
+    return await _biometricService.isBiometricAvailable();
   }
 
   //METODO PARA SABER SI UN USUARIO ESTA LOGUEADO

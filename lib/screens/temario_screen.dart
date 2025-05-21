@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:app_uct/models/tema_model.dart';
-import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/utils/session_helper.dart';
 import 'package:app_uct/widgets/flull_text_temario.dart';
@@ -33,22 +32,17 @@ class _TemarioScreenState extends State<TemarioScreen> {
   ];
 
   Future<void> loadTemario() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
       listen: false,
     );
 
-    final accessToken = authProvider.accessToken;
-    final idCurso = competenciaProvider.competencia?.idCurso;
-    // final idCurso = 19;
+    // final idCurso = competenciaProvider.competencia?.idCurso;
+    final idCurso = 31;
 
-    if (accessToken != null && idCurso != null) {
+    if (idCurso != null) {
       try {
-        final response = await competenciaProvider.fetchTemario(
-          idCurso,
-          accessToken,
-        );
+        final response = await competenciaProvider.fetchTemario(idCurso);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -66,6 +60,10 @@ class _TemarioScreenState extends State<TemarioScreen> {
           );
         }
       } catch (e) {
+        if (e.toString().contains('Sesión expirada.')) {
+          if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
+          return;
+        }
         debugPrint('Error: $e');
         if (mounted) {
           Navigator.of(context, rootNavigator: true).pop();
@@ -84,6 +82,18 @@ class _TemarioScreenState extends State<TemarioScreen> {
           );
         }
       }
+    } else {
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          'No hay un curso seleccionado.',
+          style: TextStyle(
+            fontFamily: 'Montserrat',
+            color: Colors.white,
+            fontSize: 14,
+          ),
+        ),
+      );
     }
   }
 

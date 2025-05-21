@@ -33,7 +33,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
       ),
       body: Center(
         child: InteractiveViewer(
-          boundaryMargin: EdgeInsets.all(20),
+          boundaryMargin: EdgeInsets.all(double.infinity),
           minScale: 0.5,
           maxScale: 4.0,
           child: Image.network(

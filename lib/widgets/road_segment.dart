@@ -173,6 +173,13 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     arguments: widget.tema,
                                   );
                                   break;
+                                case 'ARCHIVO':
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.archivo,
+                                    arguments: widget.tema,
+                                  );
+                                  break;
                               }
                             },
                             style: ElevatedButton.styleFrom(

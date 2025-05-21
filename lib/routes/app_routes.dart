@@ -1,4 +1,5 @@
 import 'package:app_uct/models/tema_model.dart';
+import 'package:app_uct/screens/content/archivo_screen.dart';
 import 'package:app_uct/screens/content/imagen_screen.dart';
 import 'package:app_uct/screens/content/interactive_screen.dart';
 import 'package:app_uct/screens/content/pdf_screen.dart';
@@ -20,6 +21,7 @@ class AppRoutes {
   static const String temario = '/temario';
   static const String imagen = '/imagen';
   static const String pdf = '/pdf';
+  static const String archivo = '/archivo';
 
   static final routes = {
     login: (context) => LoginScreen(),
@@ -47,6 +49,10 @@ class AppRoutes {
     pdf: (context) {
       final tema = ModalRoute.of(context)!.settings.arguments as Tema;
       return PdfScreen(tema: tema);
+    },
+    archivo: (context) {
+      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
+      return ArchivoScreen(tema: tema);
     },
   };
 }
