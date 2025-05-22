@@ -37,8 +37,8 @@ class _TemarioScreenState extends State<TemarioScreen> {
       listen: false,
     );
 
-    // final idCurso = competenciaProvider.competencia?.idCurso;
-    final idCurso = 31;
+    final idCurso = competenciaProvider.competencia?.idCurso;
+    // final idCurso = 31;
 
     if (idCurso != null) {
       try {

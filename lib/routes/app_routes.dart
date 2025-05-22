@@ -1,8 +1,10 @@
 import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/screens/content/archivo_screen.dart';
+import 'package:app_uct/screens/content/articulo_screen.dart';
 import 'package:app_uct/screens/content/imagen_screen.dart';
 import 'package:app_uct/screens/content/interactive_screen.dart';
 import 'package:app_uct/screens/content/pdf_screen.dart';
+import 'package:app_uct/screens/content/presencial_screen.dart';
 import 'package:app_uct/screens/content/video_screen.dart';
 import 'package:app_uct/screens/home_screen.dart';
 import 'package:app_uct/screens/login_screen.dart';
@@ -22,6 +24,8 @@ class AppRoutes {
   static const String imagen = '/imagen';
   static const String pdf = '/pdf';
   static const String archivo = '/archivo';
+  static const String articulo = '/articulo';
+  static const String presencial = '/presencial';
 
   static final routes = {
     login: (context) => LoginScreen(),
@@ -54,5 +58,13 @@ class AppRoutes {
       final tema = ModalRoute.of(context)!.settings.arguments as Tema;
       return ArchivoScreen(tema: tema);
     },
+    articulo: (context) {
+      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
+      return ArticuloScreen(tema: tema);
+    },
+    presencial: (context) {
+      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
+      return PresencialScreen(tema: tema);
+    }
   };
 }

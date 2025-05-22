@@ -58,5 +58,12 @@
 	<string>Necesitamos acceso para guardar videos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Necesitamos acceso para guardar videos en tu dispositivo</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>sms</string>
+		<string>tel</string>
+		<string>https</string>
+  		<string>http</string>
+	</array>
 </dict>
 </plist>
