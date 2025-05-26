@@ -11,6 +11,7 @@ class Tema {
   final int intentosDisponibles;
   final double resultado;
   final String observaciones;
+  final List slideImages;
 
   Tema({
     required this.idTema,
@@ -25,6 +26,7 @@ class Tema {
     required this.intentosDisponibles,
     required this.resultado,
     required this.observaciones,
+    required this.slideImages,
   });
 
   factory Tema.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class Tema {
       intentosDisponibles: json['intentos_disponibles'],
       resultado: json['resultado'],
       observaciones: json['observaciones'] ?? '',
+      slideImages: json['slide_images'] ?? [],
     );
   }
 }

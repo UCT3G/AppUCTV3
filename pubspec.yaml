@@ -57,6 +57,9 @@ dependencies:
   intl: ^0.20.2
   open_filex: ^4.7.0
   url_launcher: ^6.3.1
+  photo_view: ^0.15.0
+  cached_network_image: ^3.4.1
+  smooth_page_indicator: ^1.2.1
 
 dev_dependencies:
   flutter_test:
