@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:app_uct/services/api_service.dart';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -56,6 +59,38 @@ class CourseService {
       }
     } catch (e) {
       throw Exception('Error de conexión: $e');
+    }
+  }
+
+  static Future<String> subirPractica(
+    int idTema,
+    File archivo,
+    String accessToken,
+  ) async {
+    final dio = Dio();
+
+    try {
+      final formData = FormData.fromMap({
+        'id_tema': idTema,
+        'file': await MultipartFile.fromFile(
+          archivo.path,
+          filename: 'practica_tema$idTema.pdf',
+        ),
+      });
+
+      final response = await dio.post(
+        '${ApiService.baseURL}/CURSOS_MOVIL/subirPractica',
+        data: formData,
+        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data['comentario'];
+      } else {
+        throw Exception('Error al subir la práctica');
+      }
+    } catch (e) {
+      throw Exception('Error de conexion: ${e.toString()}');
     }
   }
 }

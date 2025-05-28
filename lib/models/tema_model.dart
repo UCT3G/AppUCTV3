@@ -46,4 +46,36 @@ class Tema {
       slideImages: json['slide_images'] ?? [],
     );
   }
+
+  Tema copyWith({
+    int? idTema,
+    int? idUnidad,
+    String? titulo,
+    int? orden,
+    int? intentosConsumidos,
+    String? rutaRecurso,
+    String? recursoBasicoTipo,
+    int? idCurso,
+    int? ordenUnidad,
+    int? intentosDisponibles,
+    double? resultado,
+    String? observaciones,
+    List? slideImages,
+  }) {
+    return Tema(
+      idTema: idTema ?? this.idTema,
+      idUnidad: idUnidad ?? this.idUnidad,
+      titulo: titulo ?? this.titulo,
+      orden: orden ?? this.orden,
+      intentosConsumidos: intentosConsumidos ?? this.intentosConsumidos,
+      rutaRecurso: rutaRecurso ?? this.rutaRecurso,
+      recursoBasicoTipo: recursoBasicoTipo ?? this.recursoBasicoTipo,
+      idCurso: idCurso ?? this.idCurso,
+      ordenUnidad: ordenUnidad ?? this.ordenUnidad,
+      intentosDisponibles: intentosDisponibles ?? this.intentosDisponibles,
+      resultado: resultado ?? this.resultado,
+      observaciones: observaciones ?? this.observaciones,
+      slideImages: slideImages ?? this.slideImages,
+    );
+  }
 }

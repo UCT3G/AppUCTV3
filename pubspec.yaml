@@ -60,6 +60,7 @@ dependencies:
   photo_view: ^0.15.0
   cached_network_image: ^3.4.1
   smooth_page_indicator: ^1.2.1
+  file_picker: ^10.1.9
 
 dev_dependencies:
   flutter_test:

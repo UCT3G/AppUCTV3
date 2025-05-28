@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:app_uct/models/competencia_model.dart';
 import 'package:app_uct/models/unidad_model.dart';
 import 'package:app_uct/provider/auth_provider.dart';
@@ -134,6 +137,39 @@ class CompetenciaProvider with ChangeNotifier {
         }
       }
       throw Exception('Error al cargar la competencia actual: ${e.toString()}');
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<String> subirPractica(int idTema, File archivo) async {
+    _loading = true;
+    notifyListeners();
+
+    try {
+      final response = await CourseService.subirPractica(
+        idTema,
+        archivo,
+        _authProvider.accessToken!,
+      );
+
+      for (var unidad in _unidades) {
+        final temaIndex = unidad.temas.indexWhere((t) => t.idTema == idTema);
+        if (temaIndex != -1) {
+          final temaOriginal = unidad.temas[temaIndex];
+          final temaActualizado = temaOriginal.copyWith(
+            intentosConsumidos: temaOriginal.intentosConsumidos + 1,
+          );
+          unidad.temas[temaIndex] = temaActualizado;
+          break;
+        }
+      }
+
+      notifyListeners();
+      return response;
+    } catch (e) {
+      return 'Error: ${e.toString()}';
     } finally {
       _loading = false;
       notifyListeners();

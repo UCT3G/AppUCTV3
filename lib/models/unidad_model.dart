@@ -4,7 +4,7 @@ class Unidad {
   final int idUnidad;
   final String titulo;
   final int orden;
-  final List<Tema> temas;
+  List<Tema> temas;
   final int idCurso;
 
   Unidad({
@@ -22,6 +22,22 @@ class Unidad {
       orden: json['orden'],
       temas: List<Tema>.from(json['temas'].map((x) => Tema.fromJson(x))),
       idCurso: json['id_curso_fk'],
+    );
+  }
+
+  Unidad copyWith({
+    int? idUnidad,
+    String? titulo,
+    int? orden,
+    List<Tema>? temas,
+    int? idCurso,
+  }) {
+    return Unidad(
+      idUnidad: idUnidad ?? this.idUnidad,
+      titulo: titulo ?? this.titulo,
+      orden: orden ?? this.orden,
+      temas: temas ?? this.temas,
+      idCurso: idCurso ?? this.idCurso,
     );
   }
 }

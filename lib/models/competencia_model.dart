@@ -78,4 +78,55 @@ class Competencia {
       tituloCurso: json['titulo_curso'] ?? '',
     );
   }
+
+  Competencia copyWith({
+    int? idUsuarioCurso,
+    int? idUsuario,
+    int? idCurso,
+    String? estado,
+    int? evaluacionUsuario,
+    double? promedio,
+    double? avance,
+    DateTime? fechaInicio,
+    DateTime? fechaTermino,
+    DateTime? fechaAsignacion,
+    DateTime? fechaLimite,
+    int? registroUsuario,
+    DateTime? registroFecha,
+    int? modificacionUsuario,
+    DateTime? modificacionFecha,
+    String? tituloCurso,
+    String? descripcionCurso,
+    int? calificacionMinima,
+    int? idMapaFuncional,
+    String? obligatorio,
+    int? idAsignacion,
+    String? motivoModificacionFecha,
+  }) {
+    return Competencia(
+      avance: avance ?? this.avance,
+      calificacionMinima: calificacionMinima ?? this.calificacionMinima,
+      descripcionCurso: descripcionCurso ?? this.descripcionCurso,
+      estado: estado ?? this.estado,
+      evaluacionUsuario: evaluacionUsuario ?? this.evaluacionUsuario,
+      fechaAsignacion: fechaAsignacion ?? this.fechaAsignacion,
+      fechaInicio: fechaInicio ?? this.fechaInicio,
+      fechaLimite: fechaLimite ?? this.fechaLimite,
+      fechaTermino: fechaTermino ?? this.fechaTermino,
+      idAsignacion: idAsignacion ?? this.idAsignacion,
+      idCurso: idCurso ?? this.idCurso,
+      idMapaFuncional: idMapaFuncional ?? this.idMapaFuncional,
+      idUsuario: idUsuario ?? this.idUsuario,
+      idUsuarioCurso: idUsuarioCurso ?? this.idUsuarioCurso,
+      modificacionFecha: modificacionFecha ?? this.modificacionFecha,
+      modificacionUsuario: modificacionUsuario ?? this.modificacionUsuario,
+      motivoModificacionFecha:
+          motivoModificacionFecha ?? this.motivoModificacionFecha,
+      obligatorio: obligatorio ?? this.obligatorio,
+      promedio: promedio ?? this.promedio,
+      registroFecha: registroFecha ?? this.registroFecha,
+      registroUsuario: registroUsuario ?? this.registroUsuario,
+      tituloCurso: tituloCurso ?? this.tituloCurso,
+    );
+  }
 }
