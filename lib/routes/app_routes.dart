@@ -46,8 +46,8 @@ class AppRoutes {
       return InteractiveScreen(tema: tema);
     },
     video: (context) {
-      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
-      return VideoScreen(tema: tema);
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return VideoScreen(idTema: idTema);
     },
     temario: (context) => TemarioScreen(),
     imagen: (context) {

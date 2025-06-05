@@ -9,7 +9,7 @@ class ArticuloScreen extends StatelessWidget {
 
   const ArticuloScreen({super.key, required this.tema});
 
-  Future<void> abrirURL(Uri url) async{  
+  Future<void> abrirURL(Uri url) async {
     log('$url');
     if (!await launchUrl(url, mode: LaunchMode.inAppBrowserView)) {
       throw Exception('Could not launch $url');
@@ -29,7 +29,7 @@ class ArticuloScreen extends StatelessWidget {
       body: Center(
         child: GestureDetector(
           onTap: () => abrirURL(Uri.parse(tema.rutaRecurso)),
-          child: Image.asset('assets/images/articulo.png'),
+          child: Image.asset('assets/images/Recurso.png'),
         ),
       ),
     );

@@ -2,15 +2,9 @@
 // import 'dart:convert';
 
 class ApiService {
-  // static const String baseURL = 'http://192.168.1.189:8000';
-  // static const String baseURL = 'http://192.168.1.209:8000';
-  // static const String baseURL = 'http://10.10.31.13:8000';
-  // static const String baseURL = 'http://192.168.1.140:8000';
-  // static const String baseURL = 'http://192.168.1.231:8000';
-  // static const String baseURL = 'http://10.10.127.2:8005';
-  // static const String baseURL = 'http://172.17.96.1:8005';
-  // static const String baseURL = 'http://192.168.1.169:8000';
-  static const String baseURL = 'http://uct.tresguerras.com.mx:8007';
+  // static const String baseURL = 'http://192.168.1.231:8007';
+  static const String baseURL = 'http://192.168.1.198:8007';
+  // static const String baseURL = 'http://uct.tresguerras.com.mx:8007';
 
   // METODO PARA HACER SOLICITUDES GET
   // static Future<http.Response> get(String endpoint) async {

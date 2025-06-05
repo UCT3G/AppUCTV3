@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'dart:developer';
 
-import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/utils/session_helper.dart';
 import 'package:app_uct/widgets/flull_text_temario.dart';
@@ -21,7 +21,6 @@ class TemarioScreen extends StatefulWidget {
 
 class _TemarioScreenState extends State<TemarioScreen> {
   bool _showFullText = false;
-  late int _currentUnidadIndex;
   Timer? _debounce;
 
   static const List<List<Color>> _predefinedGradients = [
@@ -38,7 +37,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
     );
 
     // final idCurso = competenciaProvider.competencia?.idCurso;
-    final idCurso = 31;
+    final idCurso = 19;
 
     if (idCurso != null) {
       try {
@@ -101,7 +100,6 @@ class _TemarioScreenState extends State<TemarioScreen> {
   void initState() {
     super.initState();
     SessionHelper.updateLastActive();
-    _currentUnidadIndex = 0;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadTemario();
     });
@@ -117,10 +115,17 @@ class _TemarioScreenState extends State<TemarioScreen> {
   Widget build(BuildContext context) {
     final competenciaProvider = Provider.of<CompetenciaProvider>(context);
     final competencia = competenciaProvider.competencia;
+    final siguienteTema = competenciaProvider.obtenerSiguienteTema();
+    final currentUnidadIndex =
+        siguienteTema == null
+            ? 1
+            : competenciaProvider.unidades.indexWhere(
+              (u) => u.idUnidad == siguienteTema.idUnidad,
+            );
     final screenSize = MediaQuery.of(context).size;
     final gradientHeight = screenSize.height * 0.25;
 
-    // log('$competenciaProvider');
+    log('$currentUnidadIndex');
     if (competenciaProvider.loading) {
       return Scaffold(
         backgroundColor: Colors.white,
@@ -160,7 +165,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
                 height: gradientHeight,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: _predefinedGradients[_currentUnidadIndex % 4],
+                    colors: _predefinedGradients[currentUnidadIndex % 4],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
@@ -267,10 +272,6 @@ class _TemarioScreenState extends State<TemarioScreen> {
         competenciaProvider.unidades.length == 1 &&
         competenciaProvider.unidades[0].temas.length == 1;
 
-    Tema? siguienteTema = obtenerSiguienteTema(competenciaProvider);
-
-    _currentUnidadIndex = siguienteTema?.idUnidad ?? 1;
-
     for (
       int unidadIndex = 0;
       unidadIndex < competenciaProvider.unidades.length;
@@ -294,29 +295,12 @@ class _TemarioScreenState extends State<TemarioScreen> {
           nextCurveIsLeft = !nextCurveIsLeft;
         }
 
-        segments.add(
-          RoadSegment(
-            type: type,
-            tema: tema,
-            esSiguienteTema: tema == siguienteTema,
-          ),
-        );
+        segments.add(RoadSegment(type: type, idTema: tema.idTema));
         temaGlobalIndex++; // Incrementa el contador GLOBAL de temas
       }
     }
 
     return segments;
-  }
-
-  Tema? obtenerSiguienteTema(CompetenciaProvider competenciaProvider) {
-    for (var unidad in competenciaProvider.unidades) {
-      for (var tema in unidad.temas) {
-        if (tema.resultado == 0) {
-          return tema;
-        }
-      }
-    }
-    return null;
   }
 }
 

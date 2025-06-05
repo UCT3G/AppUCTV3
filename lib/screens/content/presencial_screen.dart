@@ -15,9 +15,7 @@ class PresencialScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-      body: Center(
-        child: Image.asset('assets/images/recurso-presencial.png'),
-      ),
+      body: Center(child: Image.asset('assets/images/Presencial.png')),
     );
   }
 }

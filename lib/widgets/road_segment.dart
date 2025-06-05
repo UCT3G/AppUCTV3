@@ -1,21 +1,16 @@
 import 'dart:math';
 
-import 'package:app_uct/models/tema_model.dart';
+import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/screens/temario_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RoadSegment extends StatefulWidget {
   final SegmentType type;
-  final Tema tema;
-  final bool esSiguienteTema;
+  final int idTema;
 
-  const RoadSegment({
-    super.key,
-    required this.type,
-    required this.tema,
-    required this.esSiguienteTema,
-  });
+  const RoadSegment({super.key, required this.type, required this.idTema});
 
   @override
   State<RoadSegment> createState() => _RoadSegmentState();
@@ -36,6 +31,13 @@ class _RoadSegmentState extends State<RoadSegment> {
     'PRESENTACION': Icons.slideshow,
     'VIDEO': Icons.videocam,
   };
+
+  static const List<Color> _predefinedColors = [
+    Color(0xFF574293),
+    Color(0xFF05696E),
+    Color(0xFFCC151A),
+    Color(0xFF7B2884),
+  ];
 
   String get _assetPath {
     switch (widget.type) {
@@ -68,6 +70,10 @@ class _RoadSegmentState extends State<RoadSegment> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
+        final tema =
+            Provider.of<CompetenciaProvider>(
+              context,
+            ).getTemaById(widget.idTema)!;
         final imageHeight = MediaQuery.of(context).size.height * 0.15;
 
         return Center(
@@ -96,7 +102,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        widget.tema.titulo,
+                        tema.titulo,
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -124,7 +130,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${widget.tema.intentosConsumidos} visualizaciones',
+                              '${tema.intentosConsumidos} visualizaciones',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey.shade700,
@@ -151,61 +157,61 @@ class _RoadSegmentState extends State<RoadSegment> {
                           ),
                           ElevatedButton(
                             onPressed: () async {
-                              switch (widget.tema.recursoBasicoTipo) {
+                              switch (tema.recursoBasicoTipo) {
                                 case 'VIDEO':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.video,
-                                    arguments: widget.tema,
+                                    arguments: tema.idTema,
                                   );
                                   break;
                                 case 'IMAGEN':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.imagen,
-                                    arguments: widget.tema,
+                                    arguments: tema,
                                   );
                                   break;
                                 case 'DOCUMENTO':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.pdf,
-                                    arguments: widget.tema,
+                                    arguments: tema,
                                   );
                                   break;
                                 case 'ARCHIVO':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.archivo,
-                                    arguments: widget.tema,
+                                    arguments: tema,
                                   );
                                   break;
                                 case 'ARTICULO':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.articulo,
-                                    arguments: widget.tema,
+                                    arguments: tema,
                                   );
                                   break;
                                 case 'PRESENCIAL':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.presencial,
-                                    arguments: widget.tema,
+                                    arguments: tema,
                                   );
                                   break;
                                 case 'PRESENTACION':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.presentacion,
-                                    arguments: widget.tema,
+                                    arguments: tema,
                                   );
                                   break;
                                 case 'PRACTICA':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.practica,
-                                    arguments: widget.tema,
+                                    arguments: tema,
                                   );
                                   break;
                               }
@@ -266,6 +272,16 @@ class _RoadSegmentState extends State<RoadSegment> {
 
   @override
   Widget build(BuildContext context) {
+    final competenciaProvider = Provider.of<CompetenciaProvider>(context);
+    final tema = competenciaProvider.getTemaById(widget.idTema);
+    final siguienteTema = competenciaProvider.obtenerSiguienteTema();
+    final currentUnidadIndex =
+        siguienteTema == null
+            ? 1
+            : competenciaProvider.unidades.indexWhere(
+              (u) => u.idUnidad == siguienteTema.idUnidad,
+            );
+
     final screenSize = MediaQuery.of(context).size;
     bool isCardOnRight;
     bool isCircleOnLeft;
@@ -317,22 +333,16 @@ class _RoadSegmentState extends State<RoadSegment> {
               height: screenSize.height * 0.13,
               child: Card(
                 color:
-                    (widget.tema.intentosConsumidos > 0 &&
-                            widget.tema.resultado > 0)
-                        ? Color.fromRGBO(
-                          184,
-                          255,
-                          102,
-                          1,
-                        ).withValues(alpha: 0.5)
-                        : widget.esSiguienteTema
-                        ? Color.fromRGBO(255, 44, 80, 1).withValues(alpha: 0.6)
+                    (tema!.intentosConsumidos > 0 && tema.resultado >= 80)
+                        ? Color.fromRGBO(119, 200, 0, 1)
+                        : tema == siguienteTema
+                        ? Color.fromRGBO(186, 15, 60, 0.7)
                         : Colors.grey[300],
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
-                  side: BorderSide(width: 1, color: Colors.grey.shade400),
+                  // side: BorderSide(width: 1, color: Colors.grey.shade400),
                 ),
-                elevation: 5,
+                elevation: 4,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 30,
@@ -343,16 +353,14 @@ class _RoadSegmentState extends State<RoadSegment> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        widget.tema.titulo,
+                        tema.titulo,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
                           color:
-                              (widget.tema.intentosConsumidos > 0 &&
-                                      widget.tema.resultado > 0)
-                                  ? Color.fromRGBO(19, 79, 8, 1)
-                                  : widget.esSiguienteTema
-                                  ? Color.fromRGBO(66, 5, 5, 1)
+                              (tema.intentosConsumidos > 0 ||
+                                      tema == siguienteTema)
+                                  ? Colors.white
                                   : Colors.grey[600],
                         ),
                         textAlign: TextAlign.center,
@@ -370,13 +378,19 @@ class _RoadSegmentState extends State<RoadSegment> {
           top: screenSize.height * 0.05,
           left: isCircleOnLeft ? 40 : null,
           right: isCircleOnLeft ? null : 40,
-          child: CircleAvatar(
-            radius: 30,
-            backgroundColor: Color(0xFFCC151A),
-            child: Icon(
-              _resourceIcons[widget.tema.recursoBasicoTipo] ??
-                  Icons.note_rounded,
-              color: Colors.white,
+          child: Container(
+            padding: const EdgeInsets.all(2), // Grosor del borde blanco
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white, // Color del borde
+            ),
+            child: CircleAvatar(
+              radius: 30,
+              backgroundColor: _predefinedColors[currentUnidadIndex],
+              child: Icon(
+                _resourceIcons[tema.recursoBasicoTipo] ?? Icons.note_rounded,
+                color: Colors.white,
+              ),
             ),
           ),
         ),

@@ -103,7 +103,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
           children: [
             GestureDetector(
               onTap: descargarArchivo,
-              child: Image.asset('assets/images/archivo_descargable.png'),
+              child: Image.asset('assets/images/Archivo.png'),
             ),
             if (_descargando)
               Column(

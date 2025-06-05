@@ -1,7 +1,8 @@
-import 'dart:developer';
+// import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_uct/models/competencia_model.dart';
+import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/models/unidad_model.dart';
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/services/auth_service.dart';
@@ -20,19 +21,55 @@ class CompetenciaProvider with ChangeNotifier {
   List<Unidad> _unidades = [];
   Competencia? _competencia;
   bool _loading = false;
-  String _error = '';
 
   Competencia? get competencia => _competencia;
   List<Unidad> get unidades => _unidades;
   bool get loading => _loading;
-  String get error => _error;
 
-  // static const List<List<Color>> _predefinedGradients = [
-  //   [Color(0xFF574293), Color(0xFF86CBC8)],
-  //   [Color(0xFF05696E), Color(0xFF6DB75E)],
-  //   [Color(0xFFF6A431), Color(0xFFCC151A)],
-  //   [Color(0xFF7B2884), Color(0xFF7C8AC4)],
-  // ];
+  Tema? getTemaById(int idTema) {
+    for (final unidad in _unidades) {
+      try {
+        final tema = unidad.temas.firstWhere((t) => t.idTema == idTema);
+        return tema;
+      } catch (e) {
+        debugPrint('No se encontro el tema en la unidad');
+      }
+    }
+    return null;
+  }
+
+  void registrarIntento(int idTema) {
+    for (var unidad in _unidades) {
+      final index = unidad.temas.indexWhere((t) => t.idTema == idTema);
+      if (index != -1) {
+        final tema = unidad.temas[index];
+        final tiposNoCalificables = ['PRACTICA'];
+
+        final actualizarTema = tema.copyWith(
+          intentosConsumidos: tema.intentosConsumidos + 1,
+          resultado:
+              !tiposNoCalificables.contains(tema.recursoBasicoTipo)
+                  ? 100
+                  : tema.resultado,
+        );
+        unidad.temas[index] = actualizarTema;
+        break;
+      }
+    }
+    //AQUI LLAMAR ACTUALIZAR AVANCE Y CALIFICACION WUUU
+    notifyListeners();
+  }
+
+  Tema? obtenerSiguienteTema() {
+    for (var unidad in _unidades) {
+      for (var tema in unidad.temas) {
+        if (tema.resultado == 0) {
+          return tema;
+        }
+      }
+    }
+    return null;
+  }
 
   Future<Map<String, dynamic>> fetchTemario(int idCurso) async {
     _loading = true;
@@ -154,22 +191,67 @@ class CompetenciaProvider with ChangeNotifier {
         _authProvider.accessToken!,
       );
 
-      for (var unidad in _unidades) {
-        final temaIndex = unidad.temas.indexWhere((t) => t.idTema == idTema);
-        if (temaIndex != -1) {
-          final temaOriginal = unidad.temas[temaIndex];
-          final temaActualizado = temaOriginal.copyWith(
-            intentosConsumidos: temaOriginal.intentosConsumidos + 1,
-          );
-          unidad.temas[temaIndex] = temaActualizado;
-          break;
-        }
-      }
+      registrarIntento(idTema);
 
-      notifyListeners();
       return response;
     } catch (e) {
       return 'Error: ${e.toString()}';
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Map<String, dynamic>> actualizarTemaUsuario(
+    int idCurso,
+    int idTema,
+  ) async {
+    _loading = true;
+
+    notifyListeners();
+
+    try {
+      final response = await CourseService.actualizarTemaUsuario(
+        idCurso,
+        idTema,
+        _authProvider.accessToken!,
+      );
+
+      registrarIntento(idTema);
+
+      return response;
+    } catch (e) {
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await CourseService.actualizarTemaUsuario(
+                idCurso,
+                idTema,
+                _authProvider.accessToken!,
+              );
+
+              registrarIntento(idTema);
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception('Error al cargar la competencia actual: ${e.toString()}');
     } finally {
       _loading = false;
       notifyListeners();

@@ -209,6 +209,7 @@ class _PracticaScreenState extends State<PracticaScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Image.asset('assets/images/Practica.png'),
             Text("Archivo de la práctica:"),
             const SizedBox(height: 8),
             Card(
