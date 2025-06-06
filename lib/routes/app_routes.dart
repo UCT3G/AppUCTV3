@@ -51,8 +51,8 @@ class AppRoutes {
     },
     temario: (context) => TemarioScreen(),
     imagen: (context) {
-      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
-      return ImagenScreen(tema: tema);
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return ImagenScreen(idTema: idTema);
     },
     pdf: (context) {
       final tema = ModalRoute.of(context)!.settings.arguments as Tema;

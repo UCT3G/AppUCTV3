@@ -1,6 +1,7 @@
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/services/api_service.dart';
+import 'package:app_uct/widgets/breadcrumb_nav.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -118,6 +119,9 @@ class _VideoScreenState extends State<VideoScreen> {
     final competenciaProvider = Provider.of<CompetenciaProvider>(context);
     final tema = competenciaProvider.getTemaById(widget.idTema)!;
     final size = MediaQuery.of(context).size;
+    final currentUnidad = competenciaProvider.unidades.firstWhere(
+      (u) => u.idUnidad == tema.idUnidad,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -177,10 +181,18 @@ class _VideoScreenState extends State<VideoScreen> {
                       padding: EdgeInsets.all(16.0),
                       child: Text(
                         'No se pudo cargar el video.',
-                        style: TextStyle(color: Colors.redAccent),
+                        style: TextStyle(color: Colors.redAccent, fontFamily: 'Montserrat'),
                         textAlign: TextAlign.center,
                       ),
                     ),
+          ),
+
+          BreadcrumbNav(
+            paths: [
+              competenciaProvider.competencia!.tituloCurso ?? 'Competencia',
+              currentUnidad.titulo,
+              tema.titulo,
+            ],
           ),
         ],
       ),

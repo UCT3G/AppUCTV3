@@ -169,7 +169,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.imagen,
-                                    arguments: tema,
+                                    arguments: tema.idTema,
                                   );
                                   break;
                                 case 'DOCUMENTO':
@@ -277,7 +277,7 @@ class _RoadSegmentState extends State<RoadSegment> {
     final siguienteTema = competenciaProvider.obtenerSiguienteTema();
     final currentUnidadIndex =
         siguienteTema == null
-            ? 1
+            ? 0
             : competenciaProvider.unidades.indexWhere(
               (u) => u.idUnidad == siguienteTema.idUnidad,
             );

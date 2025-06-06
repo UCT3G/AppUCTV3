@@ -37,7 +37,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
     );
 
     // final idCurso = competenciaProvider.competencia?.idCurso;
-    final idCurso = 19;
+    final idCurso = 31;
 
     if (idCurso != null) {
       try {
@@ -118,7 +118,7 @@ class _TemarioScreenState extends State<TemarioScreen> {
     final siguienteTema = competenciaProvider.obtenerSiguienteTema();
     final currentUnidadIndex =
         siguienteTema == null
-            ? 1
+            ? 0
             : competenciaProvider.unidades.indexWhere(
               (u) => u.idUnidad == siguienteTema.idUnidad,
             );

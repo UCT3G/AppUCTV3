@@ -46,7 +46,7 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
               },
             ),
           )
-          ..loadRequest(Uri.parse(widget.tema['ruta']));
+          ..loadRequest(Uri.parse('https://uct.tresguerras.com.mx/UCT'));
   }
 
   @override

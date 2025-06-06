@@ -23,6 +23,7 @@ Widget buildNormalView(Size screenSize, String titulo) {
               color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
+              fontFamily: 'Montserrat',
             ),
           ),
         ),

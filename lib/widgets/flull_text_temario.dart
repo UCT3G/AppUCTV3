@@ -10,6 +10,7 @@ Widget buildFullText(String titulo) {
         color: Colors.white,
         fontSize: 20,
         fontWeight: FontWeight.bold,
+        fontFamily: 'Montserrat',
       ),
     ),
   );
