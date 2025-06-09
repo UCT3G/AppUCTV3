@@ -55,20 +55,20 @@ class AppRoutes {
       return ImagenScreen(idTema: idTema);
     },
     pdf: (context) {
-      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
-      return PdfScreen(tema: tema);
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return PdfScreen(idTema: idTema);
     },
     archivo: (context) {
-      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
-      return ArchivoScreen(tema: tema);
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return ArchivoScreen(idTema: idTema);
     },
     articulo: (context) {
-      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
-      return ArticuloScreen(tema: tema);
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return ArticuloScreen(idTema: idTema);
     },
     presencial: (context) {
-      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
-      return PresencialScreen(tema: tema);
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return PresencialScreen(idTema: idTema);
     },
     presentacion: (context) {
       final tema = ModalRoute.of(context)!.settings.arguments as Tema;

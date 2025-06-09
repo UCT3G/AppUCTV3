@@ -29,7 +29,7 @@ class _RoadSegmentState extends State<RoadSegment> {
     'PRACTICA': Icons.science,
     'PRESENCIAL': Icons.person,
     'PRESENTACION': Icons.slideshow,
-    'VIDEO': Icons.videocam,
+    'VIDEO': Icons.video_label,
   };
 
   static const List<Color> _predefinedColors = [
@@ -176,28 +176,35 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.pdf,
-                                    arguments: tema,
+                                    arguments: tema.idTema,
+                                  );
+                                  break;
+                                case 'PDF':
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.pdf,
+                                    arguments: tema.idTema,
                                   );
                                   break;
                                 case 'ARCHIVO':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.archivo,
-                                    arguments: tema,
+                                    arguments: tema.idTema,
                                   );
                                   break;
                                 case 'ARTICULO':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.articulo,
-                                    arguments: tema,
+                                    arguments: tema.idTema,
                                   );
                                   break;
                                 case 'PRESENCIAL':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.presencial,
-                                    arguments: tema,
+                                    arguments: tema.idTema,
                                   );
                                   break;
                                 case 'PRESENTACION':

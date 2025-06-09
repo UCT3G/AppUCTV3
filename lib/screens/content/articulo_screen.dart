@@ -1,8 +1,8 @@
 import 'dart:developer';
 
-import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
+import 'package:app_uct/widgets/breadcrumb_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -57,7 +57,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
           SnackBar(
             behavior: SnackBarBehavior.floating,
             content: Text(
-              'Error al cargar el video: $e',
+              'Error al cargar el articulo: $e',
               style: TextStyle(
                 fontFamily: 'Montserrat',
                 color: Colors.white,
@@ -78,20 +78,72 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      actualizarTemaVisto();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final competenciaProvider = Provider.of<CompetenciaProvider>(context);
+    final tema = competenciaProvider.getTemaById(widget.idTema)!;
+    final currentUnidad = competenciaProvider.unidades.firstWhere(
+      (u) => u.idUnidad == tema.idUnidad,
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(tema.titulo),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromRGBO(162, 157, 205, 1),
+                Color.fromRGBO(165, 210, 241, 1),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        title: Text(
+          tema.titulo,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontFamily: 'Montserrat',
+          ),
+        ),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),
       ),
-      body: Center(
-        child: GestureDetector(
-          onTap: () => abrirURL(Uri.parse(tema.rutaRecurso)),
-          child: Image.asset('assets/images/Recurso.png'),
-        ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/background_recursos.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Center(
+            child: GestureDetector(
+              onTap: () => abrirURL(Uri.parse(tema.rutaRecurso)),
+              child: Image.asset('assets/images/Recurso.png'),
+            ),
+          ),
+          BreadcrumbNav(
+            paths: [
+              competenciaProvider.competencia!.tituloCurso ?? 'Competencia',
+              currentUnidad.titulo,
+              tema.titulo,
+            ],
+          ),
+        ],
       ),
     );
   }
