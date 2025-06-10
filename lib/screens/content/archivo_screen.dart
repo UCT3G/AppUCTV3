@@ -35,17 +35,15 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
         openAppSettings(); // opción para guiar al usuario si no concede el permiso
         throw Exception('Permiso de almacenamiento completo denegado.');
       }
-      Directory? downloadsDirectory;
 
-      if (Platform.isAndroid) {
-        downloadsDirectory = Directory('/storage/emulated/0/Download');
+      Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
+
+      if (!await downloadsDirectory.exists()) {
+        downloadsDirectory =
+            await getExternalStorageDirectory() ?? downloadsDirectory;
       }
 
-      if (downloadsDirectory == null || !await downloadsDirectory.exists()) {
-        downloadsDirectory = await getExternalStorageDirectory();
-      }
-
-      return downloadsDirectory!.path;
+      return downloadsDirectory.path;
     } else if (Platform.isIOS) {
       final directory = await getApplicationDocumentsDirectory();
       return directory.path;
@@ -87,7 +85,18 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Archivo guardado en: $savePath')),
+          SnackBar(
+            backgroundColor: Colors.teal,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Archivo guardado en: $savePath',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+          ),
         );
       }
 
@@ -95,9 +104,19 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
     } catch (e) {
       debugPrint('Error al descargar: $e');
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error: ${e.toString()}',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
       }
     } finally {
       setState(() {
@@ -251,7 +270,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
                             minHeight: 8,
                             backgroundColor: Colors.grey[300],
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.teal,
+                              Color.fromRGBO(165, 209, 241, 1),
                             ),
                           ),
                           const SizedBox(height: 12),

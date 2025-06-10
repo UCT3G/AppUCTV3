@@ -1,4 +1,3 @@
-import 'package:app_uct/models/tema_model.dart';
 import 'package:app_uct/screens/content/archivo_screen.dart';
 import 'package:app_uct/screens/content/articulo_screen.dart';
 import 'package:app_uct/screens/content/imagen_screen.dart';
@@ -71,12 +70,12 @@ class AppRoutes {
       return PresencialScreen(idTema: idTema);
     },
     presentacion: (context) {
-      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
-      return PresentacionScreen(tema: tema);
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return PresentacionScreen(idTema: idTema);
     },
     practica: (context) {
-      final tema = ModalRoute.of(context)!.settings.arguments as Tema;
-      return PracticaScreen(tema: tema);
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return PracticaScreen(idTema: idTema);
     },
   };
 }

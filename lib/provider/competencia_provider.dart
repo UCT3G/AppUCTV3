@@ -180,13 +180,18 @@ class CompetenciaProvider with ChangeNotifier {
     }
   }
 
-  Future<String> subirPractica(int idTema, File archivo) async {
+  Future<Map<String, dynamic>> subirPractica(
+    int idTema,
+    int idCurso,
+    File archivo,
+  ) async {
     _loading = true;
     notifyListeners();
 
     try {
       final response = await CourseService.subirPractica(
         idTema,
+        idCurso,
         archivo,
         _authProvider.accessToken!,
       );
@@ -195,7 +200,39 @@ class CompetenciaProvider with ChangeNotifier {
 
       return response;
     } catch (e) {
-      return 'Error: ${e.toString()}';
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await CourseService.subirPractica(
+                idTema,
+                idCurso,
+                archivo,
+                _authProvider.accessToken!,
+              );
+
+              registrarIntento(idTema);
+
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception('Error al subir la practica: ${e.toString()}');
     } finally {
       _loading = false;
       notifyListeners();

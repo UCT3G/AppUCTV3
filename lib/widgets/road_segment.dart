@@ -211,14 +211,14 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.presentacion,
-                                    arguments: tema,
+                                    arguments: tema.idTema,
                                   );
                                   break;
                                 case 'PRACTICA':
                                   Navigator.pushNamed(
                                     context,
                                     AppRoutes.practica,
-                                    arguments: tema,
+                                    arguments: tema.idTema,
                                   );
                                   break;
                               }
