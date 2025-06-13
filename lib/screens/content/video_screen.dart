@@ -189,7 +189,7 @@ class _VideoScreenState extends State<VideoScreen> {
 
           BreadcrumbNav(
             paths: [
-              competenciaProvider.competencia!.tituloCurso ?? 'Competencia',
+              competenciaProvider.competencia!.titulo ?? 'Competencia',
               currentUnidad.titulo,
               tema.titulo,
             ],

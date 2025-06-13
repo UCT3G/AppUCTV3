@@ -5,7 +5,7 @@ class PainterTemario extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Layer 1
 
-    Paint paint_fill_0 =
+    Paint paintFill0 =
         Paint()
           ..color = const Color.fromARGB(127, 255, 255, 255)
           ..style = PaintingStyle.fill
@@ -53,7 +53,7 @@ class PainterTemario extends CustomPainter {
     );
     path_0.close();
 
-    canvas.drawPath(path_0, paint_fill_0);
+    canvas.drawPath(path_0, paintFill0);
   }
 
   @override

@@ -90,7 +90,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       blurRadius: 10,
                       spreadRadius: 2,
                     ),
@@ -157,6 +157,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                           ),
                           ElevatedButton(
                             onPressed: () async {
+                              Navigator.pop(context);
                               switch (tema.recursoBasicoTipo) {
                                 case 'VIDEO':
                                   Navigator.pushNamed(

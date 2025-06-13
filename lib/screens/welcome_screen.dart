@@ -302,7 +302,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   maxWidth: screenSize.width * 0.8,
                                 ),
                                 child: Text(
-                                  competencia?.tituloCurso ?? '',
+                                  competencia?.titulo ?? '',
                                   style: TextStyle(
                                     color: Color(0xFF4D4D4D),
                                     fontSize: screenSize.height * 0.025,
@@ -368,9 +368,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         width: screenSize.width * 0.5,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pushReplacementNamed(
+                            Navigator.pushNamedAndRemoveUntil(
                               context,
                               AppRoutes.home,
+                              (route) => false,
                             );
                           },
                           style: ElevatedButton.styleFrom(

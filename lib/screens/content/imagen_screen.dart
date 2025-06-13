@@ -157,7 +157,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
                 ),
             BreadcrumbNav(
               paths: [
-                competenciaProvider.competencia!.tituloCurso ?? 'Competencia',
+                competenciaProvider.competencia!.titulo ?? 'Competencia',
                 currentUnidad.titulo,
                 tema.titulo,
               ],

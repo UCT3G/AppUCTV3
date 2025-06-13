@@ -122,7 +122,7 @@ class _PresencialScreenState extends State<PresencialScreen> {
           Center(child: Image.asset('assets/images/Presencial.png')),
           BreadcrumbNav(
             paths: [
-              competenciaProvider.competencia!.tituloCurso ?? 'Competencia',
+              competenciaProvider.competencia!.titulo ?? 'Competencia',
               currentUnidad.titulo,
               tema.titulo,
             ],

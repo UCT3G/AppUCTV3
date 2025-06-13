@@ -135,7 +135,7 @@ class _PdfScreenState extends State<PdfScreen> {
               : SfPdfViewer.network(pdfUrl!),
           BreadcrumbNav(
             paths: [
-              competenciaProvider.competencia!.tituloCurso ?? 'Competencia',
+              competenciaProvider.competencia!.titulo ?? 'Competencia',
               currentUnidad.titulo,
               tema.titulo,
             ],

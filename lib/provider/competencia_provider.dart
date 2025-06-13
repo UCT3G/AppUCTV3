@@ -21,10 +21,16 @@ class CompetenciaProvider with ChangeNotifier {
   List<Unidad> _unidades = [];
   Competencia? _competencia;
   bool _loading = false;
+  List<Competencia> _competencias = [];
 
   Competencia? get competencia => _competencia;
   List<Unidad> get unidades => _unidades;
   bool get loading => _loading;
+  List<Competencia> get competencias => _competencias;
+
+  void setCompetencia(Competencia competencia) {
+    _competencia = competencia;
+  }
 
   Tema? getTemaById(int idTema) {
     for (final unidad in _unidades) {
@@ -34,6 +40,13 @@ class CompetenciaProvider with ChangeNotifier {
       } catch (e) {
         debugPrint('No se encontro el tema en la unidad');
       }
+    }
+    return null;
+  }
+
+  Competencia? getCompetenciaById(int idCurso) {
+    for (final c in _competencias) {
+      if (c.idCurso == idCurso) return c;
     }
     return null;
   }
@@ -289,6 +302,60 @@ class CompetenciaProvider with ChangeNotifier {
         }
       }
       throw Exception('Error al cargar la competencia actual: ${e.toString()}');
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchCompetencias() async {
+    _loading = true;
+
+    notifyListeners();
+
+    try {
+      final response = await CourseService.getCursosUsuario(
+        _authProvider.accessToken!,
+      );
+      final competenciasJson = response['cursos_usuario'] as List;
+      _competencias =
+          competenciasJson.map((json) => Competencia.fromJson(json)).toList();
+      return response;
+    } catch (e) {
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await CourseService.getCursosUsuario(
+                _authProvider.accessToken!,
+              );
+              final competenciasJson = response['cursos_usuario'] as List;
+              _competencias =
+                  competenciasJson
+                      .map((json) => Competencia.fromJson(json))
+                      .toList();
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception(
+        'Error al cargar las competencias del usuario: ${e.toString()}',
+      );
     } finally {
       _loading = false;
       notifyListeners();

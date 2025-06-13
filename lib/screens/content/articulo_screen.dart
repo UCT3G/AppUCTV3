@@ -138,7 +138,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
           ),
           BreadcrumbNav(
             paths: [
-              competenciaProvider.competencia!.tituloCurso ?? 'Competencia',
+              competenciaProvider.competencia!.titulo ?? 'Competencia',
               currentUnidad.titulo,
               tema.titulo,
             ],

@@ -325,7 +325,7 @@ class _PracticaScreenState extends State<PracticaScreen> {
           children: [
             BreadcrumbNav(
               paths: [
-                competenciaProvider.competencia!.tituloCurso ?? 'Competencia',
+                competenciaProvider.competencia!.titulo ?? 'Competencia',
                 currentUnidad.titulo,
                 tema.titulo,
               ],

@@ -1,7 +1,9 @@
 import 'package:app_uct/provider/auth_provider.dart';
+import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
-import 'package:app_uct/utils/session_helper.dart';
+import 'package:app_uct/widgets/competencia_card.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,29 +14,125 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Future<void> loadCompetencias() async {
+    final competenciaProvider = Provider.of<CompetenciaProvider>(
+      context,
+      listen: false,
+    );
+
+    try {
+      final response = await competenciaProvider.fetchCompetencias();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.teal,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              response['comentario'],
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (e.toString().contains('Sesión expirada.')) {
+        if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
+        return;
+      }
+      debugPrint('Error: $e');
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error: $e',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    SessionHelper.updateLastActive();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadCompetencias();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> _temas = [
-      {
-        'titulo': 'Interactivo HTML',
-        'tipo': 'INTERACTIVO',
-        'icon': Icons.html,
-        'ruta':
-            'https://uct.tresguerras.com.mx/static/interactive.html?materia=7&unidad=40&tema=90&ruta_recurso=data%2FUC3G_MATERIAS%2Fmateria7%2Funidad40%2Ftema90%2Frecurso_basico',
-      },
-      {'titulo': 'Video', 'tipo': 'VIDEO', 'icon': Icons.video_library},
-    ];
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final competenciaProvider = Provider.of<CompetenciaProvider>(context);
+    final screenSize = MediaQuery.of(context).size;
+
+    if (competenciaProvider.loading) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Lottie.asset(
+            "assets/animations/3g-tracto.json",
+            fit: BoxFit.cover,
+            width: screenSize.width * 0.6,
+            height: screenSize.width * 0.6,
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text('UCT'),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromRGBO(162, 157, 205, 1),
+                Color.fromRGBO(165, 210, 241, 1),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        title: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // Alinear a la izquierda
+          mainAxisSize:
+              MainAxisSize.min, // Evita que el Column ocupe todo el espacio
+          children: [
+            Text(
+              authProvider.currentUsuario!.nombreCompleto ?? 'Usuario',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+            Text(
+              authProvider.currentUsuario!.nombrePuesto ??
+                  'Puesto', // Aquí tu puesto
+              style: TextStyle(
+                color: Colors.white.withValues(
+                  alpha: 0.8,
+                ), // Leve transparencia si quieres distinguirlo
+                fontSize: 12, // Más pequeño que el nombre
+                fontFamily: 'Montserrat',
+              ),
+            ),
+          ],
+        ),
+        leading: Icon(Icons.account_circle_rounded, color: Colors.white),
         actions: [
           IconButton(
             onPressed: () async {
@@ -42,93 +140,84 @@ class _HomeScreenState extends State<HomeScreen> {
                 context,
                 listen: false,
               );
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.login,
+                (route) => false,
+              );
               await authProvider.logout();
-              Navigator.pushReplacementNamed(context, AppRoutes.login);
             },
-            icon: Icon(Icons.logout),
+            icon: Icon(Icons.logout, color: Colors.white),
           ),
         ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(15.0),
-        itemCount: _temas.length,
-        itemBuilder: (context, index) {
-          final tema = _temas[index];
-          return Card(
-            elevation: 4,
-            margin: const EdgeInsets.only(bottom: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // SECCION 1: FILTRADO COMPETENCIAS
+            Text(
+              'Filtrar competencias',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                switch (tema['tipo']) {
-                  case 'INTERACTIVO':
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.interactive,
-                      arguments: tema,
-                    );
-                    break;
-                  case 'VIDEO':
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.video,
-                      arguments: tema,
-                    );
-                    break;
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.blueGrey,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        tema['icon'],
-                        color: Colors.white70,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            tema['titulo'],
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Chip(
-                            label: Text(
-                              tema['tipo'] == 'VIDEO' ? 'Video' : 'Interactivo',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                              ),
-                            ),
-                            backgroundColor: Colors.blueGrey.withOpacity(0.8),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            //     Row(
+            //   children: [
+            //     Expanded(
+            //       child: ElevatedButton(
+            //         onPressed: () {}, // Acción para un filtro
+            //         child: Text('Por fecha'),
+            //       ),
+            //     ),
+            //     SizedBox(width: 8),
+            //     Expanded(
+            //       child: ElevatedButton(
+            //         onPressed: () {}, // Otro filtro
+            //         child: Text('Por avance'),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            SizedBox(height: 25),
+            // SECCION 2: COMPETENCIAS RECIENTES
+            Text(
+              'Competencias recientes',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          );
-        },
+            // SizedBox(
+            //   height: 180,
+            //   child: ListView.builder(
+            //     scrollDirection: Axis.horizontal,
+            //     itemCount: competenciaProvider.competencias.length.clamp(0, 5),
+            //     itemBuilder: (context, index) {
+            //       final competencia = competenciaProvider.competencias[index];
+            //       return Container(
+            //         width: 250,
+            //         margin: EdgeInsets.only(right: 8),
+            //         child: CompetenciaCard(competencia: competencia),
+            //       );
+            //     },
+            //   ),
+            // ),
+            SizedBox(height: 25),
+            // SECCION 3: TODAS LAS COMPETENCIAS
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: competenciaProvider.competencias.length,
+              itemBuilder: (context, index) {
+                final competencia = competenciaProvider.competencias[index];
+                return CompetenciaCard(idCompetencia: competencia.idCurso ?? 0);
+              },)
+          ],
+        ),
       ),
     );
   }
 }
+
+// Navigator.pushReplacementNamed(
+//   context,
+//   AppRoutes.temario,
+//   arguments: {'fromHome': true},
+// );

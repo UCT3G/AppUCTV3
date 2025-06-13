@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
+// import 'dart:developer';
 
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/utils/session_helper.dart';
@@ -13,7 +13,9 @@ import 'package:provider/provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 
 class TemarioScreen extends StatefulWidget {
-  const TemarioScreen({super.key});
+  final bool fromHome;
+
+  const TemarioScreen({super.key, required this.fromHome});
 
   @override
   State<TemarioScreen> createState() => _TemarioScreenState();
@@ -36,8 +38,8 @@ class _TemarioScreenState extends State<TemarioScreen> {
       listen: false,
     );
 
-    // final idCurso = competenciaProvider.competencia?.idCurso;
-    final idCurso = 31;
+    final idCurso = competenciaProvider.competencia?.idCurso;
+    // final idCurso = 31;
 
     if (idCurso != null) {
       try {
@@ -125,7 +127,6 @@ class _TemarioScreenState extends State<TemarioScreen> {
     final screenSize = MediaQuery.of(context).size;
     final gradientHeight = screenSize.height * 0.25;
 
-    log('$currentUnidadIndex');
     if (competenciaProvider.loading) {
       return Scaffold(
         backgroundColor: Colors.white,
@@ -140,120 +141,141 @@ class _TemarioScreenState extends State<TemarioScreen> {
       );
     }
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Parte scrollable (carretera y contenido)
-          SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                SizedBox(height: gradientHeight + 20),
-                Image.asset(
-                  'assets/images/Lineainicio.png',
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
-                ...buildRoadSegments(competenciaProvider),
-              ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        competenciaProvider.clear();
+        if (widget.fromHome) {
+          Navigator.pop(context);
+        } else {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.home,
+            (route) => false,
+          );
+        }
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // Parte scrollable (carretera y contenido)
+            SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  SizedBox(height: gradientHeight + 20),
+                  Image.asset(
+                    'assets/images/Lineainicio.png',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  ),
+                  ...buildRoadSegments(competenciaProvider),
+                ],
+              ),
             ),
-          ),
-          // Contenedor con gradiente Y Yowi
-          Column(
-            children: [
-              Container(
-                height: gradientHeight,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: _predefinedGradients[currentUnidadIndex % 4],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
+            // Contenedor con gradiente Y Yowi
+            Column(
+              children: [
+                Container(
+                  height: gradientHeight,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: _predefinedGradients[currentUnidadIndex % 4],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: SizedBox(
+                          width: screenSize.width,
+                          height: screenSize.height,
+                          child: CustomPaint(painter: PainterTemario()),
+                        ),
+                      ),
+                      Positioned(
+                        left: 10,
+                        top: MediaQuery.of(context).padding.top,
+                        child: IconButton(
+                          onPressed: () {
+                            competenciaProvider.clear();
+                            if (widget.fromHome) {
+                              Navigator.pop(context);
+                            } else {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                AppRoutes.home,
+                                (route) => false,
+                              );
+                            }
+                          },
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: MediaQuery.of(context).padding.top,
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(87, 66, 147, 1),
+                            borderRadius: BorderRadius.horizontal(
+                              left: Radius.circular(15),
+                            ),
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            iconSize: 30,
+                            onPressed: () {},
+                            icon: Icon(Icons.menu, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onDoubleTap: () {
+                            setState(() {
+                              _showFullText = !_showFullText;
+                            });
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 25),
+                            child: AnimatedSwitcher(
+                              duration: Duration(milliseconds: 300),
+                              transitionBuilder:
+                                  (child, animation) => FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  ),
+                              child:
+                                  _showFullText
+                                      ? buildFullText(
+                                        competencia?.titulo ??
+                                            'Titulo curso',
+                                      )
+                                      : buildNormalView(
+                                        screenSize,
+                                        competencia?.titulo ??
+                                            'Titulo curso',
+                                      ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: SizedBox(
-                        width: screenSize.width,
-                        height: screenSize.height,
-                        child: CustomPaint(painter: PainterTemario()),
-                      ),
-                    ),
-                    Positioned(
-                      left: 10,
-                      top: MediaQuery.of(context).padding.top,
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(
-                            context,
-                            AppRoutes.home,
-                          );
-                        },
-                        icon: Icon(Icons.arrow_back, color: Colors.white),
-                      ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: MediaQuery.of(context).padding.top,
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(87, 66, 147, 1),
-                          borderRadius: BorderRadius.horizontal(
-                            left: Radius.circular(15),
-                          ),
-                        ),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          iconSize: 30,
-                          onPressed: () {},
-                          icon: Icon(Icons.menu, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 0,
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onDoubleTap: () {
-                          setState(() {
-                            _showFullText = !_showFullText;
-                          });
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.only(right: 25),
-                          child: AnimatedSwitcher(
-                            duration: Duration(milliseconds: 300),
-                            transitionBuilder:
-                                (child, animation) => FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                ),
-                            child:
-                                _showFullText
-                                    ? buildFullText(
-                                      competencia?.tituloCurso ??
-                                          'Titulo curso',
-                                    )
-                                    : buildNormalView(
-                                      screenSize,
-                                      competencia?.tituloCurso ??
-                                          'Titulo curso',
-                                    ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

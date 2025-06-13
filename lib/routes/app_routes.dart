@@ -48,7 +48,11 @@ class AppRoutes {
       final idTema = ModalRoute.of(context)!.settings.arguments as int;
       return VideoScreen(idTema: idTema);
     },
-    temario: (context) => TemarioScreen(),
+    temario: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map?;
+      final fromHome = args?['fromHome'] ?? false;
+      return TemarioScreen(fromHome: fromHome);
+    },
     imagen: (context) {
       final idTema = ModalRoute.of(context)!.settings.arguments as int;
       return ImagenScreen(idTema: idTema);

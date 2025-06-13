@@ -5,7 +5,7 @@ class PainterWelcome extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Layer 1
 
-    Paint paint_fill_0 =
+    Paint paintFill0 =
         Paint()
           ..color = const Color.fromARGB(255, 255, 255, 255)
           ..style = PaintingStyle.fill
@@ -13,7 +13,7 @@ class PainterWelcome extends CustomPainter {
           ..strokeCap = StrokeCap.butt
           ..strokeJoin = StrokeJoin.miter;
 
-    paint_fill_0.shader = LinearGradient(
+    paintFill0.shader = LinearGradient(
       colors: [
         Color(0xFF86CBC8),
         Color(0xFF574293),
@@ -48,11 +48,11 @@ class PainterWelcome extends CustomPainter {
     );
     path_0.close();
 
-    canvas.drawPath(path_0, paint_fill_0);
+    canvas.drawPath(path_0, paintFill0);
 
     // Layer 1
 
-    Paint paint_fill_1 =
+    Paint paintFill1 =
         Paint()
           ..color = const Color.fromARGB(255, 255, 255, 255)
           ..style = PaintingStyle.fill
@@ -60,7 +60,7 @@ class PainterWelcome extends CustomPainter {
           ..strokeCap = StrokeCap.butt
           ..strokeJoin = StrokeJoin.miter;
 
-    paint_fill_1.shader = LinearGradient(
+    paintFill1.shader = LinearGradient(
       colors: [
         Color(0xFFA5D2F1),
         Color(0xFFA29DCD),
@@ -96,7 +96,7 @@ class PainterWelcome extends CustomPainter {
     );
     path_1.close();
 
-    canvas.drawPath(path_1, paint_fill_1);
+    canvas.drawPath(path_1, paintFill1);
   }
 
   @override
