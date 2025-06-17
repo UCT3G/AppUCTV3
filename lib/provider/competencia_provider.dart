@@ -193,18 +193,13 @@ class CompetenciaProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> subirPractica(
-    int idTema,
-    int idCurso,
-    File archivo,
-  ) async {
+  Future<Map<String, dynamic>> subirPractica(int idTema, File archivo) async {
     _loading = true;
     notifyListeners();
 
     try {
       final response = await CourseService.subirPractica(
         idTema,
-        idCurso,
         archivo,
         _authProvider.accessToken!,
       );
@@ -226,12 +221,9 @@ class CompetenciaProvider with ChangeNotifier {
             try {
               final response = await CourseService.subirPractica(
                 idTema,
-                idCurso,
                 archivo,
                 _authProvider.accessToken!,
               );
-
-              registrarIntento(idTema);
 
               return response;
             } catch (e) {

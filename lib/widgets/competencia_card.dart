@@ -1,4 +1,4 @@
-import 'dart:developer';
+// import 'dart:developer';
 
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
@@ -25,7 +25,7 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
     6000: 'assets/images/areas_tematicas/seguridad.svg',
     7000: 'assets/images/areas_tematicas/desarrollo_personal.svg',
     8000: 'assets/images/areas_tematicas/uso_tecnologias.svg',
-    9000: 'assets/images/areas_tematicas/participacion_social.svg'
+    9000: 'assets/images/areas_tematicas/participacion_social.svg',
   };
 
   @override
@@ -74,10 +74,34 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                color: Color.fromRGBO(86, 66, 148, 1),
                                 fontFamily: 'Montserrat',
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
+                                foreground:
+                                    competencia.esObligatoria == '1'
+                                        ? (Paint()
+                                          ..shader = LinearGradient(
+                                            colors: [
+                                              Color.fromRGBO(237, 30, 121, 0.8),
+                                              Color.fromRGBO(139, 0, 0, 0.8),
+                                            ],
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                          ).createShader(
+                                            Rect.fromLTWH(
+                                              0.0,
+                                              0.0,
+                                              200.0,
+                                              70.0,
+                                            ),
+                                          ))
+                                        : (Paint()
+                                          ..color = Color.fromRGBO(
+                                            86,
+                                            66,
+                                            148,
+                                            1,
+                                          )),
                               ),
                             ),
                           ),
@@ -166,7 +190,12 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
           child: CircleAvatar(
             radius: 30,
             backgroundColor: Colors.deepPurple,
-            child: SvgPicture.asset(_imageAreasTematicas[competencia.areaTematica] ?? 'assets/images/areas_tematicas/START.svg', width: 25, colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),),
+            child: SvgPicture.asset(
+              _imageAreasTematicas[competencia.areaTematica] ??
+                  'assets/images/areas_tematicas/START.svg',
+              width: 25,
+              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+            ),
           ),
         ),
       ],

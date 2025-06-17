@@ -202,6 +202,59 @@ class _PracticaScreenState extends State<PracticaScreen> {
     }
   }
 
+  Future<void> actualizarTemaVisto() async {
+    final competenciaProvider = Provider.of<CompetenciaProvider>(
+      context,
+      listen: false,
+    );
+    final tema = competenciaProvider.getTemaById(widget.idTema)!;
+
+    try {
+      final response = await competenciaProvider.actualizarTemaUsuario(
+        tema.idCurso,
+        tema.idTema,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.teal,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              response['comentario'],
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (e.toString().contains('Sesión expirada.')) {
+        if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
+        return;
+      }
+      debugPrint('Error: $e');
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error al cargar la presentación: $e',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> subirPractica() async {
     try {
       final competenciaProvider = Provider.of<CompetenciaProvider>(
@@ -240,7 +293,6 @@ class _PracticaScreenState extends State<PracticaScreen> {
 
       final response = await competenciaProvider.subirPractica(
         tema.idTema,
-        tema.idCurso,
         archivo,
       );
 
@@ -260,6 +312,7 @@ class _PracticaScreenState extends State<PracticaScreen> {
           ),
         );
       }
+      actualizarTemaVisto();
     } catch (e) {
       if (e.toString().contains('Sesión expirada.')) {
         if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
@@ -580,22 +633,23 @@ class _PracticaScreenState extends State<PracticaScreen> {
                 ],
               ),
             const SizedBox(height: 24),
-            if (tema.observaciones.isNotEmpty)
+            if (tema.observaciones.isNotEmpty) ...[
               Text(
                 "Comentarios:",
                 style: TextStyle(fontSize: 15, fontFamily: 'Montserrat'),
               ),
-            const SizedBox(height: 8),
-            Card(
-              margin: const EdgeInsets.symmetric(vertical: 4),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text(
-                  tema.observaciones,
-                  style: TextStyle(fontFamily: 'Montserrat'),
+              const SizedBox(height: 8),
+              Card(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    tema.observaciones,
+                    style: TextStyle(fontFamily: 'Montserrat'),
+                  ),
                 ),
               ),
-            ),
+            ],
             //COMENTARIOS
           ],
         ),

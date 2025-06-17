@@ -64,7 +64,6 @@ class CourseService {
 
   static Future<Map<String, dynamic>> subirPractica(
     int idTema,
-    int idCurso,
     File archivo,
     String accessToken,
   ) async {
@@ -73,7 +72,6 @@ class CourseService {
     try {
       final formData = FormData.fromMap({
         'id_tema': idTema,
-        'id_curso': idCurso,
         'file': await MultipartFile.fromFile(
           archivo.path,
           filename: 'practica_tema$idTema.pdf',

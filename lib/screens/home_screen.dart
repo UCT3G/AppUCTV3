@@ -1,7 +1,11 @@
+import 'dart:math';
+
+import 'package:app_uct/models/competencia_model.dart';
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/competencia_card.dart';
+import 'package:app_uct/widgets/painter_home.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +18,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollButton = false;
+  bool _showObligatorias = false;
+
   Future<void> loadCompetencias() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
@@ -63,18 +71,208 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> showSearchBottom(BuildContext context) {
+    final imageHeight = MediaQuery.of(context).size.height * 0.15;
+    final mensajes = [
+      "¡Hola de nuevo! ¿Qué te gustaría buscar hoy?",
+      "Dime qué necesitas... ¡Estoy listo!",
+      "¿Qué competencia quieres encontrar?",
+      "¡Es tu momento! ¿Qué quieres buscar?",
+      "¡Vamos por más! ¿Qué competencia deseas explorar?",
+      "¿Buscas algo en especial? Estoy aquí para ayudarte.",
+      "¡Hey! ¿Qué curso necesitas encontrar?",
+    ];
+
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: imageHeight / 2),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                top: 10, // espacio arriba para el contenido
+                left: 8,
+                right: 8,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white, // Fondo del modal
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromRGBO(162, 157, 205, 1),
+                    Color.fromRGBO(165, 210, 241, 1),
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(8.0),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromRGBO(162, 157, 205, 1),
+                        Color.fromRGBO(165, 210, 241, 1),
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 24,
+                        ),
+                        margin: EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          mensajes[Random().nextInt(mensajes.length)],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Montserrat',
+                            color: Color.fromRGBO(86, 66, 148, 1),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        margin: EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          style: TextStyle(fontFamily: 'Montserrat'),
+                          decoration: InputDecoration(
+                            hintText: 'Escribe aquí tu búsqueda...',
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(fontFamily: 'Montserrat'),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 150,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Acción al presionar
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 14,
+                              horizontal: 5,
+                            ),
+                            backgroundColor: Color.fromRGBO(86, 66, 148, 1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.search, color: Colors.white),
+                              SizedBox(width: 5),
+                              Text(
+                                'Buscar',
+                                style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: -(imageHeight / 2),
+              right: 0,
+              child: SizedBox(
+                height: imageHeight,
+                child: Image.asset(
+                  'assets/images/YowMitad.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadCompetencias();
     });
+
+    _scrollController.addListener(() {
+      if (_scrollController.offset >= 300 && !_showScrollButton) {
+        setState(() {
+          _showScrollButton = true;
+        });
+      } else if (_scrollController.offset < 300 && _showScrollButton) {
+        setState(() {
+          _showScrollButton = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final competenciaProvider = Provider.of<CompetenciaProvider>(context);
+    List<Competencia> listCompetencias =
+        _showObligatorias
+            ? competenciaProvider.competencias
+                .where((c) => c.esObligatoria == '1')
+                .toList()
+            : competenciaProvider.competencias;
     final screenSize = MediaQuery.of(context).size;
 
     if (competenciaProvider.loading) {
@@ -151,67 +349,142 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // SECCION 1: FILTRADO COMPETENCIAS
-            Text(
-              'Filtrar competencias',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF575398), // #A29ECE
+                  Color(0xFF84A9CA), // #A5D0EF
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-            //     Row(
-            //   children: [
-            //     Expanded(
-            //       child: ElevatedButton(
-            //         onPressed: () {}, // Acción para un filtro
-            //         child: Text('Por fecha'),
-            //       ),
-            //     ),
-            //     SizedBox(width: 8),
-            //     Expanded(
-            //       child: ElevatedButton(
-            //         onPressed: () {}, // Otro filtro
-            //         child: Text('Por avance'),
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            SizedBox(height: 25),
-            // SECCION 2: COMPETENCIAS RECIENTES
-            Text(
-              'Competencias recientes',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            // SizedBox(
-            //   height: 180,
-            //   child: ListView.builder(
-            //     scrollDirection: Axis.horizontal,
-            //     itemCount: competenciaProvider.competencias.length.clamp(0, 5),
-            //     itemBuilder: (context, index) {
-            //       final competencia = competenciaProvider.competencias[index];
-            //       return Container(
-            //         width: 250,
-            //         margin: EdgeInsets.only(right: 8),
-            //         child: CompetenciaCard(competencia: competencia),
-            //       );
-            //     },
-            //   ),
-            // ),
-            SizedBox(height: 25),
-            // SECCION 3: TODAS LAS COMPETENCIAS
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: competenciaProvider.competencias.length,
-              itemBuilder: (context, index) {
-                final competencia = competenciaProvider.competencias[index];
-                return CompetenciaCard(idCompetencia: competencia.idCurso ?? 0);
-              },)
-          ],
-        ),
+          ),
+          Positioned.fill(child: CustomPaint(painter: PainterHome())),
+          Column(
+            children: [
+              // SECCION 1: FILTRADO COMPETENCIAS
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: ShapeDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromRGBO(162, 157, 205, 1),
+                              Color.fromRGBO(165, 210, 241, 1),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          shape: CircleBorder(),
+                        ),
+                        child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _showObligatorias = !_showObligatorias;
+                            });
+                          }, // Acción para un filtro
+                          icon: Icon(Icons.error),
+                          color: _showObligatorias ? Colors.red : Colors.white,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Container(
+                        decoration: ShapeDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromRGBO(162, 157, 205, 1),
+                              Color.fromRGBO(165, 210, 241, 1),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          shape: CircleBorder(),
+                        ),
+                        child: IconButton(
+                          onPressed: () {
+                            showSearchBottom(context);
+                          }, // Otro filtro
+                          icon: Icon(Icons.search, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // SECCION 2: COMPETENCIAS RECIENTES
+                      Text(
+                        'Competencias recientes',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      // SizedBox(
+                      //   height: 180,
+                      //   child: ListView.builder(
+                      //     scrollDirection: Axis.horizontal,
+                      //     itemCount: competenciaProvider.competencias.length.clamp(0, 5),
+                      //     itemBuilder: (context, index) {
+                      //       final competencia = competenciaProvider.competencias[index];
+                      //       return Container(
+                      //         width: 250,
+                      //         margin: EdgeInsets.only(right: 8),
+                      //         child: CompetenciaCard(competencia: competencia),
+                      //       );
+                      //     },
+                      //   ),
+                      // ),
+                      SizedBox(height: 25),
+                      // SECCION 3: TODAS LAS COMPETENCIAS
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: listCompetencias.length,
+                        itemBuilder: (context, index) {
+                          final competencia = listCompetencias[index];
+                          return CompetenciaCard(
+                            idCompetencia: competencia.idCurso ?? 0,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
+      floatingActionButton:
+          _showScrollButton
+              ? FloatingActionButton(
+                backgroundColor: Color.fromRGBO(86, 66, 148, 1),
+                onPressed: () {
+                  _scrollController.animateTo(
+                    0,
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                child: Icon(Icons.arrow_upward_rounded, color: Colors.white),
+              )
+              : null,
     );
   }
 }
