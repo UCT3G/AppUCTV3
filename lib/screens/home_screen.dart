@@ -5,6 +5,7 @@ import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/competencia_card.dart';
+import 'package:app_uct/widgets/competencia_card_horizontal.dart';
 import 'package:app_uct/widgets/painter_home.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -21,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _showScrollButton = false;
   bool _showObligatorias = false;
+  bool _showFiltrado = false;
 
   Future<void> loadCompetencias() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
@@ -71,7 +73,61 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> loadCompetenciasRecientes() async {
+    final competenciaProvider = Provider.of<CompetenciaProvider>(
+      context,
+      listen: false,
+    );
+
+    try {
+      final response = await competenciaProvider.fetchCompetenciasRecientes();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.teal,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              response['comentario'],
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (e.toString().contains('Sesión expirada.')) {
+        if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
+        return;
+      }
+      debugPrint('Error: $e');
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error: $e',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> showSearchBottom(BuildContext context) {
+    final competenciaProvider = Provider.of<CompetenciaProvider>(
+      context,
+      listen: false,
+    );
+    final TextEditingController controller = TextEditingController();
     final imageHeight = MediaQuery.of(context).size.height * 0.15;
     final mensajes = [
       "¡Hola de nuevo! ¿Qué te gustaría buscar hoy?",
@@ -174,6 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         child: TextField(
+                          controller: controller,
                           style: TextStyle(fontFamily: 'Montserrat'),
                           decoration: InputDecoration(
                             hintText: 'Escribe aquí tu búsqueda...',
@@ -185,8 +242,82 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(
                         width: 150,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Acción al presionar
+                          onPressed: () async {
+                            final texto = controller.text.trim();
+                            if (texto.isEmpty) return;
+
+                            FocusScope.of(context).unfocus();
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder:
+                                  (_) => Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                            );
+
+                            try {
+                              final response = await competenciaProvider
+                                  .buscarCompetencias(texto);
+                              if (mounted) {
+                                Navigator.of(
+                                  context,
+                                  rootNavigator: true,
+                                ).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: Colors.teal,
+                                    behavior: SnackBarBehavior.floating,
+                                    content: Text(
+                                      response['comentario'],
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              setState(() {
+                                _showFiltrado = true;
+                              });
+                              Navigator.of(context).pop();
+                            } catch (e) {
+                              if (e.toString().contains('Sesión expirada.')) {
+                                if (mounted) {
+                                  Navigator.of(
+                                    context,
+                                    rootNavigator: true,
+                                  ).pop();
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    AppRoutes.login,
+                                  );
+                                }
+                                return;
+                              }
+                              debugPrint('Error: $e');
+                              if (mounted) {
+                                Navigator.of(
+                                  context,
+                                  rootNavigator: true,
+                                ).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    behavior: SnackBarBehavior.floating,
+                                    content: Text(
+                                      'Error: $e',
+                                      style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
@@ -241,6 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadCompetenciasRecientes();
       loadCompetencias();
     });
 
@@ -267,12 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final competenciaProvider = Provider.of<CompetenciaProvider>(context);
-    List<Competencia> listCompetencias =
-        _showObligatorias
-            ? competenciaProvider.competencias
-                .where((c) => c.esObligatoria == '1')
-                .toList()
-            : competenciaProvider.competencias;
+
     final screenSize = MediaQuery.of(context).size;
 
     if (competenciaProvider.loading) {
@@ -288,6 +415,17 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     }
+
+    final listCompetencias =
+        _showObligatorias
+            ? competenciaProvider.competencias
+                .where((c) => c.esObligatoria == '1')
+                .toList()
+            : _showFiltrado
+            ? competenciaProvider.competenciasFiltradas
+            : competenciaProvider.competencias;
+
+    final listCompetenciasRecientes = competenciaProvider.competenciasRecientes;
 
     return Scaffold(
       appBar: AppBar(
@@ -411,61 +549,71 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: IconButton(
                           onPressed: () {
-                            showSearchBottom(context);
+                            if (_showFiltrado) {
+                              competenciaProvider.clearFiltro();
+                              setState(() {
+                                _showFiltrado = false;
+                              });
+                            } else {
+                              showSearchBottom(context);
+                            }
                           }, // Otro filtro
-                          icon: Icon(Icons.search, color: Colors.white),
+                          icon:
+                              _showFiltrado
+                                  ? Icon(Icons.close_rounded)
+                                  : Icon(Icons.search),
+                          color: _showFiltrado ? Colors.red : Colors.white,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
+
               Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // SECCION 2: COMPETENCIAS RECIENTES
-                      Text(
-                        'Competencias recientes',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                child:
+                    listCompetencias.isEmpty
+                        ? Center(
+                          child: Text(
+                            _showFiltrado
+                                ? 'No se encontraron competencias.'
+                                : 'No hay competencias disponibles.',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        )
+                        : SingleChildScrollView(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 200,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: listCompetenciasRecientes.length,
+                                  itemBuilder: (context, index) {
+                                    final competencia =
+                                        listCompetenciasRecientes[index];
+                                    return CompetenciaCardHorizontal(
+                                      idCompetencia: competencia.idCurso ?? 0,
+                                    );
+                                  },
+                                ),
+                              ),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: listCompetencias.length,
+                                itemBuilder: (context, index) {
+                                  final competencia = listCompetencias[index];
+                                  return CompetenciaCard(
+                                    idCompetencia: competencia.idCurso ?? 0,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      // SizedBox(
-                      //   height: 180,
-                      //   child: ListView.builder(
-                      //     scrollDirection: Axis.horizontal,
-                      //     itemCount: competenciaProvider.competencias.length.clamp(0, 5),
-                      //     itemBuilder: (context, index) {
-                      //       final competencia = competenciaProvider.competencias[index];
-                      //       return Container(
-                      //         width: 250,
-                      //         margin: EdgeInsets.only(right: 8),
-                      //         child: CompetenciaCard(competencia: competencia),
-                      //       );
-                      //     },
-                      //   ),
-                      // ),
-                      SizedBox(height: 25),
-                      // SECCION 3: TODAS LAS COMPETENCIAS
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: listCompetencias.length,
-                        itemBuilder: (context, index) {
-                          final competencia = listCompetencias[index];
-                          return CompetenciaCard(
-                            idCompetencia: competencia.idCurso ?? 0,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),
@@ -488,9 +636,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-// Navigator.pushReplacementNamed(
-//   context,
-//   AppRoutes.temario,
-//   arguments: {'fromHome': true},
-// );

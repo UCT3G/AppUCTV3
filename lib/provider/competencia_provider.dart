@@ -22,11 +22,15 @@ class CompetenciaProvider with ChangeNotifier {
   Competencia? _competencia;
   bool _loading = false;
   List<Competencia> _competencias = [];
+  List<Competencia> _competenciasFiltradas = [];
+  List<Competencia> _competenciasRecientes = [];
 
   Competencia? get competencia => _competencia;
   List<Unidad> get unidades => _unidades;
   bool get loading => _loading;
   List<Competencia> get competencias => _competencias;
+  List<Competencia> get competenciasFiltradas => _competenciasFiltradas;
+  List<Competencia> get competenciasRecientes => _competenciasRecientes;
 
   void setCompetencia(Competencia competencia) {
     _competencia = competencia;
@@ -354,8 +358,142 @@ class CompetenciaProvider with ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> buscarCompetencias(String texto) async {
+    _loading = true;
+
+    notifyListeners();
+    try {
+      final response = await CourseService.buscadorCompetencia(
+        texto,
+        _authProvider.accessToken!,
+      );
+
+      final List competenciasFiltradas = response['respuesta']['resultados'];
+      final List<int> idsCursos =
+          competenciasFiltradas
+              .take(10)
+              .map((competencia) => competencia['id_curso'] as int)
+              .toList();
+
+      _competenciasFiltradas =
+          _competencias
+              .where((competencia) => idsCursos.contains(competencia.idCurso))
+              .toList();
+
+      return response;
+    } catch (e) {
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await CourseService.buscadorCompetencia(
+                texto,
+                _authProvider.accessToken!,
+              );
+
+              final List competenciasFiltradas =
+                  response['respuesta']['resultados'];
+              final List<int> idsCursos =
+                  competenciasFiltradas
+                      .take(10)
+                      .map((competencia) => competencia['id_curso'] as int)
+                      .toList();
+
+              _competenciasFiltradas =
+                  _competencias
+                      .where(
+                        (competencia) =>
+                            idsCursos.contains(competencia.idCurso),
+                      )
+                      .toList();
+
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception('Error al realizar la busqueda: ${e.toString()}');
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchCompetenciasRecientes() async {
+    _loading = true;
+
+    notifyListeners();
+
+    try {
+      final response = await CourseService.getCursosUsuarioRecientes(
+        _authProvider.accessToken!,
+      );
+      final competenciasJson = response['cursos_usuario'] as List;
+      _competenciasRecientes =
+          competenciasJson.map((json) => Competencia.fromJson(json)).toList();
+      return response;
+    } catch (e) {
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await CourseService.getCursosUsuarioRecientes(
+                _authProvider.accessToken!,
+              );
+              final competenciasJson = response['cursos_usuario'] as List;
+              _competenciasRecientes =
+                  competenciasJson
+                      .map((json) => Competencia.fromJson(json))
+                      .toList();
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception(
+        'Error al cargar las competencias recientes del usuario: ${e.toString()}',
+      );
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
   void clear() {
     _competencia = null;
+    notifyListeners();
+  }
+
+  void clearFiltro() {
+    _competenciasFiltradas = [];
     notifyListeners();
   }
 }
