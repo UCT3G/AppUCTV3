@@ -63,30 +63,48 @@ class _CompetenciaCardHorizontalState extends State<CompetenciaCardHorizontal> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF57C5B6), Color(0xFF159895)],
+                Row(
+                  children: [
+                    ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return LinearGradient(
+                          colors: [Color(0xFFA29DCD), Color(0xFFA5D2F1)],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.srcIn,
+                      child: Icon(Icons.star_border_rounded, size: 30),
                     ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    competencia!.promedio!.toStringAsFixed(0),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Montserrat',
-                      fontSize: 15,
+                    ClipPath(
+                      clipper: FlechaClipper(),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFFA29DCD), Color(0xFFA5D2F1)],
+                          ),
+                        ),
+                        child: Text(
+                          competencia!.promedio!.toStringAsFixed(0),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 15),
                   child: Text(
                     // 'FACULTAD DE CAMIONETAS -  ESTIBADORES Y OPERADORES DE CAMIONETA (ALINEACIÓN)',
                     competencia.titulo ?? 'Titulo curso',
-                    maxLines: 3,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontFamily: 'Montserrat',
@@ -198,5 +216,60 @@ class _CompetenciaCardHorizontalState extends State<CompetenciaCardHorizontal> {
         ),
       ],
     );
+  }
+}
+
+class FlechaClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+
+    path.moveTo(size.width * 0.3333333, size.height * 0.3316667);
+    path.cubicTo(
+      size.width * 0.3767083,
+      size.height * 0.4960833,
+      size.width * 0.3760417,
+      size.height * 0.4960833,
+      size.width * 0.3325,
+      size.height * 0.67,
+    );
+    path.cubicTo(
+      size.width * 0.41625,
+      size.height * 0.6691667,
+      size.width * 0.58375,
+      size.height * 0.6675,
+      size.width * 0.6675,
+      size.height * 0.6666667,
+    );
+    path.cubicTo(
+      size.width * 0.7495,
+      size.height * 0.62425,
+      size.width * 0.7508333,
+      size.height * 0.3754167,
+      size.width * 0.6675,
+      size.height * 0.3316667,
+    );
+    path.cubicTo(
+      size.width * 0.5839583,
+      size.height * 0.3316667,
+      size.width * 0.5839583,
+      size.height * 0.3316667,
+      size.width * 0.3333333,
+      size.height * 0.3316667,
+    );
+
+    path.close();
+
+    Rect bounds = path.getBounds();
+    final Matrix4 matrix4 =
+        Matrix4.identity()
+          ..scale(size.width / bounds.width, size.height / bounds.height)
+          ..translate(-bounds.left, -bounds.top);
+    return path.transform(matrix4.storage);
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    return false;
   }
 }

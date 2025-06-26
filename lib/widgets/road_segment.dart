@@ -70,10 +70,11 @@ class _RoadSegmentState extends State<RoadSegment> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        final tema =
-            Provider.of<CompetenciaProvider>(
-              context,
-            ).getTemaById(widget.idTema)!;
+        final competenciaProvider = Provider.of<CompetenciaProvider>(context);
+        final tema = competenciaProvider.getTemaById(widget.idTema)!;
+        final unidad = competenciaProvider.unidades.firstWhere(
+          (u) => u.idUnidad == tema.idUnidad,
+        );
         final imageHeight = MediaQuery.of(context).size.height * 0.15;
 
         return Center(
@@ -157,14 +158,75 @@ class _RoadSegmentState extends State<RoadSegment> {
                           ),
                           ElevatedButton(
                             onPressed: () async {
-                              Navigator.pop(context);
+                              if (tema.orden > 1) {
+                                try {
+                                  final response = await competenciaProvider
+                                      .validarUnidadAnterior(
+                                        unidad.idCurso,
+                                        unidad.orden,
+                                      );
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor: Colors.teal,
+                                        behavior: SnackBarBehavior.floating,
+                                        content: Text(
+                                          response['comentario'],
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontFamily: 'Montserrat',
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (e.toString().contains(
+                                    'Sesión expirada.',
+                                  )) {
+                                    if (context.mounted) {
+                                      Navigator.pushReplacementNamed(
+                                        context,
+                                        AppRoutes.login,
+                                      );
+                                      return;
+                                    }
+                                  }
+                                  debugPrint('Error: $e');
+                                  if (context.mounted) {
+                                    Navigator.of(
+                                      context,
+                                      rootNavigator: true,
+                                    ).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        behavior: SnackBarBehavior.floating,
+                                        content: Text(
+                                          'Error: $e',
+                                          style: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                              }
+
+                              if (context.mounted) Navigator.pop(context);
+
                               switch (tema.recursoBasicoTipo) {
                                 case 'VIDEO':
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.video,
-                                    arguments: tema.idTema,
-                                  );
+                                  if (context.mounted) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.video,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
                                   break;
                                 case 'IMAGEN':
                                   Navigator.pushNamed(
@@ -341,7 +403,7 @@ class _RoadSegmentState extends State<RoadSegment> {
               height: screenSize.height * 0.13,
               child: Card(
                 color:
-                    (tema!.intentosConsumidos > 0 && tema.resultado >= 80)
+                    (tema!.resultado >= 80)
                         ? Color.fromRGBO(119, 200, 0, 1)
                         : tema == siguienteTema
                         ? Color.fromRGBO(186, 15, 60, 0.7)

@@ -1,5 +1,5 @@
 import 'dart:async';
-// import 'dart:developer';
+import 'dart:developer';
 
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/utils/session_helper.dart';
@@ -126,6 +126,8 @@ class _TemarioScreenState extends State<TemarioScreen> {
             );
     final screenSize = MediaQuery.of(context).size;
     final gradientHeight = screenSize.height * 0.25;
+
+    log(competencia.toString());
 
     if (competenciaProvider.loading) {
       return Scaffold(
@@ -257,13 +259,11 @@ class _TemarioScreenState extends State<TemarioScreen> {
                               child:
                                   _showFullText
                                       ? buildFullText(
-                                        competencia?.titulo ??
-                                            'Titulo curso',
+                                        competencia?.titulo ?? 'Titulo curso',
                                       )
                                       : buildNormalView(
                                         screenSize,
-                                        competencia?.titulo ??
-                                            'Titulo curso',
+                                        competencia?.titulo ?? 'Titulo curso',
                                       ),
                             ),
                           ),

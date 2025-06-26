@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:app_uct/models/competencia_model.dart';
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
@@ -371,9 +370,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadCompetenciasRecientes();
-      loadCompetencias();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final competenciaProvider = Provider.of<CompetenciaProvider>(
+        context,
+        listen: false,
+      );
+      competenciaProvider.setLoading(true);
+      await Future.wait([loadCompetenciasRecientes(), loadCompetencias()]);
+      competenciaProvider.setLoading(false);
     });
 
     _scrollController.addListener(() {

@@ -1,4 +1,5 @@
 // import 'dart:developer';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_uct/models/competencia_model.dart';
@@ -60,7 +61,7 @@ class CompetenciaProvider with ChangeNotifier {
       final index = unidad.temas.indexWhere((t) => t.idTema == idTema);
       if (index != -1) {
         final tema = unidad.temas[index];
-        final tiposNoCalificables = ['PRACTICA'];
+        final tiposNoCalificables = ['PRACTICA', 'EVALUACION', 'ENCUESTA'];
 
         final actualizarTema = tema.copyWith(
           intentosConsumidos: tema.intentosConsumidos + 1,
@@ -80,7 +81,7 @@ class CompetenciaProvider with ChangeNotifier {
   Tema? obtenerSiguienteTema() {
     for (var unidad in _unidades) {
       for (var tema in unidad.temas) {
-        if (tema.resultado == 0) {
+        if (tema.resultado < 80) {
           return tema;
         }
       }
@@ -99,7 +100,9 @@ class CompetenciaProvider with ChangeNotifier {
         _authProvider.accessToken!,
       );
       final unidadesJson = response['unidades'] as List;
+      log('${response['unidades']}');
       _unidades = unidadesJson.map((json) => Unidad.fromJson(json)).toList();
+      log('$_unidades');
       return response;
     } catch (e) {
       if (e.toString().contains('Token expirado o inválido')) {
@@ -305,10 +308,6 @@ class CompetenciaProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> fetchCompetencias() async {
-    _loading = true;
-
-    notifyListeners();
-
     try {
       final response = await CourseService.getCursosUsuario(
         _authProvider.accessToken!,
@@ -352,9 +351,6 @@ class CompetenciaProvider with ChangeNotifier {
       throw Exception(
         'Error al cargar las competencias del usuario: ${e.toString()}',
       );
-    } finally {
-      _loading = false;
-      notifyListeners();
     }
   }
 
@@ -434,10 +430,6 @@ class CompetenciaProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> fetchCompetenciasRecientes() async {
-    _loading = true;
-
-    notifyListeners();
-
     try {
       final response = await CourseService.getCursosUsuarioRecientes(
         _authProvider.accessToken!,
@@ -481,6 +473,56 @@ class CompetenciaProvider with ChangeNotifier {
       throw Exception(
         'Error al cargar las competencias recientes del usuario: ${e.toString()}',
       );
+    }
+  }
+
+  Future<Map<String, dynamic>> validarUnidadAnterior(
+    int idCurso,
+    int orden,
+  ) async {
+    _loading = true;
+
+    notifyListeners();
+
+    try {
+      final response = await CourseService.validarUnidadAnterior(
+        idCurso,
+        orden,
+        _authProvider.accessToken!,
+      );
+
+      return response;
+    } catch (e) {
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await CourseService.validarUnidadAnterior(
+                idCurso,
+                orden,
+                _authProvider.accessToken!,
+              );
+
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception('Error validar la unidad anterior: ${e.toString()}');
     } finally {
       _loading = false;
       notifyListeners();
@@ -494,6 +536,11 @@ class CompetenciaProvider with ChangeNotifier {
 
   void clearFiltro() {
     _competenciasFiltradas = [];
+    notifyListeners();
+  }
+
+  void setLoading(bool value) {
+    _loading = value;
     notifyListeners();
   }
 }
