@@ -172,6 +172,13 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
             ),
             Column(
               children: [
+                BreadcrumbNav(
+                  paths: [
+                    competenciaProvider.competencia!.titulo ?? 'Competencia',
+                    currentUnidad.titulo,
+                    tema.titulo,
+                  ],
+                ),
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
@@ -230,13 +237,38 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                     ),
                   ),
                 ),
-              ],
-            ),
-            BreadcrumbNav(
-              paths: [
-                competenciaProvider.competencia!.titulo ?? 'Competencia',
-                currentUnidad.titulo,
-                tema.titulo,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 130,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.arrow_back_ios_new_rounded),
+                            Text('Atras', style: TextStyle(fontSize: 15, fontFamily: 'Monstserrat'),),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 5),
+                    SizedBox(
+                      width: 130,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Adelante', style: TextStyle(fontSize: 15, fontFamily: 'Monstserrat'),),
+                            Icon(Icons.arrow_forward_ios_rounded),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ],

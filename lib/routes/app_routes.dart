@@ -1,5 +1,6 @@
 import 'package:app_uct/screens/content/archivo_screen.dart';
 import 'package:app_uct/screens/content/articulo_screen.dart';
+import 'package:app_uct/screens/content/evaluacion_screen.dart';
 import 'package:app_uct/screens/content/imagen_screen.dart';
 import 'package:app_uct/screens/content/interactive_screen.dart';
 import 'package:app_uct/screens/content/pdf_screen.dart';
@@ -29,6 +30,7 @@ class AppRoutes {
   static const String presencial = '/presencial';
   static const String presentacion = '/presentacion';
   static const String practica = '/practica';
+  static const String evaluacion = '/evaluacion';
 
   static final routes = {
     login: (context) => LoginScreen(),
@@ -81,5 +83,6 @@ class AppRoutes {
       final idTema = ModalRoute.of(context)!.settings.arguments as int;
       return PracticaScreen(idTema: idTema);
     },
+    evaluacion: (context) => EvaluacionScreen(),
   };
 }

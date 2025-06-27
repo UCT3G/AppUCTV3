@@ -158,7 +158,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                           ),
                           ElevatedButton(
                             onPressed: () async {
-                              if (tema.orden > 1) {
+                              if (unidad.orden > 1) {
                                 try {
                                   final response = await competenciaProvider
                                       .validarUnidadAnterior(
@@ -166,6 +166,9 @@ class _RoadSegmentState extends State<RoadSegment> {
                                         unidad.orden,
                                       );
                                   if (context.mounted) {
+                                    final comentario =
+                                        response['comentario'] ?? '';
+
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         backgroundColor: Colors.teal,
@@ -180,6 +183,167 @@ class _RoadSegmentState extends State<RoadSegment> {
                                         ),
                                       ),
                                     );
+
+                                    if (comentario.contains(
+                                      'Unidad anterior no aprobada',
+                                    )) {
+                                      if (context.mounted) {
+                                        Navigator.pop(context);
+                                      }
+                                      if (context.mounted) {
+                                        await showDialog(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (BuildContext context) {
+                                            final screenWidth =
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width;
+                                            final imageSize = screenWidth * 0.4;
+
+                                            return Center(
+                                              child: Stack(
+                                                clipBehavior: Clip.none,
+                                                alignment: Alignment.centerLeft,
+                                                children: [
+                                                  // Card contenedor
+                                                  Container(
+                                                    margin: EdgeInsets.only(
+                                                      left: imageSize / 2,
+                                                    ),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          16,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withValues(
+                                                                alpha: 0.2,
+                                                              ),
+                                                          blurRadius: 10,
+                                                          spreadRadius: 2,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        SizedBox(
+                                                          width: imageSize / 2,
+                                                        ), // Espacio para la imagen
+                                                        Flexible(
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                "Estimado Usuario ¡Lo sentimos!",
+                                                                style: TextStyle(
+                                                                  fontSize: 22,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color:
+                                                                      Theme.of(
+                                                                        context,
+                                                                      ).primaryColor,
+                                                                ),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .right,
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 12,
+                                                              ),
+                                                              Text(
+                                                                '¡Tienes que pasar las unidades anteriores para ver este recurso!',
+                                                                style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  color:
+                                                                      Colors
+                                                                          .grey
+                                                                          .shade700,
+                                                                ),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .right,
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 20,
+                                                              ),
+                                                              Align(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .centerRight,
+                                                                child: ElevatedButton(
+                                                                  onPressed:
+                                                                      () => Navigator.pop(
+                                                                        context,
+                                                                      ),
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    backgroundColor:
+                                                                        Theme.of(
+                                                                          context,
+                                                                        ).primaryColor,
+                                                                    foregroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    padding: const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          24,
+                                                                      vertical:
+                                                                          12,
+                                                                    ),
+                                                                    shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            20,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                  child:
+                                                                      const Text(
+                                                                        "Salir",
+                                                                      ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  // Imagen a la izquierda, sobrepuesta
+                                                  Positioned(
+                                                    left: 0,
+                                                    child: SizedBox(
+                                                      width: imageSize,
+                                                      child: Image.asset(
+                                                        'assets/images/yowi_perfil.png',
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      }
+                                      return;
+                                    }
                                   }
                                 } catch (e) {
                                   if (e.toString().contains(
@@ -213,6 +377,8 @@ class _RoadSegmentState extends State<RoadSegment> {
                                       ),
                                     );
                                   }
+                                  if (context.mounted) Navigator.pop(context);
+                                  return;
                                 }
                               }
 
@@ -229,60 +395,468 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   }
                                   break;
                                 case 'IMAGEN':
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.imagen,
-                                    arguments: tema.idTema,
-                                  );
+                                  if (context.mounted) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.imagen,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
                                   break;
                                 case 'DOCUMENTO':
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.pdf,
-                                    arguments: tema.idTema,
-                                  );
+                                  if (context.mounted) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.pdf,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
                                   break;
                                 case 'PDF':
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.pdf,
-                                    arguments: tema.idTema,
-                                  );
+                                  if (context.mounted) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.pdf,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
                                   break;
                                 case 'ARCHIVO':
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.archivo,
-                                    arguments: tema.idTema,
-                                  );
+                                  if (context.mounted) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.archivo,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
                                   break;
                                 case 'ARTICULO':
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.articulo,
-                                    arguments: tema.idTema,
-                                  );
+                                  if (context.mounted) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.articulo,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
                                   break;
                                 case 'PRESENCIAL':
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.presencial,
-                                    arguments: tema.idTema,
-                                  );
+                                  if (context.mounted) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.presencial,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
                                   break;
                                 case 'PRESENTACION':
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.presentacion,
-                                    arguments: tema.idTema,
-                                  );
+                                  if (context.mounted) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.presentacion,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
                                   break;
                                 case 'PRACTICA':
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.practica,
-                                    arguments: tema.idTema,
-                                  );
+                                  if (context.mounted) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.practica,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
+                                  break;
+                                case 'EVALUACION':
+                                  try {
+                                    final response = await competenciaProvider
+                                        .validarTemasUnidad(
+                                          tema.idUnidad, tema.idTema, tema.idCurso, tema.recursoBasicoTipo
+                                        );
+                                    if (context.mounted) {
+                                      final comentario =
+                                          response['comentario'] ?? '';
+
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          backgroundColor: Colors.teal,
+                                          behavior: SnackBarBehavior.floating,
+                                          content: Text(
+                                            response['comentario'],
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontFamily: 'Montserrat',
+                                            ),
+                                          ),
+                                        ),
+                                      );
+
+                                      if (comentario.contains(
+                                        'No tienes mas intentos'
+                                      )) {
+                                        if (context.mounted) {
+                                          await showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (BuildContext context) {
+                                              final screenWidth =
+                                                  MediaQuery.of(
+                                                    context,
+                                                  ).size.width;
+                                              final imageSize =
+                                                  screenWidth * 0.4;
+
+                                              return Center(
+                                                child: Stack(
+                                                  clipBehavior: Clip.none,
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  children: [
+                                                    // Card contenedor
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                        left: imageSize / 2,
+                                                      ),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            16,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              20,
+                                                            ),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withValues(
+                                                                  alpha: 0.2,
+                                                                ),
+                                                            blurRadius: 10,
+                                                            spreadRadius: 2,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          SizedBox(
+                                                            width:
+                                                                imageSize / 2,
+                                                          ), // Espacio para la imagen
+                                                          Flexible(
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  "Estimado Usuario ¡Lo sentimos!",
+                                                                  style: TextStyle(
+                                                                    fontSize:
+                                                                        22,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        Theme.of(
+                                                                          context,
+                                                                        ).primaryColor,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .right,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 12,
+                                                                ),
+                                                                Text(
+                                                                  'Lo siento no puedes contestar esta evaluación, ya consumiste todos los intentos.',
+                                                                  style: TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    color:
+                                                                        Colors
+                                                                            .grey
+                                                                            .shade700,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .right,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 20,
+                                                                ),
+                                                                Align(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .centerRight,
+                                                                  child: ElevatedButton(
+                                                                    onPressed:
+                                                                        () => Navigator.pop(
+                                                                          context,
+                                                                        ),
+                                                                    style: ElevatedButton.styleFrom(
+                                                                      backgroundColor:
+                                                                          Theme.of(
+                                                                            context,
+                                                                          ).primaryColor,
+                                                                      foregroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      padding: const EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            24,
+                                                                        vertical:
+                                                                            12,
+                                                                      ),
+                                                                      shape: RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                              20,
+                                                                            ),
+                                                                      ),
+                                                                    ),
+                                                                    child:
+                                                                        const Text(
+                                                                          "Salir",
+                                                                        ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    // Imagen a la izquierda, sobrepuesta
+                                                    Positioned(
+                                                      left: 0,
+                                                      child: SizedBox(
+                                                        width: imageSize,
+                                                        child: Image.asset(
+                                                          'assets/images/yowi_perfil.png',
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        }
+                                        return;
+                                      } else if(comentario.contains('No puede contestar esta encuesta')) {
+                                        if (context.mounted) {
+                                          await showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (BuildContext context) {
+                                              final screenWidth =
+                                                  MediaQuery.of(
+                                                    context,
+                                                  ).size.width;
+                                              final imageSize =
+                                                  screenWidth * 0.4;
+
+                                              return Center(
+                                                child: Stack(
+                                                  clipBehavior: Clip.none,
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  children: [
+                                                    // Card contenedor
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                        left: imageSize / 2,
+                                                      ),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            16,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              20,
+                                                            ),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withValues(
+                                                                  alpha: 0.2,
+                                                                ),
+                                                            blurRadius: 10,
+                                                            spreadRadius: 2,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          SizedBox(
+                                                            width:
+                                                                imageSize / 2,
+                                                          ), // Espacio para la imagen
+                                                          Flexible(
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  "Estimado Usuario ¡Lo sentimos!",
+                                                                  style: TextStyle(
+                                                                    fontSize:
+                                                                        22,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color:
+                                                                        Theme.of(
+                                                                          context,
+                                                                        ).primaryColor,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .right,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 12,
+                                                                ),
+                                                                Text(
+                                                                  'Lo siento no puedes contestar esta evaluación, no has visto todos los temas.',
+                                                                  style: TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    color:
+                                                                        Colors
+                                                                            .grey
+                                                                            .shade700,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .right,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 20,
+                                                                ),
+                                                                Align(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .centerRight,
+                                                                  child: ElevatedButton(
+                                                                    onPressed:
+                                                                        () => Navigator.pop(
+                                                                          context,
+                                                                        ),
+                                                                    style: ElevatedButton.styleFrom(
+                                                                      backgroundColor:
+                                                                          Theme.of(
+                                                                            context,
+                                                                          ).primaryColor,
+                                                                      foregroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      padding: const EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            24,
+                                                                        vertical:
+                                                                            12,
+                                                                      ),
+                                                                      shape: RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                              20,
+                                                                            ),
+                                                                      ),
+                                                                    ),
+                                                                    child:
+                                                                        const Text(
+                                                                          "Salir",
+                                                                        ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    // Imagen a la izquierda, sobrepuesta
+                                                    Positioned(
+                                                      left: 0,
+                                                      child: SizedBox(
+                                                        width: imageSize,
+                                                        child: Image.asset(
+                                                          'assets/images/yowi_perfil.png',
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        }
+                                        return;
+                                      }
+                                    }
+                                  } catch (e) {
+                                    if (e.toString().contains(
+                                      'Sesión expirada.',
+                                    )) {
+                                      if (context.mounted) {
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          AppRoutes.login,
+                                        );
+                                        return;
+                                      }
+                                    }
+                                    debugPrint('Error: $e');
+                                    if (context.mounted) {
+                                      Navigator.of(
+                                        context,
+                                        rootNavigator: true,
+                                      ).pop();
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          behavior: SnackBarBehavior.floating,
+                                          content: Text(
+                                            'Error: $e',
+                                            style: TextStyle(
+                                              fontFamily: 'Montserrat',
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return;
+                                  }
+                                  if (context.mounted) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.evaluacion,
+                                    );
+                                  }
                                   break;
                               }
                             },
@@ -403,7 +977,7 @@ class _RoadSegmentState extends State<RoadSegment> {
               height: screenSize.height * 0.13,
               child: Card(
                 color:
-                    (tema!.resultado >= 80)
+                    (tema!.intentosConsumidos >= 1)
                         ? Color.fromRGBO(119, 200, 0, 1)
                         : tema == siguienteTema
                         ? Color.fromRGBO(186, 15, 60, 0.7)

@@ -43,7 +43,7 @@ class CompetenciaProvider with ChangeNotifier {
         final tema = unidad.temas.firstWhere((t) => t.idTema == idTema);
         return tema;
       } catch (e) {
-        debugPrint('No se encontro el tema en la unidad');
+        debugPrint('No se encontro el tema en la unidad: $e');
       }
     }
     return null;
@@ -61,7 +61,12 @@ class CompetenciaProvider with ChangeNotifier {
       final index = unidad.temas.indexWhere((t) => t.idTema == idTema);
       if (index != -1) {
         final tema = unidad.temas[index];
-        final tiposNoCalificables = ['PRACTICA', 'EVALUACION', 'ENCUESTA'];
+        final tiposNoCalificables = [
+          'PRACTICA',
+          'EVALUACION',
+          'ENCUESTA',
+          'PRESENCIAL',
+        ];
 
         final actualizarTema = tema.copyWith(
           intentosConsumidos: tema.intentosConsumidos + 1,
@@ -81,7 +86,7 @@ class CompetenciaProvider with ChangeNotifier {
   Tema? obtenerSiguienteTema() {
     for (var unidad in _unidades) {
       for (var tema in unidad.temas) {
-        if (tema.resultado < 80) {
+        if (tema.intentosConsumidos == 0) {
           return tema;
         }
       }
@@ -523,6 +528,65 @@ class CompetenciaProvider with ChangeNotifier {
         }
       }
       throw Exception('Error validar la unidad anterior: ${e.toString()}');
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Map<String, dynamic>> validarTemasUnidad(
+    int idUnidad,
+    int idTema,
+    int idCurso,
+    String recursoBasicoTipo,
+  ) async {
+    _loading = true;
+
+    notifyListeners();
+
+    try {
+      final response = await CourseService.validarTemasUnidad(
+        idUnidad,
+        idTema,
+        idCurso,
+        recursoBasicoTipo,
+        _authProvider.accessToken!,
+      );
+
+      return response;
+    } catch (e) {
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await CourseService.validarTemasUnidad(
+                idUnidad,
+                idTema,
+                idCurso,
+                recursoBasicoTipo,
+                _authProvider.accessToken!,
+              );
+
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception('Error al validar los temas de la unidad: ${e.toString()}');
     } finally {
       _loading = false;
       notifyListeners();

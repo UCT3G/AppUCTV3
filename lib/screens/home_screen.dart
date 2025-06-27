@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             try {
                               final response = await competenciaProvider
                                   .buscarCompetencias(texto);
-                              if (mounted) {
+                              if (context.mounted) {
                                 Navigator.of(
                                   context,
                                   rootNavigator: true,
@@ -281,10 +281,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               setState(() {
                                 _showFiltrado = true;
                               });
-                              Navigator.of(context).pop();
+                              if(context.mounted) Navigator.of(context).pop();
                             } catch (e) {
                               if (e.toString().contains('Sesión expirada.')) {
-                                if (mounted) {
+                                if (context.mounted) {
                                   Navigator.of(
                                     context,
                                     rootNavigator: true,
@@ -297,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 return;
                               }
                               debugPrint('Error: $e');
-                              if (mounted) {
+                              if (context.mounted) {
                                 Navigator.of(
                                   context,
                                   rootNavigator: true,
