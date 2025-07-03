@@ -262,7 +262,54 @@ class CourseService {
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
         },
-        body: json.encode({'id_unidad': idUnidad, 'id_tema': idTema, 'id_curso': idCurso, 'recurso_tipo': recursoBasicoTipo}),
+        body: json.encode({
+          'id_unidad': idUnidad,
+          'id_tema': idTema,
+          'id_curso': idCurso,
+          'recurso_tipo': recursoBasicoTipo,
+        }),
+        encoding: Encoding.getByName('utf-8'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data;
+      } else if (response.statusCode == 401) {
+        throw Exception('Token expirado o inválido');
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error de conexión: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> adelantarAtrasar(
+    int idCurso,
+    int idUnidad,
+    int ordenTema,
+    int ordenUnidad,
+    int accion,
+    String accessToken,
+  ) async {
+    final url = Uri.parse(
+      '${ApiService.baseURL}/CURSOS_MOVIL/siguienteAtrasTema',
+    );
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: json.encode({
+          'id_curso': idCurso,
+          'id_unidad': idUnidad,
+          'orden_tema': ordenTema,
+          'orden_unidad': ordenUnidad,
+          'accion': accion,
+        }),
         encoding: Encoding.getByName('utf-8'),
       );
 

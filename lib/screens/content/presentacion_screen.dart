@@ -101,6 +101,461 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
     }
   }
 
+  Future<void> atrasarAdelantarTema(int accion) async {
+    final competenciaProvider = Provider.of<CompetenciaProvider>(
+      context,
+      listen: false,
+    );
+    final tema = competenciaProvider.getTemaById(widget.idTema)!;
+    final unidad = competenciaProvider.unidades.firstWhere(
+      (u) => u.idUnidad == tema.idUnidad,
+    );
+
+    try {
+      final response = await competenciaProvider.adelantarAtrasarTemas(
+        tema.idCurso,
+        unidad.idUnidad,
+        tema.orden,
+        unidad.orden,
+        accion,
+      );
+      if (mounted) {
+        if (response['tema_usuario'] == 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                response['comentario'],
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontFamily: 'Montserrat',
+                ),
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.teal,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                response['comentario'],
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontFamily: 'Montserrat',
+                ),
+              ),
+            ),
+          );
+          final nuevoTema =
+              competenciaProvider.getTemaById(response['tema_usuario'])!;
+          switch (nuevoTema.recursoBasicoTipo) {
+            case 'VIDEO':
+              if (mounted) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.video,
+                  arguments: nuevoTema.idTema,
+                );
+              }
+              break;
+            case 'IMAGEN':
+              if (mounted) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.imagen,
+                  arguments: nuevoTema.idTema,
+                );
+              }
+              break;
+            case 'DOCUMENTO':
+              if (mounted) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.pdf,
+                  arguments: nuevoTema.idTema,
+                );
+              }
+              break;
+            case 'PDF':
+              if (mounted) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.pdf,
+                  arguments: nuevoTema.idTema,
+                );
+              }
+              break;
+            case 'ARCHIVO':
+              if (mounted) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.archivo,
+                  arguments: nuevoTema.idTema,
+                );
+              }
+              break;
+            case 'ARTICULO':
+              if (mounted) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.articulo,
+                  arguments: nuevoTema.idTema,
+                );
+              }
+              break;
+            case 'PRESENCIAL':
+              if (mounted) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.presencial,
+                  arguments: nuevoTema.idTema,
+                );
+              }
+              break;
+            case 'PRESENTACION':
+              if (mounted) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.presentacion,
+                  arguments: nuevoTema.idTema,
+                );
+              }
+              break;
+            case 'PRACTICA':
+              if (mounted) {
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.practica,
+                  arguments: nuevoTema.idTema,
+                );
+              }
+              break;
+            case 'EVALUACION':
+              try {
+                final response = await competenciaProvider.validarTemasUnidad(
+                  nuevoTema.idUnidad,
+                  nuevoTema.idTema,
+                  nuevoTema.idCurso,
+                  nuevoTema.recursoBasicoTipo,
+                );
+                if (mounted) {
+                  final comentario = response['comentario'] ?? '';
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.teal,
+                      behavior: SnackBarBehavior.floating,
+                      content: Text(
+                        response['comentario'],
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontFamily: 'Montserrat',
+                        ),
+                      ),
+                    ),
+                  );
+
+                  if (comentario.contains('No tienes mas intentos')) {
+                    Navigator.pop(context);
+                    if (mounted) {
+                      await showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          final screenWidth = MediaQuery.of(context).size.width;
+                          final imageSize = screenWidth * 0.4;
+
+                          return Center(
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.centerLeft,
+                              children: [
+                                // Card contenedor
+                                Container(
+                                  margin: EdgeInsets.only(left: imageSize / 2),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.2,
+                                        ),
+                                        blurRadius: 10,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        width: imageSize / 2,
+                                      ), // Espacio para la imagen
+                                      Flexible(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Estimado Usuario ¡Lo sentimos!",
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).primaryColor,
+                                              ),
+                                              textAlign: TextAlign.right,
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              'Lo siento no puedes contestar esta evaluación, ya consumiste todos los intentos.',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.grey.shade700,
+                                              ),
+                                              textAlign: TextAlign.right,
+                                            ),
+                                            const SizedBox(height: 20),
+                                            Align(
+                                              alignment: Alignment.centerRight,
+                                              child: ElevatedButton(
+                                                onPressed:
+                                                    () =>
+                                                        Navigator.pop(context),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Theme.of(
+                                                        context,
+                                                      ).primaryColor,
+                                                  foregroundColor: Colors.white,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 24,
+                                                        vertical: 12,
+                                                      ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                  ),
+                                                ),
+                                                child: const Text("Salir"),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Imagen a la izquierda, sobrepuesta
+                                Positioned(
+                                  left: 0,
+                                  child: SizedBox(
+                                    width: imageSize,
+                                    child: Image.asset(
+                                      'assets/images/yowi_perfil.png',
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }
+                    return;
+                  } else if (comentario.contains(
+                    'No puede contestar esta encuesta',
+                  )) {
+                    Navigator.pop(context);
+                    if (mounted) {
+                      await showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          final screenWidth = MediaQuery.of(context).size.width;
+                          final imageSize = screenWidth * 0.4;
+
+                          return Center(
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.centerLeft,
+                              children: [
+                                // Card contenedor
+                                Container(
+                                  margin: EdgeInsets.only(left: imageSize / 2),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.2,
+                                        ),
+                                        blurRadius: 10,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        width: imageSize / 2,
+                                      ), // Espacio para la imagen
+                                      Flexible(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Estimado Usuario ¡Lo sentimos!",
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).primaryColor,
+                                              ),
+                                              textAlign: TextAlign.right,
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              'Lo siento no puedes contestar esta evaluación, no has visto todos los temas.',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.grey.shade700,
+                                              ),
+                                              textAlign: TextAlign.right,
+                                            ),
+                                            const SizedBox(height: 20),
+                                            Align(
+                                              alignment: Alignment.centerRight,
+                                              child: ElevatedButton(
+                                                onPressed:
+                                                    () =>
+                                                        Navigator.pop(context),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Theme.of(
+                                                        context,
+                                                      ).primaryColor,
+                                                  foregroundColor: Colors.white,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 24,
+                                                        vertical: 12,
+                                                      ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                  ),
+                                                ),
+                                                child: const Text("Salir"),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Imagen a la izquierda, sobrepuesta
+                                Positioned(
+                                  left: 0,
+                                  child: SizedBox(
+                                    width: imageSize,
+                                    child: Image.asset(
+                                      'assets/images/yowi_perfil.png',
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }
+                    return;
+                  }
+                }
+              } catch (e) {
+                if (e.toString().contains('Sesión expirada.')) {
+                  if (mounted) {
+                    Navigator.pushReplacementNamed(context, AppRoutes.login);
+                    return;
+                  }
+                }
+                debugPrint('Error: $e');
+                if (mounted) {
+                  Navigator.of(context, rootNavigator: true).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text(
+                        'Error: $e',
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return;
+              }
+              if (mounted) {
+                Navigator.pushReplacementNamed(context, AppRoutes.evaluacion);
+              }
+              break;
+          }
+        }
+      }
+    } catch (e) {
+      if (e.toString().contains('Sesión expirada.')) {
+        if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
+        return;
+      }
+      debugPrint('Error: $e');
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error al cargar la presentación: $e',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -172,6 +627,7 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
             ),
             Column(
               children: [
+                // Breadcrumb arriba
                 BreadcrumbNav(
                   paths: [
                     competenciaProvider.competencia!.titulo ?? 'Competencia',
@@ -179,95 +635,127 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                     tema.titulo,
                   ],
                 ),
+
+                // Contenido centrado
                 Expanded(
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: imageUrls.length,
-                    onPageChanged: (index) {
-                      setState(() => _currentPage = index);
-                    },
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () => openFullScreen(index),
-                        child: InteractiveViewer(
-                          panEnabled: true,
-                          minScale: 1,
-                          maxScale: 4,
-                          child: CachedNetworkImage(
-                            imageUrl: imageUrls[index],
-                            fit: BoxFit.contain,
-                            placeholder:
-                                (context, url) => const Center(
-                                  child: CircularProgressIndicator(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: imageUrls.length,
+                          onPageChanged: (index) {
+                            setState(() => _currentPage = index);
+                          },
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onTap: () => openFullScreen(index),
+                              child: InteractiveViewer(
+                                panEnabled: true,
+                                minScale: 1,
+                                maxScale: 4,
+                                child: CachedNetworkImage(
+                                  imageUrl: imageUrls[index],
+                                  fit: BoxFit.contain,
+                                  placeholder:
+                                      (context, url) => const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                  errorWidget:
+                                      (context, error, stackTrace) =>
+                                          const Center(
+                                            child: Text(
+                                              'Error al cargar la imagen',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontFamily: 'Montserrat',
+                                              ),
+                                            ),
+                                          ),
                                 ),
-                            errorWidget:
-                                (context, error, stackTrace) => const Center(
-                                  child: Text(
-                                    'Error al cargar la imagen',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontFamily: 'Montserrat',
-                                    ),
-                                  ),
-                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SmoothPageIndicator(
+                        controller: _pageController,
+                        count: imageUrls.length,
+                        effect: WormEffect(
+                          dotHeight: isSmall ? 8 : 10,
+                          dotWidth: isSmall ? 8 : 10,
+                          activeDotColor: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: padding),
+                        child: Text(
+                          'Diapositiva ${_currentPage + 1} de ${imageUrls.length}',
+                          style: TextStyle(
+                            fontSize: isSmall ? 12 : 14,
+                            fontFamily: 'Montserrat',
                           ),
                         ),
-                      );
-                    },
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                   ),
                 ),
-                SizedBox(height: isSmall ? 8 : 16),
-                SmoothPageIndicator(
-                  controller: _pageController,
-                  count: imageUrls.length,
-                  effect: WormEffect(
-                    dotHeight: isSmall ? 8 : 10,
-                    dotWidth: isSmall ? 8 : 10,
-                    activeDotColor: Theme.of(context).primaryColor,
-                  ),
-                ),
-                SizedBox(height: isSmall ? 6 : 12),
+
+                // Botones en el pie
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: padding),
-                  child: Text(
-                    'Diapositiva ${_currentPage + 1} de ${imageUrls.length}',
-                    style: TextStyle(
-                      fontSize: isSmall ? 12 : 14,
-                      fontFamily: 'Montserrat',
-                    ),
+                  padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 130,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            atrasarAdelantarTema(0);
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_back_ios_new_rounded),
+                              Text(
+                                'Atras',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      SizedBox(
+                        width: 130,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            atrasarAdelantarTema(1);
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Adelante',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                              Icon(Icons.arrow_forward_ios_rounded),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 130,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.arrow_back_ios_new_rounded),
-                            Text('Atras', style: TextStyle(fontSize: 15, fontFamily: 'Monstserrat'),),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 5),
-                    SizedBox(
-                      width: 130,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Adelante', style: TextStyle(fontSize: 15, fontFamily: 'Monstserrat'),),
-                            Icon(Icons.arrow_forward_ios_rounded),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),

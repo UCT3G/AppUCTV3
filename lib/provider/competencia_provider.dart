@@ -586,7 +586,73 @@ class CompetenciaProvider with ChangeNotifier {
           throw Exception('Sesión expirada.');
         }
       }
-      throw Exception('Error al validar los temas de la unidad: ${e.toString()}');
+      throw Exception(
+        'Error al validar los temas de la unidad: ${e.toString()}',
+      );
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Map<String, dynamic>> adelantarAtrasarTemas(
+    int idCurso,
+    int idUnidad,
+    int ordenTema,
+    int ordenUnidad,
+    int accion,
+  ) async {
+    _loading = true;
+
+    notifyListeners();
+
+    try {
+      final response = await CourseService.adelantarAtrasar(
+        idCurso,
+        idUnidad,
+        ordenTema,
+        ordenUnidad,
+        accion,
+        _authProvider.accessToken!,
+      );
+
+      return response;
+    } catch (e) {
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await CourseService.adelantarAtrasar(
+                idCurso,
+                idUnidad,
+                ordenTema,
+                ordenUnidad,
+                accion,
+                _authProvider.accessToken!,
+              );
+
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception(
+        'Error al validar los temas de la unidad: ${e.toString()}',
+      );
     } finally {
       _loading = false;
       notifyListeners();

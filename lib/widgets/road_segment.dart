@@ -382,8 +382,6 @@ class _RoadSegmentState extends State<RoadSegment> {
                                 }
                               }
 
-                              if (context.mounted) Navigator.pop(context);
-
                               switch (tema.recursoBasicoTipo) {
                                 case 'VIDEO':
                                   if (context.mounted) {
@@ -470,7 +468,10 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   try {
                                     final response = await competenciaProvider
                                         .validarTemasUnidad(
-                                          tema.idUnidad, tema.idTema, tema.idCurso, tema.recursoBasicoTipo
+                                          tema.idUnidad,
+                                          tema.idTema,
+                                          tema.idCurso,
+                                          tema.recursoBasicoTipo,
                                         );
                                     if (context.mounted) {
                                       final comentario =
@@ -492,9 +493,9 @@ class _RoadSegmentState extends State<RoadSegment> {
                                           ),
                                         ),
                                       );
-
+                                      print(comentario);
                                       if (comentario.contains(
-                                        'No tienes mas intentos'
+                                        'No tienes mas intentos',
                                       )) {
                                         if (context.mounted) {
                                           await showDialog(
@@ -558,7 +559,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                                                                       .start,
                                                               children: [
                                                                 Text(
-                                                                  "Estimado Usuario ¡Lo sentimos!",
+                                                                  "Estimado Usuario",
                                                                   style: TextStyle(
                                                                     fontSize:
                                                                         22,
@@ -578,7 +579,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                                                                   height: 12,
                                                                 ),
                                                                 Text(
-                                                                  'Lo siento no puedes contestar esta evaluación, ya consumiste todos los intentos.',
+                                                                  'Lo siento no puedes contestar esta evaluación, ya consumiste todos los intentos',
                                                                   style: TextStyle(
                                                                     fontSize:
                                                                         16,
@@ -654,7 +655,9 @@ class _RoadSegmentState extends State<RoadSegment> {
                                           );
                                         }
                                         return;
-                                      } else if(comentario.contains('No puede contestar esta encuesta')) {
+                                      } else if (comentario.contains(
+                                        'No puede contestar esta encuesta',
+                                      )) {
                                         if (context.mounted) {
                                           await showDialog(
                                             context: context,
@@ -859,6 +862,8 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   }
                                   break;
                               }
+
+                              if (context.mounted) Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColor,
@@ -969,8 +974,8 @@ class _RoadSegmentState extends State<RoadSegment> {
           left: isCardOnRight ? null : 50,
           right: isCardOnRight ? 50 : null,
           child: GestureDetector(
-            onTap: () {
-              showTemarioDialog();
+            onTap: () async {
+              await showTemarioDialog();
             },
             child: SizedBox(
               width: screenSize.width * 0.7,
