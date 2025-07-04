@@ -20,7 +20,6 @@ class _RoadSegmentState extends State<RoadSegment> {
   static const Map<String, IconData> _resourceIcons = {
     'ARCHIVO': Icons.insert_drive_file,
     'ARTICULO': Icons.article,
-    'DOCUMENTO': Icons.description,
     'ENCUESTA': Icons.assignment,
     'EVALUACION': Icons.quiz,
     'IMAGEN': Icons.image,
@@ -28,8 +27,8 @@ class _RoadSegmentState extends State<RoadSegment> {
     'PDF': Icons.picture_as_pdf,
     'PRACTICA': Icons.science,
     'PRESENCIAL': Icons.person,
-    'PRESENTACION': Icons.slideshow,
-    'VIDEO': Icons.video_label,
+    'PRESENTACION': Icons.video_label,
+    'VIDEO': Icons.slideshow,
   };
 
   static const List<Color> _predefinedColors = [
@@ -65,17 +64,25 @@ class _RoadSegmentState extends State<RoadSegment> {
   late String? _extraImagePath;
   late bool _isImageAbove; // true = arriba, false = abajo (contenedor)
 
-  Future<void> showTemarioDialog() async {
+  Future<void> showTemarioDialog(BuildContext parentContext) async {
+    if (!parentContext.mounted) return;
+
     return showDialog<void>(
-      context: context,
+      context: parentContext,
       barrierDismissible: false,
-      builder: (BuildContext context) {
-        final competenciaProvider = Provider.of<CompetenciaProvider>(context);
+      builder: (BuildContext dialogContext) {
+        final competenciaProvider = Provider.of<CompetenciaProvider>(
+          dialogContext,
+        );
         final tema = competenciaProvider.getTemaById(widget.idTema)!;
         final unidad = competenciaProvider.unidades.firstWhere(
           (u) => u.idUnidad == tema.idUnidad,
         );
-        final imageHeight = MediaQuery.of(context).size.height * 0.15;
+        final imageHeight = MediaQuery.of(dialogContext).size.height * 0.15;
+
+        if (competenciaProvider.loadingDialog) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
         return Center(
           child: Stack(
@@ -107,7 +114,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(dialogContext).primaryColor,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -122,21 +129,43 @@ class _RoadSegmentState extends State<RoadSegment> {
                           color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                        child: Column(
                           children: [
-                            Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.grey.shade700,
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.remove_red_eye,
+                                  color: Colors.grey.shade700,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${tema.intentosConsumidos} visualizaciones',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${tema.intentosConsumidos} visualizaciones',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey.shade700,
+                            if(tema.recursoBasicoTipo == 'EVALUACION' || tema.recursoBasicoTipo == 'PRACTICA')
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.grade_rounded,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '${tema.resultado}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
                           ],
                         ),
                       ),
@@ -146,7 +175,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           TextButton(
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () => Navigator.pop(dialogContext),
                             style: TextButton.styleFrom(
                               foregroundColor: Colors.grey.shade600,
                               padding: const EdgeInsets.symmetric(
@@ -165,11 +194,14 @@ class _RoadSegmentState extends State<RoadSegment> {
                                         unidad.idCurso,
                                         unidad.orden,
                                       );
-                                  if (context.mounted) {
-                                    final comentario =
-                                        response['comentario'] ?? '';
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                  final comentario =
+                                      response['comentario'] ?? '';
+
+                                  if (dialogContext.mounted) {
+                                    ScaffoldMessenger.of(
+                                      parentContext,
+                                    ).showSnackBar(
                                       SnackBar(
                                         backgroundColor: Colors.teal,
                                         behavior: SnackBarBehavior.floating,
@@ -183,187 +215,41 @@ class _RoadSegmentState extends State<RoadSegment> {
                                         ),
                                       ),
                                     );
-
-                                    if (comentario.contains(
-                                      'Unidad anterior no aprobada',
-                                    )) {
-                                      if (context.mounted) {
-                                        Navigator.pop(context);
-                                      }
-                                      if (context.mounted) {
-                                        await showDialog(
-                                          context: context,
-                                          barrierDismissible: false,
-                                          builder: (BuildContext context) {
-                                            final screenWidth =
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width;
-                                            final imageSize = screenWidth * 0.4;
-
-                                            return Center(
-                                              child: Stack(
-                                                clipBehavior: Clip.none,
-                                                alignment: Alignment.centerLeft,
-                                                children: [
-                                                  // Card contenedor
-                                                  Container(
-                                                    margin: EdgeInsets.only(
-                                                      left: imageSize / 2,
-                                                    ),
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                          16,
-                                                        ),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            20,
-                                                          ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.black
-                                                              .withValues(
-                                                                alpha: 0.2,
-                                                              ),
-                                                          blurRadius: 10,
-                                                          spreadRadius: 2,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        SizedBox(
-                                                          width: imageSize / 2,
-                                                        ), // Espacio para la imagen
-                                                        Flexible(
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(
-                                                                "Estimado Usuario ¡Lo sentimos!",
-                                                                style: TextStyle(
-                                                                  fontSize: 22,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      Theme.of(
-                                                                        context,
-                                                                      ).primaryColor,
-                                                                ),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 12,
-                                                              ),
-                                                              Text(
-                                                                '¡Tienes que pasar las unidades anteriores para ver este recurso!',
-                                                                style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  color:
-                                                                      Colors
-                                                                          .grey
-                                                                          .shade700,
-                                                                ),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 20,
-                                                              ),
-                                                              Align(
-                                                                alignment:
-                                                                    Alignment
-                                                                        .centerRight,
-                                                                child: ElevatedButton(
-                                                                  onPressed:
-                                                                      () => Navigator.pop(
-                                                                        context,
-                                                                      ),
-                                                                  style: ElevatedButton.styleFrom(
-                                                                    backgroundColor:
-                                                                        Theme.of(
-                                                                          context,
-                                                                        ).primaryColor,
-                                                                    foregroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    padding: const EdgeInsets.symmetric(
-                                                                      horizontal:
-                                                                          24,
-                                                                      vertical:
-                                                                          12,
-                                                                    ),
-                                                                    shape: RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            20,
-                                                                          ),
-                                                                    ),
-                                                                  ),
-                                                                  child:
-                                                                      const Text(
-                                                                        "Salir",
-                                                                      ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  // Imagen a la izquierda, sobrepuesta
-                                                  Positioned(
-                                                    left: 0,
-                                                    child: SizedBox(
-                                                      width: imageSize,
-                                                      child: Image.asset(
-                                                        'assets/images/yowi_perfil.png',
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      }
-                                      return;
+                                  }
+                                  if (comentario.contains(
+                                    'Unidad anterior no aprobada',
+                                  )) {
+                                    if (dialogContext.mounted) {
+                                      Navigator.pop(dialogContext);
                                     }
+                                    if (parentContext.mounted) {
+                                      showAlertDialog(
+                                        parentContext,
+                                        '¡Tienes que pasar las unidades anteriores para ver este recurso!',
+                                      );
+                                    }
+                                    return;
                                   }
                                 } catch (e) {
                                   if (e.toString().contains(
                                     'Sesión expirada.',
                                   )) {
-                                    if (context.mounted) {
+                                    if (parentContext.mounted) {
                                       Navigator.pushReplacementNamed(
-                                        context,
+                                        parentContext,
                                         AppRoutes.login,
                                       );
                                       return;
                                     }
                                   }
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
                                   debugPrint('Error: $e');
-                                  if (context.mounted) {
-                                    Navigator.of(
-                                      context,
-                                      rootNavigator: true,
-                                    ).pop();
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                  if (parentContext.mounted) {
+                                    ScaffoldMessenger.of(
+                                      parentContext,
+                                    ).showSnackBar(
                                       SnackBar(
                                         behavior: SnackBarBehavior.floating,
                                         content: Text(
@@ -377,88 +263,114 @@ class _RoadSegmentState extends State<RoadSegment> {
                                       ),
                                     );
                                   }
-                                  if (context.mounted) Navigator.pop(context);
                                   return;
                                 }
                               }
 
                               switch (tema.recursoBasicoTipo) {
                                 case 'VIDEO':
-                                  if (context.mounted) {
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
                                     Navigator.pushNamed(
-                                      context,
+                                      parentContext,
                                       AppRoutes.video,
                                       arguments: tema.idTema,
                                     );
                                   }
                                   break;
                                 case 'IMAGEN':
-                                  if (context.mounted) {
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
                                     Navigator.pushNamed(
-                                      context,
+                                      parentContext,
                                       AppRoutes.imagen,
                                       arguments: tema.idTema,
                                     );
                                   }
                                   break;
                                 case 'DOCUMENTO':
-                                  if (context.mounted) {
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
                                     Navigator.pushNamed(
-                                      context,
+                                      parentContext,
                                       AppRoutes.pdf,
                                       arguments: tema.idTema,
                                     );
                                   }
                                   break;
                                 case 'PDF':
-                                  if (context.mounted) {
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
                                     Navigator.pushNamed(
-                                      context,
+                                      parentContext,
                                       AppRoutes.pdf,
                                       arguments: tema.idTema,
                                     );
                                   }
                                   break;
                                 case 'ARCHIVO':
-                                  if (context.mounted) {
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
                                     Navigator.pushNamed(
-                                      context,
+                                      parentContext,
                                       AppRoutes.archivo,
                                       arguments: tema.idTema,
                                     );
                                   }
                                   break;
                                 case 'ARTICULO':
-                                  if (context.mounted) {
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
                                     Navigator.pushNamed(
-                                      context,
+                                      parentContext,
                                       AppRoutes.articulo,
                                       arguments: tema.idTema,
                                     );
                                   }
                                   break;
                                 case 'PRESENCIAL':
-                                  if (context.mounted) {
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
                                     Navigator.pushNamed(
-                                      context,
+                                      parentContext,
                                       AppRoutes.presencial,
                                       arguments: tema.idTema,
                                     );
                                   }
                                   break;
                                 case 'PRESENTACION':
-                                  if (context.mounted) {
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
                                     Navigator.pushNamed(
-                                      context,
+                                      parentContext,
                                       AppRoutes.presentacion,
                                       arguments: tema.idTema,
                                     );
                                   }
                                   break;
                                 case 'PRACTICA':
-                                  if (context.mounted) {
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
                                     Navigator.pushNamed(
-                                      context,
+                                      parentContext,
                                       AppRoutes.practica,
                                       arguments: tema.idTema,
                                     );
@@ -473,12 +385,13 @@ class _RoadSegmentState extends State<RoadSegment> {
                                           tema.idCurso,
                                           tema.recursoBasicoTipo,
                                         );
-                                    if (context.mounted) {
-                                      final comentario =
-                                          response['comentario'] ?? '';
 
+                                    final comentario =
+                                        response['comentario'] ?? '';
+
+                                    if (parentContext.mounted) {
                                       ScaffoldMessenger.of(
-                                        context,
+                                        parentContext,
                                       ).showSnackBar(
                                         SnackBar(
                                           backgroundColor: Colors.teal,
@@ -493,351 +406,48 @@ class _RoadSegmentState extends State<RoadSegment> {
                                           ),
                                         ),
                                       );
-                                      print(comentario);
-                                      if (comentario.contains(
-                                        'No tienes mas intentos',
-                                      )) {
-                                        if (context.mounted) {
-                                          await showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (BuildContext context) {
-                                              final screenWidth =
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width;
-                                              final imageSize =
-                                                  screenWidth * 0.4;
+                                    }
 
-                                              return Center(
-                                                child: Stack(
-                                                  clipBehavior: Clip.none,
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  children: [
-                                                    // Card contenedor
-                                                    Container(
-                                                      margin: EdgeInsets.only(
-                                                        left: imageSize / 2,
-                                                      ),
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                            16,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              20,
-                                                            ),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.black
-                                                                .withValues(
-                                                                  alpha: 0.2,
-                                                                ),
-                                                            blurRadius: 10,
-                                                            spreadRadius: 2,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          SizedBox(
-                                                            width:
-                                                                imageSize / 2,
-                                                          ), // Espacio para la imagen
-                                                          Flexible(
-                                                            child: Column(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  "Estimado Usuario",
-                                                                  style: TextStyle(
-                                                                    fontSize:
-                                                                        22,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color:
-                                                                        Theme.of(
-                                                                          context,
-                                                                        ).primaryColor,
-                                                                  ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .right,
-                                                                ),
-                                                                const SizedBox(
-                                                                  height: 12,
-                                                                ),
-                                                                Text(
-                                                                  'Lo siento no puedes contestar esta evaluación, ya consumiste todos los intentos',
-                                                                  style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    color:
-                                                                        Colors
-                                                                            .grey
-                                                                            .shade700,
-                                                                  ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .right,
-                                                                ),
-                                                                const SizedBox(
-                                                                  height: 20,
-                                                                ),
-                                                                Align(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .centerRight,
-                                                                  child: ElevatedButton(
-                                                                    onPressed:
-                                                                        () => Navigator.pop(
-                                                                          context,
-                                                                        ),
-                                                                    style: ElevatedButton.styleFrom(
-                                                                      backgroundColor:
-                                                                          Theme.of(
-                                                                            context,
-                                                                          ).primaryColor,
-                                                                      foregroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      padding: const EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            24,
-                                                                        vertical:
-                                                                            12,
-                                                                      ),
-                                                                      shape: RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(
-                                                                              20,
-                                                                            ),
-                                                                      ),
-                                                                    ),
-                                                                    child:
-                                                                        const Text(
-                                                                          "Salir",
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    // Imagen a la izquierda, sobrepuesta
-                                                    Positioned(
-                                                      left: 0,
-                                                      child: SizedBox(
-                                                        width: imageSize,
-                                                        child: Image.asset(
-                                                          'assets/images/yowi_perfil.png',
-                                                          fit: BoxFit.cover,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        }
-                                        return;
-                                      } else if (comentario.contains(
-                                        'No puede contestar esta encuesta',
-                                      )) {
-                                        if (context.mounted) {
-                                          await showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (BuildContext context) {
-                                              final screenWidth =
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width;
-                                              final imageSize =
-                                                  screenWidth * 0.4;
-
-                                              return Center(
-                                                child: Stack(
-                                                  clipBehavior: Clip.none,
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  children: [
-                                                    // Card contenedor
-                                                    Container(
-                                                      margin: EdgeInsets.only(
-                                                        left: imageSize / 2,
-                                                      ),
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                            16,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              20,
-                                                            ),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.black
-                                                                .withValues(
-                                                                  alpha: 0.2,
-                                                                ),
-                                                            blurRadius: 10,
-                                                            spreadRadius: 2,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          SizedBox(
-                                                            width:
-                                                                imageSize / 2,
-                                                          ), // Espacio para la imagen
-                                                          Flexible(
-                                                            child: Column(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  "Estimado Usuario ¡Lo sentimos!",
-                                                                  style: TextStyle(
-                                                                    fontSize:
-                                                                        22,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color:
-                                                                        Theme.of(
-                                                                          context,
-                                                                        ).primaryColor,
-                                                                  ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .right,
-                                                                ),
-                                                                const SizedBox(
-                                                                  height: 12,
-                                                                ),
-                                                                Text(
-                                                                  'Lo siento no puedes contestar esta evaluación, no has visto todos los temas.',
-                                                                  style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    color:
-                                                                        Colors
-                                                                            .grey
-                                                                            .shade700,
-                                                                  ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .right,
-                                                                ),
-                                                                const SizedBox(
-                                                                  height: 20,
-                                                                ),
-                                                                Align(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .centerRight,
-                                                                  child: ElevatedButton(
-                                                                    onPressed:
-                                                                        () => Navigator.pop(
-                                                                          context,
-                                                                        ),
-                                                                    style: ElevatedButton.styleFrom(
-                                                                      backgroundColor:
-                                                                          Theme.of(
-                                                                            context,
-                                                                          ).primaryColor,
-                                                                      foregroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      padding: const EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            24,
-                                                                        vertical:
-                                                                            12,
-                                                                      ),
-                                                                      shape: RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(
-                                                                              20,
-                                                                            ),
-                                                                      ),
-                                                                    ),
-                                                                    child:
-                                                                        const Text(
-                                                                          "Salir",
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    // Imagen a la izquierda, sobrepuesta
-                                                    Positioned(
-                                                      left: 0,
-                                                      child: SizedBox(
-                                                        width: imageSize,
-                                                        child: Image.asset(
-                                                          'assets/images/yowi_perfil.png',
-                                                          fit: BoxFit.cover,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        }
-                                        return;
+                                    if (comentario.contains(
+                                      'No tienes mas intentos',
+                                    )) {
+                                      if (dialogContext.mounted){ Navigator.pop(dialogContext); }
+                                      if (parentContext.mounted) {
+                                        showAlertDialog(
+                                          parentContext,
+                                          'Lo siento no puedes contestar esta evaluación, ya consumiste todos los intentos',
+                                        );
                                       }
+                                      return;
+                                    } else if (comentario.contains(
+                                      'No puede contestar esta encuesta',
+                                    )) {
+                                      if (dialogContext.mounted){ Navigator.pop(dialogContext); }
+                                      if (parentContext.mounted) {
+                                        showAlertDialog(
+                                          parentContext,
+                                          'Lo siento no puedes contestar esta evaluación, no has visto todos los temas.',
+                                        );
+                                      }
+                                      return;
                                     }
                                   } catch (e) {
                                     if (e.toString().contains(
                                       'Sesión expirada.',
                                     )) {
-                                      if (context.mounted) {
+                                      if (parentContext.mounted) {
                                         Navigator.pushReplacementNamed(
-                                          context,
+                                          parentContext,
                                           AppRoutes.login,
                                         );
                                         return;
                                       }
                                     }
+                                    if (dialogContext.mounted){ Navigator.pop(dialogContext); }
                                     debugPrint('Error: $e');
-                                    if (context.mounted) {
-                                      Navigator.of(
-                                        context,
-                                        rootNavigator: true,
-                                      ).pop();
+                                    if (parentContext.mounted) {
                                       ScaffoldMessenger.of(
-                                        context,
+                                        parentContext,
                                       ).showSnackBar(
                                         SnackBar(
                                           behavior: SnackBarBehavior.floating,
@@ -854,19 +464,18 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     }
                                     return;
                                   }
-                                  if (context.mounted) {
+                                  if (parentContext.mounted) {
                                     Navigator.pushNamed(
-                                      context,
+                                      parentContext,
                                       AppRoutes.evaluacion,
                                     );
                                   }
                                   break;
                               }
-
-                              if (context.mounted) Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
+                              backgroundColor:
+                                  Theme.of(dialogContext).primaryColor,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 24,
@@ -891,6 +500,108 @@ class _RoadSegmentState extends State<RoadSegment> {
                   height: imageHeight,
                   child: Image.asset(
                     'assets/images/YowMitad.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> showAlertDialog(
+    BuildContext parentContext,
+    String message,
+  ) async {
+    return await showDialog(
+      context: parentContext,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        final screenWidth = MediaQuery.of(dialogContext).size.width;
+        final imageSize = screenWidth * 0.4;
+
+        return Center(
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.centerLeft,
+            children: [
+              // Card contenedor
+              Container(
+                margin: EdgeInsets.only(left: imageSize / 2),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(width: imageSize / 2), // Espacio para la imagen
+                    Flexible(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Estimado Usuario ¡Lo sentimos!",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(dialogContext).primaryColor,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            message,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade700,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                          const SizedBox(height: 20),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.pop(dialogContext),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(dialogContext).primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              child: const Text("Salir"),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Imagen a la izquierda, sobrepuesta
+              Positioned(
+                left: 0,
+                child: SizedBox(
+                  width: imageSize,
+                  child: Image.asset(
+                    'assets/images/yowi_perfil.png',
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -975,14 +686,17 @@ class _RoadSegmentState extends State<RoadSegment> {
           right: isCardOnRight ? 50 : null,
           child: GestureDetector(
             onTap: () async {
-              await showTemarioDialog();
+              await showTemarioDialog(context);
             },
             child: SizedBox(
               width: screenSize.width * 0.7,
               height: screenSize.height * 0.13,
               child: Card(
                 color:
-                    (tema!.intentosConsumidos >= 1)
+                    (tema!.recursoBasicoTipo == 'EVALUACION' &&
+                                tema.resultado >= 80) ||
+                            (tema.recursoBasicoTipo != 'EVALUACION' &&
+                                tema.intentosConsumidos >= 1)
                         ? Color.fromRGBO(119, 200, 0, 1)
                         : tema == siguienteTema
                         ? Color.fromRGBO(186, 15, 60, 0.7)

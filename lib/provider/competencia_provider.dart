@@ -22,6 +22,7 @@ class CompetenciaProvider with ChangeNotifier {
   List<Unidad> _unidades = [];
   Competencia? _competencia;
   bool _loading = false;
+  bool _loadingDialog = false;
   List<Competencia> _competencias = [];
   List<Competencia> _competenciasFiltradas = [];
   List<Competencia> _competenciasRecientes = [];
@@ -29,6 +30,7 @@ class CompetenciaProvider with ChangeNotifier {
   Competencia? get competencia => _competencia;
   List<Unidad> get unidades => _unidades;
   bool get loading => _loading;
+  bool get loadingDialog => _loadingDialog;
   List<Competencia> get competencias => _competencias;
   List<Competencia> get competenciasFiltradas => _competenciasFiltradas;
   List<Competencia> get competenciasRecientes => _competenciasRecientes;
@@ -86,8 +88,14 @@ class CompetenciaProvider with ChangeNotifier {
   Tema? obtenerSiguienteTema() {
     for (var unidad in _unidades) {
       for (var tema in unidad.temas) {
-        if (tema.intentosConsumidos == 0) {
-          return tema;
+        if (tema.recursoBasicoTipo == 'EVALUACION') {
+          if (tema.resultado < 80) {
+            return tema;
+          }
+        } else {
+          if (tema.intentosConsumidos == 0) {
+            return tema;
+          }
         }
       }
     }
@@ -485,7 +493,7 @@ class CompetenciaProvider with ChangeNotifier {
     int idCurso,
     int orden,
   ) async {
-    _loading = true;
+    _loadingDialog = true;
 
     notifyListeners();
 
@@ -529,7 +537,7 @@ class CompetenciaProvider with ChangeNotifier {
       }
       throw Exception('Error validar la unidad anterior: ${e.toString()}');
     } finally {
-      _loading = false;
+      _loadingDialog = false;
       notifyListeners();
     }
   }
@@ -540,7 +548,7 @@ class CompetenciaProvider with ChangeNotifier {
     int idCurso,
     String recursoBasicoTipo,
   ) async {
-    _loading = true;
+    _loadingDialog = true;
 
     notifyListeners();
 
@@ -590,7 +598,7 @@ class CompetenciaProvider with ChangeNotifier {
         'Error al validar los temas de la unidad: ${e.toString()}',
       );
     } finally {
-      _loading = false;
+      _loadingDialog = false;
       notifyListeners();
     }
   }
@@ -602,7 +610,7 @@ class CompetenciaProvider with ChangeNotifier {
     int ordenUnidad,
     int accion,
   ) async {
-    _loading = true;
+    _loadingDialog = true;
 
     notifyListeners();
 
@@ -654,7 +662,7 @@ class CompetenciaProvider with ChangeNotifier {
         'Error al validar los temas de la unidad: ${e.toString()}',
       );
     } finally {
-      _loading = false;
+      _loadingDialog = false;
       notifyListeners();
     }
   }

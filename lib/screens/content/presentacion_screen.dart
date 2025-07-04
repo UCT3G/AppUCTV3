@@ -101,9 +101,12 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
     }
   }
 
-  Future<void> atrasarAdelantarTema(int accion) async {
+  Future<void> atrasarAdelantarTema(
+    BuildContext parentContext,
+    int accion,
+  ) async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
-      context,
+      parentContext,
       listen: false,
     );
     final tema = competenciaProvider.getTemaById(widget.idTema)!;
@@ -119,9 +122,9 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
         unidad.orden,
         accion,
       );
-      if (mounted) {
-        if (response['tema_usuario'] == 0) {
-          ScaffoldMessenger.of(context).showSnackBar(
+      if (response['tema_usuario'] == 0) {
+        if (parentContext.mounted) {
+          ScaffoldMessenger.of(parentContext).showSnackBar(
             SnackBar(
               backgroundColor: Colors.redAccent,
               behavior: SnackBarBehavior.floating,
@@ -135,8 +138,117 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
               ),
             ),
           );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
+        }
+        if (response['comentario'].contains('Ya no hay mas temas')) {
+          if (parentContext.mounted) {
+            await showDialog(
+              context: parentContext,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final imageSize = screenWidth * 0.4;
+
+                return Center(
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      // Card contenedor
+                      Container(
+                        margin: EdgeInsets.only(left: imageSize / 2),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: imageSize / 2,
+                            ), // Espacio para la imagen
+                            Flexible(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Estimado Usuario",
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).primaryColor,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'Ya no hay más temas para ver.',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey.shade700,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: ElevatedButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            Theme.of(context).primaryColor,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 12,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Text("Salir"),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Imagen a la izquierda, sobrepuesta
+                      Positioned(
+                        left: 0,
+                        child: SizedBox(
+                          width: imageSize,
+                          child: Image.asset(
+                            'assets/images/yowi_perfil.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+          return;
+        }
+      } else {
+        if (parentContext.mounted) {
+          ScaffoldMessenger.of(parentContext).showSnackBar(
             SnackBar(
               backgroundColor: Colors.teal,
               behavior: SnackBarBehavior.floating,
@@ -150,385 +262,377 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
               ),
             ),
           );
-          final nuevoTema =
-              competenciaProvider.getTemaById(response['tema_usuario'])!;
-          switch (nuevoTema.recursoBasicoTipo) {
-            case 'VIDEO':
-              if (mounted) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  AppRoutes.video,
-                  arguments: nuevoTema.idTema,
-                );
-              }
-              break;
-            case 'IMAGEN':
-              if (mounted) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  AppRoutes.imagen,
-                  arguments: nuevoTema.idTema,
-                );
-              }
-              break;
-            case 'DOCUMENTO':
-              if (mounted) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  AppRoutes.pdf,
-                  arguments: nuevoTema.idTema,
-                );
-              }
-              break;
-            case 'PDF':
-              if (mounted) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  AppRoutes.pdf,
-                  arguments: nuevoTema.idTema,
-                );
-              }
-              break;
-            case 'ARCHIVO':
-              if (mounted) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  AppRoutes.archivo,
-                  arguments: nuevoTema.idTema,
-                );
-              }
-              break;
-            case 'ARTICULO':
-              if (mounted) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  AppRoutes.articulo,
-                  arguments: nuevoTema.idTema,
-                );
-              }
-              break;
-            case 'PRESENCIAL':
-              if (mounted) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  AppRoutes.presencial,
-                  arguments: nuevoTema.idTema,
-                );
-              }
-              break;
-            case 'PRESENTACION':
-              if (mounted) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  AppRoutes.presentacion,
-                  arguments: nuevoTema.idTema,
-                );
-              }
-              break;
-            case 'PRACTICA':
-              if (mounted) {
-                Navigator.pushReplacementNamed(
-                  context,
-                  AppRoutes.practica,
-                  arguments: nuevoTema.idTema,
-                );
-              }
-              break;
-            case 'EVALUACION':
-              try {
-                final response = await competenciaProvider.validarTemasUnidad(
-                  nuevoTema.idUnidad,
-                  nuevoTema.idTema,
-                  nuevoTema.idCurso,
-                  nuevoTema.recursoBasicoTipo,
-                );
-                if (mounted) {
-                  final comentario = response['comentario'] ?? '';
+        }
+        final nuevoTema =
+            competenciaProvider.getTemaById(response['tema_usuario'])!;
+        switch (nuevoTema.recursoBasicoTipo) {
+          case 'VIDEO':
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.video,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
+          case 'IMAGEN':
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.imagen,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
+          case 'DOCUMENTO':
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.pdf,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
+          case 'PDF':
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.pdf,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
+          case 'ARCHIVO':
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.archivo,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
+          case 'ARTICULO':
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.articulo,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
+          case 'PRESENCIAL':
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.presencial,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
+          case 'PRESENTACION':
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.presentacion,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
+          case 'PRACTICA':
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.practica,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
+          case 'EVALUACION':
+            try {
+              final response = await competenciaProvider.validarTemasUnidad(
+                nuevoTema.idUnidad,
+                nuevoTema.idTema,
+                nuevoTema.idCurso,
+                nuevoTema.recursoBasicoTipo,
+              );
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Colors.teal,
-                      behavior: SnackBarBehavior.floating,
-                      content: Text(
-                        response['comentario'],
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontFamily: 'Montserrat',
-                        ),
+              final comentario = response['comentario'] ?? '';
+
+              if (parentContext.mounted) {
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  SnackBar(
+                    backgroundColor: Colors.teal,
+                    behavior: SnackBarBehavior.floating,
+                    content: Text(
+                      response['comentario'],
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontFamily: 'Montserrat',
                       ),
                     ),
+                  ),
+                );
+              }
+              if (comentario.contains('No tienes mas intentos')) {
+                if (parentContext.mounted) {
+                  await showDialog(
+                    context: parentContext,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      final screenWidth = MediaQuery.of(context).size.width;
+                      final imageSize = screenWidth * 0.4;
+
+                      return Center(
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.centerLeft,
+                          children: [
+                            // Card contenedor
+                            Container(
+                              margin: EdgeInsets.only(left: imageSize / 2),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 10,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: imageSize / 2,
+                                  ), // Espacio para la imagen
+                                  Flexible(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Estimado Usuario",
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            decoration: TextDecoration.none,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'Lo siento no puedes contestar esta evaluación, ya consumiste todos los intentos.',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey.shade700,
+                                            decoration: TextDecoration.none,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: ElevatedButton(
+                                            onPressed:
+                                                () => Navigator.pop(context),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  Theme.of(
+                                                    context,
+                                                  ).primaryColor,
+                                              foregroundColor: Colors.white,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 24,
+                                                    vertical: 12,
+                                                  ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                            ),
+                                            child: const Text("Salir"),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Imagen a la izquierda, sobrepuesta
+                            Positioned(
+                              left: 0,
+                              child: SizedBox(
+                                width: imageSize,
+                                child: Image.asset(
+                                  'assets/images/yowi_perfil.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   );
+                }
+                return;
+              } else if (comentario.contains(
+                'No puede contestar esta encuesta',
+              )) {
+                if (parentContext.mounted) {
+                  await showDialog(
+                    context: parentContext,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      final screenWidth = MediaQuery.of(context).size.width;
+                      final imageSize = screenWidth * 0.4;
 
-                  if (comentario.contains('No tienes mas intentos')) {
-                    Navigator.pop(context);
-                    if (mounted) {
-                      await showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          final screenWidth = MediaQuery.of(context).size.width;
-                          final imageSize = screenWidth * 0.4;
-
-                          return Center(
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              alignment: Alignment.centerLeft,
-                              children: [
-                                // Card contenedor
-                                Container(
-                                  margin: EdgeInsets.only(left: imageSize / 2),
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.2,
-                                        ),
-                                        blurRadius: 10,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
+                      return Center(
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.centerLeft,
+                          children: [
+                            // Card contenedor
+                            Container(
+                              margin: EdgeInsets.only(left: imageSize / 2),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 10,
+                                    spreadRadius: 2,
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      SizedBox(
-                                        width: imageSize / 2,
-                                      ), // Espacio para la imagen
-                                      Flexible(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Estimado Usuario ¡Lo sentimos!",
-                                              style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold,
-                                                color:
-                                                    Theme.of(
-                                                      context,
-                                                    ).primaryColor,
-                                              ),
-                                              textAlign: TextAlign.right,
-                                            ),
-                                            const SizedBox(height: 12),
-                                            Text(
-                                              'Lo siento no puedes contestar esta evaluación, ya consumiste todos los intentos.',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.grey.shade700,
-                                              ),
-                                              textAlign: TextAlign.right,
-                                            ),
-                                            const SizedBox(height: 20),
-                                            Align(
-                                              alignment: Alignment.centerRight,
-                                              child: ElevatedButton(
-                                                onPressed:
-                                                    () =>
-                                                        Navigator.pop(context),
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      Theme.of(
-                                                        context,
-                                                      ).primaryColor,
-                                                  foregroundColor: Colors.white,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 24,
-                                                        vertical: 12,
-                                                      ),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: imageSize / 2,
+                                  ), // Espacio para la imagen
+                                  Flexible(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Estimado Usuario",
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'Lo siento no puedes contestar esta evaluación, no has visto todos los temas.',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: ElevatedButton(
+                                            onPressed:
+                                                () => Navigator.pop(context),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  Theme.of(
+                                                    context,
+                                                  ).primaryColor,
+                                              foregroundColor: Colors.white,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 24,
+                                                    vertical: 12,
                                                   ),
-                                                ),
-                                                child: const Text("Salir"),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
                                               ),
                                             ),
-                                          ],
+                                            child: const Text("Salir"),
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Imagen a la izquierda, sobrepuesta
-                                Positioned(
-                                  left: 0,
-                                  child: SizedBox(
-                                    width: imageSize,
-                                    child: Image.asset(
-                                      'assets/images/yowi_perfil.png',
-                                      fit: BoxFit.cover,
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          );
-                        },
-                      );
-                    }
-                    return;
-                  } else if (comentario.contains(
-                    'No puede contestar esta encuesta',
-                  )) {
-                    Navigator.pop(context);
-                    if (mounted) {
-                      await showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          final screenWidth = MediaQuery.of(context).size.width;
-                          final imageSize = screenWidth * 0.4;
-
-                          return Center(
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              alignment: Alignment.centerLeft,
-                              children: [
-                                // Card contenedor
-                                Container(
-                                  margin: EdgeInsets.only(left: imageSize / 2),
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.2,
-                                        ),
-                                        blurRadius: 10,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      SizedBox(
-                                        width: imageSize / 2,
-                                      ), // Espacio para la imagen
-                                      Flexible(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Estimado Usuario ¡Lo sentimos!",
-                                              style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold,
-                                                color:
-                                                    Theme.of(
-                                                      context,
-                                                    ).primaryColor,
-                                              ),
-                                              textAlign: TextAlign.right,
-                                            ),
-                                            const SizedBox(height: 12),
-                                            Text(
-                                              'Lo siento no puedes contestar esta evaluación, no has visto todos los temas.',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.grey.shade700,
-                                              ),
-                                              textAlign: TextAlign.right,
-                                            ),
-                                            const SizedBox(height: 20),
-                                            Align(
-                                              alignment: Alignment.centerRight,
-                                              child: ElevatedButton(
-                                                onPressed:
-                                                    () =>
-                                                        Navigator.pop(context),
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      Theme.of(
-                                                        context,
-                                                      ).primaryColor,
-                                                  foregroundColor: Colors.white,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 24,
-                                                        vertical: 12,
-                                                      ),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
-                                                  ),
-                                                ),
-                                                child: const Text("Salir"),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                            // Imagen a la izquierda, sobrepuesta
+                            Positioned(
+                              left: 0,
+                              child: SizedBox(
+                                width: imageSize,
+                                child: Image.asset(
+                                  'assets/images/yowi_perfil.png',
+                                  fit: BoxFit.cover,
                                 ),
-                                // Imagen a la izquierda, sobrepuesta
-                                Positioned(
-                                  left: 0,
-                                  child: SizedBox(
-                                    width: imageSize,
-                                    child: Image.asset(
-                                      'assets/images/yowi_perfil.png',
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                          );
-                        },
-                      );
-                    }
-                    return;
-                  }
-                }
-              } catch (e) {
-                if (e.toString().contains('Sesión expirada.')) {
-                  if (mounted) {
-                    Navigator.pushReplacementNamed(context, AppRoutes.login);
-                    return;
-                  }
-                }
-                debugPrint('Error: $e');
-                if (mounted) {
-                  Navigator.of(context, rootNavigator: true).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text(
-                        'Error: $e',
-                        style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          color: Colors.white,
-                          fontSize: 14,
+                          ],
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   );
                 }
                 return;
               }
-              if (mounted) {
-                Navigator.pushReplacementNamed(context, AppRoutes.evaluacion);
+            } catch (e) {
+              if (e.toString().contains('Sesión expirada.')) {
+                if (parentContext.mounted) {
+                  Navigator.pushReplacementNamed(
+                    parentContext,
+                    AppRoutes.login,
+                  );
+                  return;
+                }
               }
-              break;
-          }
+              debugPrint('Error: $e');
+              if (parentContext.mounted) {
+                Navigator.of(parentContext, rootNavigator: true).pop();
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    content: Text(
+                      'Error: $e',
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return;
+            }
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.evaluacion,
+              );
+            }
+            break;
         }
       }
     } catch (e) {
@@ -537,9 +641,9 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
         return;
       }
       debugPrint('Error: $e');
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
+      if (parentContext.mounted) {
+        Navigator.of(parentContext, rootNavigator: true).pop();
+        ScaffoldMessenger.of(parentContext).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
             content: Text(
@@ -712,10 +816,10 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: 130,
+                        width: 150,
                         child: ElevatedButton(
                           onPressed: () {
-                            atrasarAdelantarTema(0);
+                            atrasarAdelantarTema(context, 0);
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -734,10 +838,10 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                       ),
                       SizedBox(width: 5),
                       SizedBox(
-                        width: 130,
+                        width: 150,
                         child: ElevatedButton(
                           onPressed: () {
-                            atrasarAdelantarTema(1);
+                            atrasarAdelantarTema(context, 1);
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
