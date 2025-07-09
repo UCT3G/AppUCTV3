@@ -52,22 +52,25 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
           child: SizedBox(
             width: 300,
             height: 700,
-            child: Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.black12,
-                    radius: 125,
-                    child: CircleAvatar(
-                      backgroundImage: AssetImage(
-                        'assets/images/yowi_evaluacion.png',
-                      ),
-                      radius: 120,
+            child: Column(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+                  child: Container(
+                    width: 300,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(235, 221, 255, 1),
+                    ),
+                    child: Image.asset(
+                      'assets/images/yowi_evaluacion.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
-                  SizedBox(height: 10),
-                  Text(
+                ),
+                SizedBox(height: 10),
+                Padding(
+                  padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
+                  child: Text(
                     'Estimado estudiante.',
                     style: TextStyle(
                       fontFamily: 'Montserrat',
@@ -77,8 +80,11 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 5),
-                  Text(
+                ),
+                SizedBox(height: 5),
+                Padding(
+                  padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
+                  child: Text(
                     '¡Estás por iniciar una evaluación! La calificación mínima es de 80. Esto contará como ${tema.intentosConsumidos + 1} oportunidad(es) de las ${tema.intentosDisponibles} disponibles. , Al aceptar, estás indicando que has revisado y entendido los contenidos previos y que estás listo para contestar tu evaluación. (Abrir la evaluación para sólo ver las preguntas ES HACER TRAMPA , aún cuando no contestes nada cuenta como una oportunidad)',
                     style: TextStyle(
                       fontFamily: 'Montserrat',
@@ -87,33 +93,30 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 10),
-                  SizedBox(
-                    width: 200,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                ),
+                SizedBox(height: 10),
+                SizedBox(
+                  width: 200,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
                       ),
-                      child: Text(
-                        'Contestar Evaluacion',
-                        style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 12,
-                        ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
                     ),
+                    child: Text(
+                      'Contestar Evaluacion',
+                      style: TextStyle(fontFamily: 'Montserrat', fontSize: 12),
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

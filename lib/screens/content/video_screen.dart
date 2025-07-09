@@ -627,6 +627,7 @@ class _VideoScreenState extends State<VideoScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacion,
+                arguments: tema.idTema,
               );
             }
             break;

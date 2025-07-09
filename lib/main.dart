@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
+import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:app_uct/routes/app_navigator.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,12 @@ void main() async {
           update:
               (_, auth, competenciaProvider) =>
                   competenciaProvider!..updateAuth(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, EvaluacionProvider>(
+          create: (_) => EvaluacionProvider(authProvider),
+          update:
+              (_, auth, evaluacionProvider) =>
+                  evaluacionProvider!..updateAuth(auth),
         ),
       ],
       child: MyApp(),

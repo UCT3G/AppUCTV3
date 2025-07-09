@@ -608,6 +608,7 @@ class _PdfScreenState extends State<PdfScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacion,
+                arguments: tema.idTema,
               );
             }
             break;

@@ -867,6 +867,7 @@ class _PracticaScreenState extends State<PracticaScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacion,
+                arguments: tema.idTema,
               );
             }
             break;

@@ -630,6 +630,7 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacion,
+                arguments: tema.idTema,
               );
             }
             break;

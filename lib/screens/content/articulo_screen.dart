@@ -608,6 +608,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacion,
+                arguments: tema.idTema,
               );
             }
             break;

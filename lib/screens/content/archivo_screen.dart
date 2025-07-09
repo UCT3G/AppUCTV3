@@ -709,6 +709,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacion,
+                arguments: tema.idTema,
               );
             }
             break;

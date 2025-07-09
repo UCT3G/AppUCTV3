@@ -26,6 +26,7 @@ class CompetenciaProvider with ChangeNotifier {
   List<Competencia> _competencias = [];
   List<Competencia> _competenciasFiltradas = [];
   List<Competencia> _competenciasRecientes = [];
+  int _idEvaluacion = 0; 
 
   Competencia? get competencia => _competencia;
   List<Unidad> get unidades => _unidades;
@@ -34,6 +35,7 @@ class CompetenciaProvider with ChangeNotifier {
   List<Competencia> get competencias => _competencias;
   List<Competencia> get competenciasFiltradas => _competenciasFiltradas;
   List<Competencia> get competenciasRecientes => _competenciasRecientes;
+  int get idEvaluacion => _idEvaluacion;
 
   void setCompetencia(Competencia competencia) {
     _competencia = competencia;
@@ -561,6 +563,7 @@ class CompetenciaProvider with ChangeNotifier {
         _authProvider.accessToken!,
       );
 
+      _idEvaluacion = response['id_evaluacion'];
       return response;
     } catch (e) {
       if (e.toString().contains('Token expirado o inválido')) {
@@ -582,6 +585,7 @@ class CompetenciaProvider with ChangeNotifier {
                 _authProvider.accessToken!,
               );
 
+              _idEvaluacion = response['id_evaluacion'];
               return response;
             } catch (e) {
               throw Exception(

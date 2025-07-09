@@ -620,6 +620,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacion,
+                arguments: tema.idTema,
               );
             }
             break;

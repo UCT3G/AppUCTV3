@@ -597,6 +597,7 @@ class _PresencialScreenState extends State<PresencialScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacion,
+                arguments: tema.idTema,
               );
             }
             break;
