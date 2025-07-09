@@ -83,6 +83,9 @@ class AppRoutes {
       final idTema = ModalRoute.of(context)!.settings.arguments as int;
       return PracticaScreen(idTema: idTema);
     },
-    evaluacion: (context) => EvaluacionScreen(),
+    evaluacion: (context) {
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return EvaluacionScreen(idTema: idTema);
+    },
   };
 }

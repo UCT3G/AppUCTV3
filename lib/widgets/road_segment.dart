@@ -148,7 +148,8 @@ class _RoadSegmentState extends State<RoadSegment> {
                                 ),
                               ],
                             ),
-                            if(tema.recursoBasicoTipo == 'EVALUACION' || tema.recursoBasicoTipo == 'PRACTICA')
+                            if (tema.recursoBasicoTipo == 'EVALUACION' ||
+                                tema.recursoBasicoTipo == 'PRACTICA')
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -411,7 +412,9 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     if (comentario.contains(
                                       'No tienes mas intentos',
                                     )) {
-                                      if (dialogContext.mounted){ Navigator.pop(dialogContext); }
+                                      if (dialogContext.mounted) {
+                                        Navigator.pop(dialogContext);
+                                      }
                                       if (parentContext.mounted) {
                                         showAlertDialog(
                                           parentContext,
@@ -422,7 +425,9 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     } else if (comentario.contains(
                                       'No puede contestar esta encuesta',
                                     )) {
-                                      if (dialogContext.mounted){ Navigator.pop(dialogContext); }
+                                      if (dialogContext.mounted) {
+                                        Navigator.pop(dialogContext);
+                                      }
                                       if (parentContext.mounted) {
                                         showAlertDialog(
                                           parentContext,
@@ -443,7 +448,9 @@ class _RoadSegmentState extends State<RoadSegment> {
                                         return;
                                       }
                                     }
-                                    if (dialogContext.mounted){ Navigator.pop(dialogContext); }
+                                    if (dialogContext.mounted) {
+                                      Navigator.pop(dialogContext);
+                                    }
                                     debugPrint('Error: $e');
                                     if (parentContext.mounted) {
                                       ScaffoldMessenger.of(
@@ -468,6 +475,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     Navigator.pushNamed(
                                       parentContext,
                                       AppRoutes.evaluacion,
+                                      arguments: tema.idTema,
                                     );
                                   }
                                   break;
