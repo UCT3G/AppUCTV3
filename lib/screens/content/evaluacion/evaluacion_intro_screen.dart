@@ -1,17 +1,18 @@
 import 'package:app_uct/provider/competencia_provider.dart';
+import 'package:app_uct/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class EvaluacionScreen extends StatefulWidget {
+class EvaluacionIntroScreen extends StatefulWidget {
   final int idTema;
 
-  const EvaluacionScreen({super.key, required this.idTema});
+  const EvaluacionIntroScreen({super.key, required this.idTema});
 
   @override
-  State<EvaluacionScreen> createState() => _EvaluacionScreenState();
+  State<EvaluacionIntroScreen> createState() => _EvaluacionIntroScreenState();
 }
 
-class _EvaluacionScreenState extends State<EvaluacionScreen> {
+class _EvaluacionIntroScreenState extends State<EvaluacionIntroScreen> {
   @override
   Widget build(BuildContext context) {
     final competenciaProvider = Provider.of<CompetenciaProvider>(context);
@@ -55,7 +56,10 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
             child: Column(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
                   child: Container(
                     width: 300,
                     decoration: BoxDecoration(
@@ -98,7 +102,13 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                 SizedBox(
                   width: 200,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.evaluacion,
+                        arguments: tema.idTema,
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                       foregroundColor: Colors.white,

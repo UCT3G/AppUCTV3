@@ -25,17 +25,18 @@ class Formulario {
 
   factory Formulario.fromJson(Map<String, dynamic> json) {
     return Formulario(
-      idFormulario: json['id_formu'],
-      idCategoria: json['id_categoria_fk'],
-      idAreaEncuesta: json['id_area_encuesta_fk'],
-      nombre: json['nombre'],
-      tituloFormulario: json['titulo_formulario'],
-      descripcion: json['descripcion'],
-      estado: json['estado'],
-      idTema: json['id_tema_fk'],
-      reactivos: List<Reactivo>.from(
-        json['reactivos'].map((x) => Reactivo.fromJson(x)),
-      ),
+      idFormulario: json['id_formu'] ?? 0,
+      idCategoria: json['id_categoria_fk'] ?? 0,
+      idAreaEncuesta: json['id_area_encuesta_fk'] ?? 0,
+      nombre: json['nombre'] ?? '',
+      tituloFormulario: json['titulo_formulario'] ?? '',
+      descripcion: json['descripcion'] ?? '',
+      estado: json['estado'] ?? '',
+      idTema: json['id_tema_fk'] ?? 0,
+      reactivos:
+          (json['reactivos'] as List<dynamic>? ?? [])
+              .map((x) => Reactivo.fromJson(x))
+              .toList(),
     );
   }
 

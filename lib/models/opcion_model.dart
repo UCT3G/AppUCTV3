@@ -27,10 +27,10 @@ class Opcion {
       idReactivo: json['id_reactivo_fk'] ?? 0,
       orden: json['orden'] ?? 0,
       correcta: json['correcta'] ?? '',
-      descripcion: json['descripcion'] ?? '',
+      descripcion: (json['descripcion'] ?? ''.toString().trim()),
       grupo: json['grupo'] ?? 0,
       estado: json['estado'] ?? '',
-      poderacion: json['poderacion'] ?? 0.0,
+      poderacion: (json['poderacion'] ?? 0).toDouble(),
       imagen: json['imagen'] ?? '',
     );
   }

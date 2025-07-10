@@ -619,7 +619,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
             if (parentContext.mounted) {
               Navigator.pushReplacementNamed(
                 parentContext,
-                AppRoutes.evaluacion,
+                AppRoutes.evaluacionIntro,
                 arguments: tema.idTema,
               );
             }

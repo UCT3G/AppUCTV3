@@ -607,7 +607,7 @@ class _PdfScreenState extends State<PdfScreen> {
             if (parentContext.mounted) {
               Navigator.pushReplacementNamed(
                 parentContext,
-                AppRoutes.evaluacion,
+                AppRoutes.evaluacionIntro,
                 arguments: tema.idTema,
               );
             }

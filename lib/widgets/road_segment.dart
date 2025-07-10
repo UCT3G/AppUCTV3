@@ -474,7 +474,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   if (parentContext.mounted) {
                                     Navigator.pushNamed(
                                       parentContext,
-                                      AppRoutes.evaluacion,
+                                      AppRoutes.evaluacionIntro,
                                       arguments: tema.idTema,
                                     );
                                   }

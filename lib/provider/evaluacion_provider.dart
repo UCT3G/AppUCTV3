@@ -2,14 +2,12 @@ import 'dart:developer';
 
 import 'package:app_uct/models/formulario_model.dart';
 import 'package:app_uct/provider/auth_provider.dart';
-import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/services/auth_service.dart';
 import 'package:app_uct/services/evaluacion_service.dart';
 import 'package:flutter/foundation.dart';
 
 class EvaluacionProvider with ChangeNotifier {
   late AuthProvider _authProvider;
-  late CompetenciaProvider _competenciaProvider;
 
   EvaluacionProvider(this._authProvider);
 
@@ -18,12 +16,13 @@ class EvaluacionProvider with ChangeNotifier {
   }
 
   bool _loading = false;
-  List<Formulario> _formulario = [];
+  Formulario? _formulario;
 
   bool get loading => _loading;
-  List<Formulario> get formulario => _formulario;
+  Formulario? get formulario => _formulario;
 
   Future<Map<String, dynamic>> getFormularioEvaluacion(
+    int idEvaluacion,
     int tipo,
     int idUnidad,
     int user,
@@ -34,17 +33,16 @@ class EvaluacionProvider with ChangeNotifier {
 
     try {
       final response = await EvaluacionService.getFormularioEvaluacion(
-        _competenciaProvider.idEvaluacion,
+        idEvaluacion,
         tipo,
         idUnidad,
         user,
         _authProvider.accessToken!,
       );
 
-      final formularioJson = response['formulario'] as List;
+      final formularioJson = response['formulario'] as Map<String, dynamic>;
       log('${response['formulario']}');
-      _formulario =
-          formularioJson.map((json) => Formulario.fromJson(json)).toList();
+      _formulario = Formulario.fromJson(formularioJson);
       log('$_formulario');
       return response;
     } catch (e) {
@@ -60,19 +58,17 @@ class EvaluacionProvider with ChangeNotifier {
             await _authProvider.updateAccessToken(newAccessToken);
             try {
               final response = await EvaluacionService.getFormularioEvaluacion(
-                _competenciaProvider.idEvaluacion,
+                idEvaluacion,
                 tipo,
                 idUnidad,
                 user,
                 _authProvider.accessToken!,
               );
 
-              final formularioJson = response['formulario'] as List;
+              final formularioJson =
+                  response['formulario'] as Map<String, dynamic>;
               log('${response['formulario']}');
-              _formulario =
-                  formularioJson
-                      .map((json) => Formulario.fromJson(json))
-                      .toList();
+              _formulario = Formulario.fromJson(formularioJson);
               log('$_formulario');
               return response;
             } catch (e) {

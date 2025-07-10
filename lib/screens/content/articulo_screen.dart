@@ -607,7 +607,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
             if (parentContext.mounted) {
               Navigator.pushReplacementNamed(
                 parentContext,
-                AppRoutes.evaluacion,
+                AppRoutes.evaluacionIntro,
                 arguments: tema.idTema,
               );
             }

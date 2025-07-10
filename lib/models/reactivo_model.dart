@@ -60,9 +60,10 @@ class Reactivo {
       tipoPregunta: json['tipo_pregunta'] ?? 0,
       longitudMinima: json['longitud_minima'] ?? 0,
       longitudMaxima: json['longitud_maxima'] ?? 0,
-      opciones: List<Opcion>.from(
-        json['opciones'].map((x) => Opcion.fromJson(x)),
-      ),
+      opciones:
+          (json['opciones'] as List<dynamic>? ?? [])
+              .map((x) => Opcion.fromJson(x))
+              .toList(),
       imagen: json['imagen'] ?? '',
       orden: json['orden'] ?? 0,
       etiqueta: json['etiqueta'] ?? '',
