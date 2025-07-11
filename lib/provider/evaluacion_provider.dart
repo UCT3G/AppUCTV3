@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:app_uct/models/formulario_model.dart';
+import 'package:app_uct/models/reactivo_model.dart';
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/services/auth_service.dart';
 import 'package:app_uct/services/evaluacion_service.dart';
@@ -20,6 +21,18 @@ class EvaluacionProvider with ChangeNotifier {
 
   bool get loading => _loading;
   Formulario? get formulario => _formulario;
+
+  Reactivo? getReactivoById(int idReactivo) {
+    try {
+      final reactivo = _formulario!.reactivos.firstWhere(
+        (r) => r.idReactivo == idReactivo,
+      );
+      return reactivo;
+    } catch (e) {
+      debugPrint('No se encontro el reactivo en el formulario: $e');
+    }
+    return null;
+  }
 
   Future<Map<String, dynamic>> getFormularioEvaluacion(
     int idEvaluacion,

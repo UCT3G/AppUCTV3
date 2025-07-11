@@ -671,6 +671,12 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
   }
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,

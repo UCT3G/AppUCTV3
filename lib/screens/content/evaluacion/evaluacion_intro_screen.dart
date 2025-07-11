@@ -73,7 +73,7 @@ class _EvaluacionIntroScreenState extends State<EvaluacionIntroScreen> {
                 ),
                 SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
                     'Estimado estudiante.',
                     style: TextStyle(
@@ -87,7 +87,7 @@ class _EvaluacionIntroScreenState extends State<EvaluacionIntroScreen> {
                 ),
                 SizedBox(height: 5),
                 Padding(
-                  padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
                     '¡Estás por iniciar una evaluación! La calificación mínima es de 80. Esto contará como ${tema.intentosConsumidos + 1} oportunidad(es) de las ${tema.intentosDisponibles} disponibles. , Al aceptar, estás indicando que has revisado y entendido los contenidos previos y que estás listo para contestar tu evaluación. (Abrir la evaluación para sólo ver las preguntas ES HACER TRAMPA , aún cuando no contestes nada cuenta como una oportunidad)',
                     style: TextStyle(

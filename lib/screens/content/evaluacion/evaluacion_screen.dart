@@ -1,9 +1,11 @@
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
+import 'package:app_uct/widgets/evaluacion/question_card.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class EvaluacionScreen extends StatefulWidget {
   final int idTema;
@@ -15,6 +17,9 @@ class EvaluacionScreen extends StatefulWidget {
 }
 
 class _EvaluacionScreenState extends State<EvaluacionScreen> {
+  late PageController _pageController;
+  int _currentPage = 0;
+
   Future<void> getFormularioEvaluacion() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
@@ -82,6 +87,13 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       getFormularioEvaluacion();
     });
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -131,10 +143,97 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),
       ),
-      body: ListView(
+      body: Stack(
         children: [
-          ...formulario.reactivos.map(
-            (r) => ListTile(title: Text(r.textoInput)),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF575398), // #A29ECE
+                  Color(0xFF84A9CA), // #A5D0EF
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: formulario.reactivos.length,
+                  onPageChanged:
+                      (index) => setState(() => _currentPage = index),
+                  itemBuilder: (context, index) {
+                    final reactivo = formulario.reactivos[index];
+                    return QuestionCard(
+                      idReactivo: reactivo.idReactivo,
+                      index: index,
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: 10),
+              if (formulario.reactivos.length <= 10)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: SmoothPageIndicator(
+                    controller: _pageController,
+                    count: formulario.reactivos.length,
+                    effect: JumpingDotEffect(
+                      dotHeight: 10,
+                      dotWidth: 10,
+                      dotColor: Colors.deepPurpleAccent,
+                      activeDotColor: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+              if (formulario.reactivos.length > 10)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: LinearProgressIndicator(
+                    value: (_currentPage + 1) / formulario.reactivos.length,
+                    minHeight: 8,
+                    backgroundColor: Colors.grey.shade300,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+              SizedBox(height: 5),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed:
+                          _currentPage > 0
+                              ? () => _pageController.previousPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease,
+                              )
+                              : null,
+                      icon: Icon(Icons.arrow_back),
+                    ),
+                    Text(
+                      'Pregunta ${_currentPage + 1} de ${formulario.reactivos.length}',
+                    ),
+                    IconButton(
+                      onPressed:
+                          _currentPage < formulario.reactivos.length - 1
+                              ? () => _pageController.nextPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease,
+                              )
+                              : null,
+                      icon: Icon(Icons.arrow_forward),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
