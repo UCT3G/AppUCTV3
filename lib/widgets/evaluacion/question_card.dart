@@ -1,4 +1,9 @@
+import 'package:app_uct/models/reactivo_model.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
+import 'package:app_uct/widgets/inputs/input_checkbox_widget.dart';
+import 'package:app_uct/widgets/inputs/input_draggable_widget.dart';
+import 'package:app_uct/widgets/inputs/input_radio_widget.dart';
+import 'package:app_uct/widgets/inputs/input_undefined_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,7 +48,7 @@ class _QuestionCardState extends State<QuestionCard> {
                       '${widget.index + 1}. ${getTextoInstruccion(reactivo.idInput)}',
                       style: TextStyle(
                         color: Colors.grey,
-                        fontSize: 18,
+                        fontSize: 20,
                         fontFamily: 'Montserrat',
                       ),
                     ),
@@ -53,10 +58,12 @@ class _QuestionCardState extends State<QuestionCard> {
                         reactivo.textoInput,
                         style: TextStyle(
                           fontFamily: 'Montserrat',
-                          fontSize: 15,
+                          fontSize: 18,
                         ),
                         textAlign: TextAlign.justify,
                       ),
+                    SizedBox(height: 10),
+                    buildInputWidget(reactivo),
                   ],
                 ),
               );
@@ -82,5 +89,27 @@ class _QuestionCardState extends State<QuestionCard> {
       default:
         return 'Responde la siguiente pregunta: ';
     }
+  }
+
+  Widget buildInputWidget(Reactivo reactivo) {
+    final valor = reactivo.valor.toLowerCase();
+    final etiqueta = reactivo.etiqueta;
+
+    switch (etiqueta) {
+      case 'input':
+        if (valor.contains('type=radio')) {
+          return InputRadioWidget(idReactivo: reactivo.idReactivo);
+        } else if (valor.contains('type=checkbox')) {
+          if (reactivo.idInput == 11) {
+            return InputDraggableWidget(idReactivo: reactivo.idReactivo);
+          } else {
+            return InputCheckboxWidget(idReactivo: reactivo.idReactivo);
+          }
+        }
+        break;
+      default:
+        return InputUndefinedWidget();
+    }
+    return SizedBox();
   }
 }

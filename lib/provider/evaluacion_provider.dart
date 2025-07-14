@@ -18,9 +18,11 @@ class EvaluacionProvider with ChangeNotifier {
 
   bool _loading = false;
   Formulario? _formulario;
+  final Map<int, dynamic> _respuestas = {};
 
   bool get loading => _loading;
   Formulario? get formulario => _formulario;
+  Map<int, dynamic> get respuestas => _respuestas;
 
   Reactivo? getReactivoById(int idReactivo) {
     try {
@@ -32,6 +34,15 @@ class EvaluacionProvider with ChangeNotifier {
       debugPrint('No se encontro el reactivo en el formulario: $e');
     }
     return null;
+  }
+
+  void setRespuesta(int idReactivo, dynamic valor) {
+    _respuestas[idReactivo] = valor;
+    notifyListeners();
+  }
+
+  dynamic getRespuestas(int idReactivo) {
+    return _respuestas[idReactivo];
   }
 
   Future<Map<String, dynamic>> getFormularioEvaluacion(
