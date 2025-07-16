@@ -1,5 +1,7 @@
 import 'package:app_uct/models/reactivo_model.dart';
+import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
+import 'package:app_uct/widgets/inputs/input_agrupar_widget.dart';
 import 'package:app_uct/widgets/inputs/input_checkbox_widget.dart';
 import 'package:app_uct/widgets/inputs/input_draggable_widget.dart';
 import 'package:app_uct/widgets/inputs/input_radio_widget.dart';
@@ -62,6 +64,13 @@ class _QuestionCardState extends State<QuestionCard> {
                         ),
                         textAlign: TextAlign.justify,
                       ),
+                    if (reactivo.imagen.isNotEmpty)
+                      Center(
+                        child: Image.network(
+                          getImageUrl(reactivo),
+                          height: 100,
+                        ),
+                      ),
                     SizedBox(height: 10),
                     buildInputWidget(reactivo),
                   ],
@@ -107,9 +116,20 @@ class _QuestionCardState extends State<QuestionCard> {
           }
         }
         break;
+      case 'div-rela':
+        return InputAgruparWidget(idReactivo: reactivo.idReactivo);
       default:
         return InputUndefinedWidget();
     }
     return SizedBox();
+  }
+
+  String getImageUrl(Reactivo reactivo) {
+    final evaluacionProvider = Provider.of<EvaluacionProvider>(context);
+    final competenciaProvider = Provider.of<CompetenciaProvider>(context);
+    final formulario = evaluacionProvider.formulario;
+    final tema = competenciaProvider.getTemaById(formulario!.idTema);
+
+    return "http://uct.tresguerras.com.mx:8007/imagenEvaluacion/${tema!.idCurso}/${tema.idUnidad}/${tema.idTema}/${reactivo.idReactivo}/${reactivo.imagen}";
   }
 }

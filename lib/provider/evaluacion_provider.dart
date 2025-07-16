@@ -18,7 +18,7 @@ class EvaluacionProvider with ChangeNotifier {
 
   bool _loading = false;
   Formulario? _formulario;
-  final Map<int, dynamic> _respuestas = {};
+  Map<int, dynamic> _respuestas = {};
 
   bool get loading => _loading;
   Formulario? get formulario => _formulario;
@@ -113,5 +113,10 @@ class EvaluacionProvider with ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
+  }
+
+  void clearRespuestas() {
+    _respuestas = {};
+    notifyListeners();
   }
 }

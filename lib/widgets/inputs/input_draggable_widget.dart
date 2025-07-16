@@ -70,12 +70,23 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    item,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Montserrat',
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.drag_indicator_rounded,
+                        color: Color(0xFF84A9CA),
+                        size: 15,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        item,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Montserrat',
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   // 🔍 Busca la opción completa (para acceder a la imagen)

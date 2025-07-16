@@ -28,6 +28,7 @@ class InputRadioWidget extends StatelessWidget {
                   value: opcion.descripcion,
                   groupValue: valorSeleccionado,
                   onChanged: (value) {
+                    if (reactivo.idInput == 12) {}
                     evaluacionProvider.setRespuesta(idReactivo, value!);
                   },
                   title: Column(

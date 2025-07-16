@@ -139,7 +139,10 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
           ),
         ),
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            evaluacionProvider.clearRespuestas();
+            Navigator.pop(context);
+          },
           icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),
       ),
@@ -231,6 +234,29 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                       icon: Icon(Icons.arrow_forward),
                     ),
                   ],
+                ),
+              ),
+              SizedBox(
+                width: 250,
+                child: ElevatedButton(
+                  onPressed: () {
+                    print(evaluacionProvider.respuestas);
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.save, size: 15),
+                      SizedBox(width: 5),
+                      Text(
+                        'Guardar evaluacion',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Montserrat',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
