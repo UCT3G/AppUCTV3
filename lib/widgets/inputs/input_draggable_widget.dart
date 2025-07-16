@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +14,7 @@ class InputDraggableWidget extends StatefulWidget {
 }
 
 class _InputDraggableWidgetState extends State<InputDraggableWidget> {
-  late List<String> _ordenUsuario;
+  late List<Map<String, dynamic>> _ordenUsuario;
 
   @override
   void initState() {
@@ -23,13 +25,30 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
     );
     final reactivo = evaluacionProvider.getReactivoById(widget.idReactivo);
 
-    _ordenUsuario = List<String>.from(
-      reactivo!.opciones.map((o) => o.descripcion),
-    );
-    // _ordenUsuario.shuffle();
+    _ordenUsuario =
+        reactivo!.opciones.asMap().entries.map((entry) {
+          final index = entry.key;
+          final o = entry.value;
+          return {
+            'id_opcion': o.idOpcion,
+            'descripcion': o.descripcion,
+            'correcta': o.correcta,
+            'ponderacion': o.poderacion,
+            'orden': index + 1,
+          };
+        }).toList();
+
+    final respuesta = {
+      'type': 'checkbox',
+      'valor': _ordenUsuario.map((o) => o['descripcion']).toList(),
+      'id_reactivo': reactivo.idReactivo,
+      'opciones': _ordenUsuario,
+    };
+
+    final reactivoSeleccionado = reactivo.toJson(respuesta: respuesta);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      evaluacionProvider.setRespuesta(widget.idReactivo, _ordenUsuario);
+      evaluacionProvider.setRespuesta(reactivoSeleccionado);
     });
   }
 
@@ -51,8 +70,8 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
             final item = _ordenUsuario[index];
 
             return Container(
-              key: ValueKey(item),
-              margin: const EdgeInsets.symmetric(vertical: 4),
+              key: ValueKey(item['id_opcion']),
+              margin: EdgeInsets.symmetric(vertical: 4),
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -80,7 +99,7 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
                       ),
                       SizedBox(width: 5),
                       Text(
-                        item,
+                        item['descripcion'],
                         style: const TextStyle(
                           fontSize: 16,
                           fontFamily: 'Montserrat',
@@ -91,12 +110,16 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
                   const SizedBox(height: 8),
                   // 🔍 Busca la opción completa (para acceder a la imagen)
                   if (reactivo.opciones.any(
-                    (op) => op.descripcion == item && op.imagen.isNotEmpty,
+                    (op) =>
+                        op.idOpcion == item['id_opcion'] &&
+                        op.imagen.isNotEmpty,
                   ))
                     Image.network(
                       getImageUrl(
                         reactivo.opciones
-                            .firstWhere((op) => op.descripcion == item)
+                            .firstWhere(
+                              (op) => op.idOpcion == item['id_opcion'],
+                            )
                             .imagen,
                       ),
                       height: 100,
@@ -111,7 +134,23 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
               final item = _ordenUsuario.removeAt(oldIndex);
               _ordenUsuario.insert(newIndex, item);
 
-              evaluacionProvider.setRespuesta(widget.idReactivo, _ordenUsuario);
+              for (int i = 0; i < _ordenUsuario.length; i++) {
+                _ordenUsuario[i]['orden'] = i + 1;
+              }
+
+              final respuesta = {
+                'type': 'checkbox',
+                'valor': _ordenUsuario.map((o) => o['descripcion']).toList(),
+                'id_reactivo': reactivo.idReactivo,
+                'opciones': _ordenUsuario,
+              };
+
+              final reactivoSeleccionado = reactivo.toJson(
+                respuesta: respuesta,
+              );
+
+              log(reactivoSeleccionado.toString());
+              evaluacionProvider.setRespuesta(reactivoSeleccionado);
             });
           },
         ),

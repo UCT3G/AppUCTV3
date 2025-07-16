@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,8 +14,8 @@ class InputAgruparWidget extends StatefulWidget {
 }
 
 class _InputAgruparWidgetState extends State<InputAgruparWidget> {
-  List<dynamic> _opciones = [];
-  List<List<int>> _grupoRespuesta = [];
+  List<Map<String, dynamic>> _opciones = [];
+  List<List<Map<String, dynamic>>> _grupoRespuesta = [];
   List<int> _seleccionActual = [];
   int _colorIndex = 0;
 
@@ -41,11 +43,15 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
       _opciones =
           reactivo.opciones.map((opcion) {
             return {
-              'id': opcion.idOpcion,
+              'id_opcion': opcion.idOpcion,
               'descripcion': opcion.descripcion,
               'imagen': opcion.imagen,
               'selected': false,
               'color': null,
+              'correcta': opcion.correcta,
+              'grupo': opcion.grupo,
+              'estado': opcion.estado,
+              'ponderacion': opcion.poderacion,
             };
           }).toList();
     }
@@ -61,20 +67,34 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
     });
 
     if (_seleccionActual.length == 2) {
-      final id1 = _opciones[_seleccionActual[0]]['id'] as int;
-      final id2 = _opciones[_seleccionActual[1]]['id'] as int;
+      final grupo = [
+        _opciones[_seleccionActual[0]],
+        _opciones[_seleccionActual[1]],
+      ];
+      log(grupo.toString());
 
       setState(() {
-        _grupoRespuesta.add([id1, id2]);
+        _grupoRespuesta.add(grupo);
         _colorIndex = (_colorIndex + 1) % _colores.length;
         _seleccionActual.clear();
       });
 
+      // Aquí arma el objeto completo para enviar la respuesta actualizada
       final evaluacionProvider = Provider.of<EvaluacionProvider>(
         context,
         listen: false,
       );
-      evaluacionProvider.setRespuesta(widget.idReactivo, _grupoRespuesta);
+      final reactivo = evaluacionProvider.getReactivoById(widget.idReactivo);
+      if (reactivo != null) {
+        final gruposAplanados =
+            _grupoRespuesta.expand((grupo) => grupo).toList();
+
+        final reactivoSeleccionado = reactivo.toJson(
+          grupoRespuesta: gruposAplanados,
+        );
+        log(reactivoSeleccionado.toString());
+        evaluacionProvider.setRespuesta(reactivoSeleccionado);
+      }
     }
   }
 
@@ -94,7 +114,12 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
       context,
       listen: false,
     );
-    evaluacionProvider.setRespuesta(widget.idReactivo, []);
+
+    final reactivo = evaluacionProvider.getReactivoById(widget.idReactivo);
+    if (reactivo != null) {
+      final reactivoSeleccionado = reactivo.toJson(grupoRespuesta: []);
+      evaluacionProvider.setRespuesta(reactivoSeleccionado);
+    }
   }
 
   @override

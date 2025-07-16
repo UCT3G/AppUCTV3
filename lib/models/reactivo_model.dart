@@ -128,4 +128,35 @@ class Reactivo {
       error: error ?? this.error,
     );
   }
+
+  Map<String, dynamic> toJson({
+    Map<String, dynamic>? respuesta,
+    List<Map<String, dynamic>>? grupoRespuesta,
+  }) {
+    return {
+      'id_reactivo': idReactivo,
+      'id_formulario_fk': idFormulario,
+      'id_input_fk': idInput,
+      'texto_input': textoInput,
+      'campo_tabla': campoTabla,
+      'tabla_bd': tablaBd,
+      'tipo_pregunta': tipoPregunta,
+      'longitud_minima': longitudMinima == 0 ? null : longitudMinima,
+      'longitud_maxima': longitudMaxima == 0 ? null : longitudMaxima,
+      'opciones': opciones.map((o) => o.toJson()).toList(),
+      'imagen': imagen.isEmpty ? null : imagen,
+      'orden': orden,
+      'etiqueta': etiqueta,
+      'valor': valor,
+      'valor_reactivo': valorReactivo,
+      'obligatorio': obligatorio,
+      'estado': estado,
+      'id_tema': idTema,
+      'descripcion_tema': descripcionTema,
+      'reactivo_json': reactivoJson,
+      if (respuesta != null) 'respuesta': respuesta,
+      if (grupoRespuesta != null) 'grupo_respuesta': grupoRespuesta,
+      'error': error,
+    };
+  }
 }

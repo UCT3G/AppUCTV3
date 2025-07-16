@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
@@ -240,7 +242,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                 width: 250,
                 child: ElevatedButton(
                   onPressed: () {
-                    print(evaluacionProvider.respuestas);
+                    log(evaluacionProvider.respuestas.toString());
                   },
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,

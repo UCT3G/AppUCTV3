@@ -18,11 +18,11 @@ class EvaluacionProvider with ChangeNotifier {
 
   bool _loading = false;
   Formulario? _formulario;
-  Map<int, dynamic> _respuestas = {};
+  List<Map<String, dynamic>> _respuestas = [];
 
   bool get loading => _loading;
   Formulario? get formulario => _formulario;
-  Map<int, dynamic> get respuestas => _respuestas;
+  List<Map<String, dynamic>> get respuestas => _respuestas;
 
   Reactivo? getReactivoById(int idReactivo) {
     try {
@@ -36,13 +36,18 @@ class EvaluacionProvider with ChangeNotifier {
     return null;
   }
 
-  void setRespuesta(int idReactivo, dynamic valor) {
-    _respuestas[idReactivo] = valor;
+  void setRespuesta(Map<String, dynamic> respuesta) {
+    _respuestas.removeWhere((r) => r['id_reactivo'] == respuesta['id_reactivo'],);
+    _respuestas.add(respuesta);
     notifyListeners();
   }
 
-  dynamic getRespuestas(int idReactivo) {
-    return _respuestas[idReactivo];
+  Map<String, dynamic>? getReactivoRespuesta(int idReactivo) {
+    try {
+      return _respuestas.firstWhere((r) => r['id_reactivo'] == idReactivo);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<Map<String, dynamic>> getFormularioEvaluacion(
@@ -116,7 +121,7 @@ class EvaluacionProvider with ChangeNotifier {
   }
 
   void clearRespuestas() {
-    _respuestas = {};
+    _respuestas = [];
     notifyListeners();
   }
 }

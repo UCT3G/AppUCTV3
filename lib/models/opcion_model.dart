@@ -58,4 +58,18 @@ class Opcion {
       imagen: imagen ?? this.imagen,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id_opcion': idOpcion,
+      'id_reactivo_fk': idReactivo,
+      'orden': orden == 0 ? null : orden,
+      'correcta': correcta,
+      'descripcion': descripcion,
+      'grupo': grupo == 0 ? null : grupo,
+      'estado': estado,
+      'ponderacion': poderacion == 0 ? null : poderacion,
+      'imagen': imagen.isEmpty ? null : imagen
+    };
+  }
 }

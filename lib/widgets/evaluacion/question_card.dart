@@ -49,9 +49,10 @@ class _QuestionCardState extends State<QuestionCard> {
                     Text(
                       '${widget.index + 1}. ${getTextoInstruccion(reactivo.idInput)}',
                       style: TextStyle(
-                        color: Colors.grey,
+                        color: Color(0xFF575398),
                         fontSize: 20,
                         fontFamily: 'Montserrat',
+                        fontWeight: FontWeight.w700
                       ),
                     ),
                     SizedBox(height: 5),

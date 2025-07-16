@@ -1,5 +1,3 @@
-// import 'dart:developer';
-
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +14,13 @@ class InputRadioWidget extends StatelessWidget {
 
     if (reactivo == null) return Text("Reactivo no encontrado");
 
-    final valorSeleccionado = evaluacionProvider.getRespuestas(idReactivo);
+    final reactivoRespuesta = evaluacionProvider.getReactivoRespuesta(
+      idReactivo,
+    );
+    final valorSeleccionado =
+        reactivoRespuesta != null
+            ? reactivoRespuesta['respuesta']['id_opcion']
+            : null;
 
     return Column(
       children:
@@ -25,11 +29,25 @@ class InputRadioWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RadioListTile(
-                  value: opcion.descripcion,
+                  value: opcion.idOpcion,
                   groupValue: valorSeleccionado,
                   onChanged: (value) {
-                    if (reactivo.idInput == 12) {}
-                    evaluacionProvider.setRespuesta(idReactivo, value!);
+                    final opcionSeleccionada = reactivo.opciones.firstWhere(
+                      (o) => o.idOpcion == value,
+                    );
+
+                    final respuesta = {
+                      'type': 'radio',
+                      'valor': opcionSeleccionada.descripcion,
+                      'id_reactivo': opcionSeleccionada.idReactivo,
+                      'id_opcion': opcionSeleccionada.idOpcion,
+                      'correcta': opcionSeleccionada.correcta,
+                      'ponderacion': opcionSeleccionada.poderacion,
+                    };
+
+                    final reactivoSeleccionado = reactivo.toJson(respuesta: respuesta);
+
+                    evaluacionProvider.setRespuesta(reactivoSeleccionado);
                   },
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

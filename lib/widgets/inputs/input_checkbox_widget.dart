@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,15 +16,22 @@ class InputCheckboxWidget extends StatelessWidget {
 
     if (reactivo == null) return Text("Reactivo no encontrado");
 
-    final List<String> valoresSeleccionados =
-        (evaluacionProvider.getRespuestas(idReactivo) as List<String>?) ?? [];
+    final reactivoRespuesta = evaluacionProvider.getReactivoRespuesta(
+      idReactivo,
+    );
+    final valoresSeleccionados =
+        reactivoRespuesta != null
+            ? reactivoRespuesta['respuesta']['opciones']
+            : null;
 
     return Column(
       children:
           reactivo.opciones.map((opcion) {
-            final bool isChecked = valoresSeleccionados.contains(
-              opcion.descripcion,
-            );
+            final bool isChecked =
+                valoresSeleccionados != null &&
+                valoresSeleccionados.any(
+                  (o) => o['id_opcion'] == opcion.idOpcion,
+                );
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,18 +39,38 @@ class InputCheckboxWidget extends StatelessWidget {
                 CheckboxListTile(
                   value: isChecked,
                   onChanged: (bool? value) {
-                    final nuevasRespuestas = [...valoresSeleccionados];
+                    List<Map<String, dynamic>> nuevasOpciones =
+                        valoresSeleccionados != null
+                            ? List<Map<String, dynamic>>.from(
+                              valoresSeleccionados,
+                            )
+                            : [];
+
+                    final opcionSeleccionada = {
+                      'id_opcion': opcion.idOpcion,
+                      'descripcion': opcion.descripcion,
+                      'correcta': opcion.correcta,
+                      'ponderacion': opcion.poderacion,
+                      'orden': opcion.orden,
+                    };
 
                     if (value == true) {
-                      nuevasRespuestas.add(opcion.descripcion);
+                      nuevasOpciones.add(opcionSeleccionada);
                     } else {
-                      nuevasRespuestas.remove(opcion.descripcion);
+                      nuevasOpciones.removeWhere((o) => o['id_opcion'] == opcion.idOpcion);
                     }
 
-                    evaluacionProvider.setRespuesta(
-                      idReactivo,
-                      nuevasRespuestas,
-                    );
+                    final respuesta = {
+                      'type': 'checkbox',
+                      'valor': nuevasOpciones.map((o) => o['descripcion']).toList(),
+                      'id_reactivo': opcion.idReactivo,
+                      'opciones': nuevasOpciones,
+                    };
+
+                    final reactivoSeleccionado = reactivo.toJson(respuesta: respuesta);
+
+                    log(reactivoSeleccionado.toString());
+                    evaluacionProvider.setRespuesta(reactivoSeleccionado);
                   },
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
