@@ -672,7 +672,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
           ),
         ),
         title: Text(
-          tema.titulo,
+          tema.titulo ?? 'Titulo',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -700,7 +700,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                 paths: [
                   competenciaProvider.competencia!.titulo ?? 'Competencia',
                   currentUnidad.titulo,
-                  tema.titulo,
+                  tema.titulo ?? 'Titulo',
                 ],
               ),
               Expanded(

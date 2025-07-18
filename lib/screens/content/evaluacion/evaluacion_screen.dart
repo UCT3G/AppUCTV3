@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
@@ -80,6 +81,17 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
           ),
         );
       }
+    }
+  }
+
+  void verificarRespuestas() {
+    final evaluacionProvider = Provider.of<EvaluacionProvider>(context);
+    final reactivos = evaluacionProvider.formulario!.reactivos;
+    final respuestas = evaluacionProvider.respuestas;
+    final errores = false;
+
+    for (var i = 0; i < reactivos.length; i++) {
+      if (reactivos[i].obligatorio == 'A') {}
     }
   }
 
@@ -242,7 +254,74 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                 width: 250,
                 child: ElevatedButton(
                   onPressed: () {
-                    log(evaluacionProvider.respuestas.toString());
+                    // final authProvider = Provider.of<AuthProvider>(
+                    //   context,
+                    //   listen: false,
+                    // );
+                    // final competenciaProvider =
+                    //     Provider.of<CompetenciaProvider>(
+                    //       context,
+                    //       listen: false,
+                    //     );
+                    // final tema = competenciaProvider.getTemaById(widget.idTema);
+
+                    // final jsonEvaluacion = {
+                    //   'id_user': authProvider.currentUsuario!.idUsuario,
+                    //   'idencuesta': formulario.idFormulario,
+                    //   'evaluacion': evaluacionProvider.respuestas,
+                    //   'NoReactivos': formulario.reactivos.length,
+                    //   'idcurso': tema!.idCurso,
+                    //   'ordenunidad': tema.ordenUnidad,
+                    //   'idMapaFuncional':
+                    //       competenciaProvider.competencia!.idMapaFuncionalFk,
+                    //   'saveRespuestas': {
+                    //     'id_formu': formulario.idFormulario,
+                    //     'id_sistema_fk': 0,
+                    //     'id_categoria_fk': formulario.idCategoria,
+                    //     'categoria_detalles': 0,
+                    //     'sistema_detalles': 0,
+                    //     'nombre': formulario.nombre,
+                    //     'titulo_formulario': formulario.tituloFormulario,
+                    //     'descripcion': formulario.descripcion,
+                    //     'auto_update': '',
+                    //     'estado': formulario.estado,
+                    //     'id_tema_fk': formulario.idTema,
+                    //     'registro_usuario': formulario.registroUsuario,
+                    //     'registro_fecha': formulario.registroFecha,
+                    //     'modificacion_usuario': formulario.modificacionUsuario,
+                    //     'modificacion_fecha': formulario.modificacionFecha,
+                    //     'id_area_encuesta_fk': formulario.idAreaEncuesta,
+                    //     'reactivos': evaluacionProvider.respuestas,
+                    //   },
+                    //   'datostema': {
+                    //     'id_tema': tema.idTema,
+                    //     'titulo': tema.titulo,
+                    //     'descripcion': tema.descripcion,
+                    //     'duracion': tema.duracion,
+                    //     'orden': tema.orden,
+                    //     'estado': tema.estado,
+                    //     'duracion_minutos': tema.duracionMinutos,
+                    //     'reactivos_mostrar': tema.reactivosMostrar,
+                    //     'id_unidad_fk': tema.idUnidad,
+                    //     'intentos_consumidos': tema.intentosConsumidos,
+                    //     'recurso_url': tema.recursoUrl,
+                    //     'ruta_recurso': tema.rutaRecurso,
+                    //     'slide_images': tema.slideImages,
+                    //     'recurso_basico_tipo': tema.recursoBasicoTipo,
+                    //     'id_tema_tipo_fk': tema.idTemaTipo,
+                    //     'registro_fecha': tema.registroFecha,
+                    //     'registro_usuario': tema.registroUsuario,
+                    //     'modificacion_fecha': tema.modificacionFecha,
+                    //     'modificacion_usuario': tema.modificacionUsuario,
+                    //     'id_curso_fk': tema.idCurso,
+                    //     'orden_unidad': tema.ordenUnidad,
+                    //     'intentos_disponibles': tema.intentosDisponibles,
+                    //     'resultado': tema.resultado,
+                    //     'observaciones': tema.observaciones,
+                    //   },
+                    // };
+
+                    // log(jsonEvaluacion.toString());
                   },
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,

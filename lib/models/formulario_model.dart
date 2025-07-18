@@ -9,6 +9,10 @@ class Formulario {
   final String descripcion;
   final String estado;
   final int idTema;
+  final int registroUsuario;
+  final String registroFecha;
+  final int modificacionUsuario;
+  final String modificacionFecha;
   final List<Reactivo> reactivos;
 
   Formulario({
@@ -20,6 +24,10 @@ class Formulario {
     required this.descripcion,
     required this.estado,
     required this.idTema,
+    required this.registroUsuario,
+    required this.registroFecha,
+    required this.modificacionUsuario,
+    required this.modificacionFecha,
     required this.reactivos,
   });
 
@@ -33,6 +41,10 @@ class Formulario {
       descripcion: json['descripcion'] ?? '',
       estado: json['estado'] ?? '',
       idTema: json['id_tema_fk'] ?? 0,
+      registroUsuario: json['registro_usuario'] ?? 0,
+      registroFecha: json['registro_fecha'] ?? '',
+      modificacionUsuario: json['modificacion_usuario'] ?? 0,
+      modificacionFecha: json['modificacion_fecha'] ?? '',
       reactivos:
           (json['reactivos'] as List<dynamic>? ?? [])
               .map((x) => Reactivo.fromJson(x))
@@ -49,6 +61,10 @@ class Formulario {
     String? descripcion,
     String? estado,
     int? idTema,
+    int? registroUsuario,
+    String? registroFecha,
+    int? modificacionUsuario,
+    String? modificacionFecha,
     List<Reactivo>? reactivos,
   }) {
     return Formulario(
@@ -60,6 +76,10 @@ class Formulario {
       descripcion: descripcion ?? this.descripcion,
       estado: estado ?? this.estado,
       idTema: idTema ?? this.idTema,
+      registroUsuario: registroUsuario ?? this.registroUsuario,
+      registroFecha: registroFecha ?? this.registroFecha,
+      modificacionUsuario: modificacionUsuario ?? this.modificacionUsuario,
+      modificacionFecha: modificacionFecha ?? this.modificacionFecha,
       reactivos: reactivos ?? this.reactivos,
     );
   }

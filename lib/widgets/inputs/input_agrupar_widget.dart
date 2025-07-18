@@ -63,7 +63,11 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
     setState(() {
       _seleccionActual.add(index);
       _opciones[index]['selected'] = true;
-      _opciones[index]['color'] = _colores[_colorIndex];
+      final color = _colores[_colorIndex];
+      final argb = color.toARGB32();
+      final hexColor =
+          '#${(argb & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
+      _opciones[index]['color'] = hexColor;
     });
 
     if (_seleccionActual.length == 2) {
@@ -92,6 +96,8 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
         final reactivoSeleccionado = reactivo.toJson(
           grupoRespuesta: gruposAplanados,
         );
+
+        reactivoSeleccionado['opciones'] = _opciones;
         log(reactivoSeleccionado.toString());
         evaluacionProvider.setRespuesta(reactivoSeleccionado);
       }
@@ -135,7 +141,9 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
                 _opciones.asMap().entries.map((entry) {
                   final index = entry.key;
                   final opcion = entry.value;
-                  final color = opcion['color'] as Color?;
+                  final colorHex = opcion['color'];
+                  final color =
+                      colorHex != null ? getColorFromHex(colorHex) : null;
                   final descripcion = opcion['descripcion'] as String;
                   final imagen = opcion['imagen'] as String?;
 
@@ -194,5 +202,10 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
 
   String getImageUrl(String nombreArchivo) {
     return "http://uct.tresguerras.com.mx:8007/media/${nombreArchivo.replaceFirst('data/', '')}";
+  }
+
+  Color getColorFromHex(String hex) {
+    hex = hex.replaceAll('#', '');
+    return Color(int.parse('FF$hex', radix: 16));
   }
 }

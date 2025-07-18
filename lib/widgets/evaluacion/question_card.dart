@@ -37,7 +37,7 @@ class _QuestionCardState extends State<QuestionCard> {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: Colors.grey.shade300,
+        color: reactivo.error ? Colors.green : Colors.grey.shade300,
         child: Padding(
           padding: EdgeInsets.all(15),
           child: LayoutBuilder(
@@ -52,7 +52,7 @@ class _QuestionCardState extends State<QuestionCard> {
                         color: Color(0xFF575398),
                         fontSize: 20,
                         fontFamily: 'Montserrat',
-                        fontWeight: FontWeight.w700
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     SizedBox(height: 5),

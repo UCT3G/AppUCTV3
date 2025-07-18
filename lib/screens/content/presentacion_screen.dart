@@ -714,7 +714,7 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
             ),
           ),
           title: Text(
-            tema.titulo,
+            tema.titulo ?? 'Titulo',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -743,7 +743,7 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                   paths: [
                     competenciaProvider.competencia!.titulo ?? 'Competencia',
                     currentUnidad.titulo,
-                    tema.titulo,
+                    tema.titulo ?? 'Titulo',
                   ],
                 ),
 

@@ -110,7 +110,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        tema.titulo,
+                        tema.titulo ?? 'Titulo',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -724,7 +724,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        tema.titulo,
+                        tema.titulo ?? 'Titulo',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,

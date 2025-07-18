@@ -685,7 +685,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
             ),
           ),
           title: Text(
-            tema.titulo,
+            tema.titulo ?? 'Titulo',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -713,7 +713,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
                   paths: [
                     competenciaProvider.competencia!.titulo ?? 'Competencia',
                     currentUnidad.titulo,
-                    tema.titulo,
+                    tema.titulo ?? 'Titulo',
                   ],
                 ),
                 Expanded(

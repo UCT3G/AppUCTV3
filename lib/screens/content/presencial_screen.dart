@@ -662,7 +662,7 @@ class _PresencialScreenState extends State<PresencialScreen> {
           ),
         ),
         title: Text(
-          tema.titulo,
+          tema.titulo ?? 'Titulo',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -690,7 +690,7 @@ class _PresencialScreenState extends State<PresencialScreen> {
                 paths: [
                   competenciaProvider.competencia!.titulo ?? 'Competencia',
                   currentUnidad.titulo,
-                  tema.titulo,
+                  tema.titulo ?? 'Titulo',
                 ],
               ),
               Expanded(

@@ -924,7 +924,7 @@ class _PracticaScreenState extends State<PracticaScreen> {
           ),
         ),
         title: Text(
-          tema.titulo,
+          tema.titulo ?? 'Titulo',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -952,7 +952,7 @@ class _PracticaScreenState extends State<PracticaScreen> {
                 paths: [
                   competenciaProvider.competencia!.titulo ?? 'Competencia',
                   currentUnidad.titulo,
-                  tema.titulo,
+                  tema.titulo ?? 'Titulo',
                 ],
               ),
               Expanded(

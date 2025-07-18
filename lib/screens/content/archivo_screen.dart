@@ -773,7 +773,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
           ),
         ),
         title: Text(
-          tema.titulo,
+          tema.titulo ?? 'Titulo',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -807,7 +807,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
                         competenciaProvider.competencia!.titulo ??
                             'Competencia',
                         currentUnidad.titulo,
-                        tema.titulo,
+                        tema.titulo ?? 'Titulo',
                       ],
                     ),
                     Expanded(

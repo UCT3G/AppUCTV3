@@ -5,6 +5,11 @@ class InputUndefinedWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("SOY UN INPUT INDEFINIDO"));
+    return Center(
+      child: Text(
+        "Este input no esta definido, avisar al equipo de desarrollo",
+        style: TextStyle(fontFamily: 'Montserrat', fontSize: 14),
+      ),
+    );
   }
 }

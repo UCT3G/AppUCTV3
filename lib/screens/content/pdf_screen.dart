@@ -672,7 +672,7 @@ class _PdfScreenState extends State<PdfScreen> {
           ),
         ),
         title: Text(
-          tema.titulo,
+          tema.titulo ?? 'Titulo',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -700,7 +700,7 @@ class _PdfScreenState extends State<PdfScreen> {
                 paths: [
                   competenciaProvider.competencia!.titulo ?? 'Competencia',
                   currentUnidad.titulo,
-                  tema.titulo,
+                  tema.titulo ?? 'Titulo',
                 ],
               ),
               Expanded(

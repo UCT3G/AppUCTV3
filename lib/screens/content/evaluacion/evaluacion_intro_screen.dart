@@ -33,7 +33,7 @@ class _EvaluacionIntroScreenState extends State<EvaluacionIntroScreen> {
           ),
         ),
         title: Text(
-          tema.titulo,
+          tema.titulo ?? 'Titulo',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
