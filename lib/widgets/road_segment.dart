@@ -24,6 +24,7 @@ class _RoadSegmentState extends State<RoadSegment> {
     'EVALUACION': Icons.quiz,
     'IMAGEN': Icons.image,
     'INTERACTIVO': Icons.html,
+    'TEMPLATE': Icons.html,
     'PDF': Icons.picture_as_pdf,
     'PRACTICA': Icons.science,
     'PRESENCIAL': Icons.person,
@@ -377,6 +378,19 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     );
                                   }
                                   break;
+                                case 'INTERACTIVO':
+                                case 'TEMPLATE':
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
+                                    Navigator.pushNamed(
+                                      parentContext,
+                                      AppRoutes.interactive,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
+                                  break; 
                                 case 'EVALUACION':
                                   try {
                                     final response = await competenciaProvider

@@ -44,9 +44,8 @@ class AppRoutes {
     },
     welcome: (context) => WelcomeScreen(),
     interactive: (context) {
-      final tema =
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-      return InteractiveScreen(tema: tema);
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return InteractiveScreen(idTema: idTema);
     },
     video: (context) {
       final idTema = ModalRoute.of(context)!.settings.arguments as int;
