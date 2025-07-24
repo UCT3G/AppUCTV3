@@ -390,7 +390,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                                       arguments: tema.idTema,
                                     );
                                   }
-                                  break; 
+                                  break;
                                 case 'EVALUACION':
                                   try {
                                     final response = await competenciaProvider
@@ -423,12 +423,13 @@ class _RoadSegmentState extends State<RoadSegment> {
                                       );
                                     }
 
+                                    if (dialogContext.mounted) {
+                                      Navigator.pop(dialogContext);
+                                    }
+
                                     if (comentario.contains(
                                       'No tienes mas intentos',
                                     )) {
-                                      if (dialogContext.mounted) {
-                                        Navigator.pop(dialogContext);
-                                      }
                                       if (parentContext.mounted) {
                                         showAlertDialog(
                                           parentContext,
@@ -439,9 +440,6 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     } else if (comentario.contains(
                                       'No puede contestar esta encuesta',
                                     )) {
-                                      if (dialogContext.mounted) {
-                                        Navigator.pop(dialogContext);
-                                      }
                                       if (parentContext.mounted) {
                                         showAlertDialog(
                                           parentContext,

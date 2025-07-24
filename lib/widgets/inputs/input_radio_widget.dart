@@ -14,6 +14,8 @@ class InputRadioWidget extends StatelessWidget {
 
     if (reactivo == null) return Text("Reactivo no encontrado");
 
+    final bool deshabilitado = reactivo.incorrecto != null;
+
     final reactivoRespuesta = evaluacionProvider.getReactivoRespuesta(
       idReactivo,
     );
@@ -31,24 +33,30 @@ class InputRadioWidget extends StatelessWidget {
                 RadioListTile(
                   value: opcion.idOpcion,
                   groupValue: valorSeleccionado,
-                  onChanged: (value) {
-                    final opcionSeleccionada = reactivo.opciones.firstWhere(
-                      (o) => o.idOpcion == value,
-                    );
+                  onChanged:
+                      deshabilitado
+                          ? null
+                          : (value) {
+                            final opcionSeleccionada = reactivo.opciones
+                                .firstWhere((o) => o.idOpcion == value);
 
-                    final respuesta = {
-                      'type': 'radio',
-                      'valor': opcionSeleccionada.descripcion,
-                      'id_reactivo': opcionSeleccionada.idReactivo,
-                      'id_opcion': opcionSeleccionada.idOpcion,
-                      'correcta': opcionSeleccionada.correcta,
-                      'ponderacion': opcionSeleccionada.poderacion,
-                    };
+                            final respuesta = {
+                              'type': 'radio',
+                              'valor': opcionSeleccionada.descripcion,
+                              'id_reactivo': opcionSeleccionada.idReactivo,
+                              'id_opcion': opcionSeleccionada.idOpcion,
+                              'correcta': opcionSeleccionada.correcta,
+                              'ponderacion': opcionSeleccionada.poderacion,
+                            };
 
-                    final reactivoSeleccionado = reactivo.toJson(respuesta: respuesta);
+                            final reactivoSeleccionado = reactivo.toJson(
+                              respuesta: respuesta,
+                            );
 
-                    evaluacionProvider.setRespuesta(reactivoSeleccionado);
-                  },
+                            evaluacionProvider.setRespuesta(
+                              reactivoSeleccionado,
+                            );
+                          },
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,

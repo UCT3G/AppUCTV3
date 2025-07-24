@@ -36,8 +36,11 @@ class _QuestionCardState extends State<QuestionCard> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: reactivo.error ? Colors.green : Colors.grey.shade300,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+          side: BorderSide(color: getBordeColor(reactivo), width: 2.0),
+        ),
+        color: Colors.white,
         child: Padding(
           padding: EdgeInsets.all(15),
           child: LayoutBuilder(
@@ -46,22 +49,49 @@ class _QuestionCardState extends State<QuestionCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${widget.index + 1}. ${getTextoInstruccion(reactivo.idInput)}',
-                      style: TextStyle(
-                        color: Color(0xFF575398),
-                        fontSize: 20,
-                        fontFamily: 'Montserrat',
-                        fontWeight: FontWeight.w700,
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(25),
+                        color: Color.fromRGBO(87, 84, 153, 1),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${widget.index + 1}. ${getTextoInstruccion(reactivo.idInput)}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            if (reactivo.textoInput.isNotEmpty)
+                              Text(
+                                reactivo.textoInput,
+                                style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                                textAlign: TextAlign.justify,
+                              ),
+                          ],
+                        ),
                       ),
                     ),
-                    SizedBox(height: 5),
-                    if (reactivo.textoInput.isNotEmpty)
+                    if (reactivo.temaIncorrecto != null &&
+                        reactivo.temaIncorrecto!.isNotEmpty)
                       Text(
-                        reactivo.textoInput,
+                        'Tema incorrecto: ${reactivo.temaIncorrecto}',
                         style: TextStyle(
                           fontFamily: 'Montserrat',
-                          fontSize: 18,
+                          fontSize: 15,
+                          color: Colors.redAccent,
                         ),
                         textAlign: TextAlign.justify,
                       ),
@@ -132,5 +162,18 @@ class _QuestionCardState extends State<QuestionCard> {
     final tema = competenciaProvider.getTemaById(formulario!.idTema);
 
     return "http://uct.tresguerras.com.mx:8007/imagenEvaluacion/${tema!.idCurso}/${tema.idUnidad}/${tema.idTema}/${reactivo.idReactivo}/${reactivo.imagen}";
+  }
+
+  Color getBordeColor(Reactivo reactivo) {
+    if (reactivo.incorrecto == true ||
+        reactivo.temaIncorrecto != null ||
+        reactivo.error) {
+      return Colors.red;
+    } else if (reactivo.incorrecto == false &&
+        reactivo.temaIncorrecto == null) {
+      return Colors.green;
+    } else {
+      return Colors.grey.shade300;
+    }
   }
 }

@@ -26,7 +26,7 @@ class CompetenciaProvider with ChangeNotifier {
   List<Competencia> _competencias = [];
   List<Competencia> _competenciasFiltradas = [];
   List<Competencia> _competenciasRecientes = [];
-  int _idEvaluacion = 0; 
+  int _idEvaluacion = 0;
 
   Competencia? get competencia => _competencia;
   List<Unidad> get unidades => _unidades;
@@ -78,6 +78,23 @@ class CompetenciaProvider with ChangeNotifier {
               !tiposNoCalificables.contains(tema.recursoBasicoTipo)
                   ? 100
                   : tema.resultado,
+        );
+        unidad.temas[index] = actualizarTema;
+        break;
+      }
+    }
+    //AQUI LLAMAR ACTUALIZAR AVANCE Y CALIFICACION WUUU
+    notifyListeners();
+  }
+
+  void actualizarEvaluacion(int idTema, int resultado) {
+    for (var unidad in _unidades) {
+      final index = unidad.temas.indexWhere((t) => t.idTema == idTema);
+      if (index != -1) {
+        final tema = unidad.temas[index];
+
+        final actualizarTema = tema.copyWith(
+          resultado: resultado.toDouble().truncateToDouble(),
         );
         unidad.temas[index] = actualizarTema;
         break;

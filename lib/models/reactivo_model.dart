@@ -22,7 +22,9 @@ class Reactivo {
   final String descripcionTema;
   final String reactivoJson;
   final List respuesta;
-  final bool error;
+  bool error;
+  bool? incorrecto;
+  String? temaIncorrecto;
 
   Reactivo({
     required this.idReactivo,
@@ -46,7 +48,9 @@ class Reactivo {
     required this.descripcionTema,
     required this.reactivoJson,
     required this.respuesta,
-    required this.error,
+    this.error = false,
+    this.incorrecto,
+    this.temaIncorrecto,
   });
 
   factory Reactivo.fromJson(Map<String, dynamic> json) {
@@ -131,7 +135,7 @@ class Reactivo {
 
   Map<String, dynamic> toJson({
     Map<String, dynamic>? respuesta,
-    List<Map<String, dynamic>>? grupoRespuesta,
+    List<List<Map<String, dynamic>>>? grupoRespuesta,
   }) {
     return {
       'id_reactivo': idReactivo,

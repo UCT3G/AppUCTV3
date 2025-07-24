@@ -42,4 +42,33 @@ class EvaluacionService {
       throw Exception('Error de conexión: $e');
     }
   }
+
+  static Future<Map<String, dynamic>> enviarEvaluacion(
+    Map<String, dynamic> jsonFinal,
+    String accessToken,
+  ) async {
+    final url = Uri.parse('${ApiService.baseURL}/CURSOS_MOVIL/saveEvaluacion');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: json.encode(jsonFinal),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data;
+      } else if (response.statusCode == 401) {
+        throw Exception('Token expirado o inválido');
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error de conexión: $e');
+    }
+  }
 }

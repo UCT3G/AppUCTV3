@@ -23,6 +23,7 @@ class InputCheckboxWidget extends StatelessWidget {
         reactivoRespuesta != null
             ? reactivoRespuesta['respuesta']['opciones']
             : null;
+    final bool deshabilitado = reactivo.incorrecto != null;
 
     return Column(
       children:
@@ -38,40 +39,52 @@ class InputCheckboxWidget extends StatelessWidget {
               children: [
                 CheckboxListTile(
                   value: isChecked,
-                  onChanged: (bool? value) {
-                    List<Map<String, dynamic>> nuevasOpciones =
-                        valoresSeleccionados != null
-                            ? List<Map<String, dynamic>>.from(
-                              valoresSeleccionados,
-                            )
-                            : [];
+                  onChanged:
+                      deshabilitado
+                          ? null
+                          : (bool? value) {
+                            List<Map<String, dynamic>> nuevasOpciones =
+                                valoresSeleccionados != null
+                                    ? List<Map<String, dynamic>>.from(
+                                      valoresSeleccionados,
+                                    )
+                                    : [];
 
-                    final opcionSeleccionada = {
-                      'id_opcion': opcion.idOpcion,
-                      'descripcion': opcion.descripcion,
-                      'correcta': opcion.correcta,
-                      'ponderacion': opcion.poderacion,
-                      'orden': opcion.orden,
-                    };
+                            final opcionSeleccionada = {
+                              'id_opcion': opcion.idOpcion,
+                              'descripcion': opcion.descripcion,
+                              'correcta': opcion.correcta,
+                              'ponderacion': opcion.poderacion,
+                              'orden': opcion.orden,
+                            };
 
-                    if (value == true) {
-                      nuevasOpciones.add(opcionSeleccionada);
-                    } else {
-                      nuevasOpciones.removeWhere((o) => o['id_opcion'] == opcion.idOpcion);
-                    }
+                            if (value == true) {
+                              nuevasOpciones.add(opcionSeleccionada);
+                            } else {
+                              nuevasOpciones.removeWhere(
+                                (o) => o['id_opcion'] == opcion.idOpcion,
+                              );
+                            }
 
-                    final respuesta = {
-                      'type': 'checkbox',
-                      'valor': nuevasOpciones.map((o) => o['descripcion']).toList(),
-                      'id_reactivo': opcion.idReactivo,
-                      'opciones': nuevasOpciones,
-                    };
+                            final respuesta = {
+                              'type': 'checkbox',
+                              'valor':
+                                  nuevasOpciones
+                                      .map((o) => o['descripcion'])
+                                      .toList(),
+                              'id_reactivo': opcion.idReactivo,
+                              'opciones': nuevasOpciones,
+                            };
 
-                    final reactivoSeleccionado = reactivo.toJson(respuesta: respuesta);
+                            final reactivoSeleccionado = reactivo.toJson(
+                              respuesta: respuesta,
+                            );
 
-                    log(reactivoSeleccionado.toString());
-                    evaluacionProvider.setRespuesta(reactivoSeleccionado);
-                  },
+                            log(reactivoSeleccionado.toString());
+                            evaluacionProvider.setRespuesta(
+                              reactivoSeleccionado,
+                            );
+                          },
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,

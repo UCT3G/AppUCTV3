@@ -59,6 +59,8 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
 
     if (reactivo == null) return const Text("Reactivo no encontrado");
 
+    final bool deshabilitado = reactivo.incorrecto != null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -74,9 +76,11 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
               margin: EdgeInsets.symmetric(vertical: 4),
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: deshabilitado ? Colors.grey.shade200 : Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xFF84A9CA)),
+                border: Border.all(
+                  color: deshabilitado ? Colors.grey : Color(0xFF84A9CA),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
@@ -94,7 +98,7 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
                     children: [
                       Icon(
                         Icons.drag_indicator_rounded,
-                        color: Color(0xFF84A9CA),
+                        color: deshabilitado ? Colors.grey : Color(0xFF84A9CA),
                         size: 15,
                       ),
                       SizedBox(width: 5),
@@ -129,6 +133,8 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
             );
           },
           onReorder: (oldIndex, newIndex) {
+            if (deshabilitado) return;
+
             setState(() {
               if (newIndex > oldIndex) newIndex -= 1;
               final item = _ordenUsuario.removeAt(oldIndex);

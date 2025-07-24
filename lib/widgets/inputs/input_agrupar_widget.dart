@@ -38,6 +38,9 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
       listen: false,
     );
     final reactivo = evaluacionProvider.getReactivoById(widget.idReactivo);
+    final respuesta = evaluacionProvider.getReactivoRespuesta(
+      widget.idReactivo,
+    );
 
     if (reactivo != null) {
       _opciones =
@@ -54,6 +57,30 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
               'ponderacion': opcion.poderacion,
             };
           }).toList();
+
+      if (respuesta != null && respuesta['grupo_respuesta'] != null) {
+        final grupos = List<List<dynamic>>.from(respuesta['grupo_respuesta']);
+        _grupoRespuesta = [];
+
+        for (var grupo in grupos) {
+          final grupoConvertido = <Map<String, dynamic>>[];
+          for (var opcion in grupo) {
+            final idOpcion = opcion['id_opcion'];
+            final index = _opciones.indexWhere(
+              (o) => o['id_opcion'] == idOpcion,
+            );
+            if (index != -1) {
+              _opciones[index]['selected'] = true;
+              _opciones[index]['color'] = opcion['color']; // Restaurar color
+              grupoConvertido.add(_opciones[index]);
+            }
+          }
+          _grupoRespuesta.add(grupoConvertido);
+        }
+
+        // Actualizar el índice de color (evita repetir)
+        _colorIndex = _grupoRespuesta.length % _colores.length;
+      }
     }
   }
 
@@ -90,11 +117,8 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
       );
       final reactivo = evaluacionProvider.getReactivoById(widget.idReactivo);
       if (reactivo != null) {
-        final gruposAplanados =
-            _grupoRespuesta.expand((grupo) => grupo).toList();
-
         final reactivoSeleccionado = reactivo.toJson(
-          grupoRespuesta: gruposAplanados,
+          grupoRespuesta: _grupoRespuesta,
         );
 
         reactivoSeleccionado['opciones'] = _opciones;
@@ -130,6 +154,13 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final evaluacionProvider = Provider.of<EvaluacionProvider>(
+      context,
+      listen: false,
+    );
+    final reactivo = evaluacionProvider.getReactivoById(widget.idReactivo);
+    final bool deshabilitado = reactivo!.incorrecto != null;
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -148,40 +179,44 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
                   final imagen = opcion['imagen'] as String?;
 
                   return GestureDetector(
-                    onTap: () => seleccionarOpcion(index),
-                    child: Container(
-                      width: 120,
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: color ?? Colors.white,
-                        border: Border.all(
-                          color: color ?? Colors.grey,
-                          width: opcion['selected'] ? 2 : 1,
+                    onTap:
+                        () => deshabilitado ? null : seleccionarOpcion(index),
+                    child: Opacity(
+                      opacity: deshabilitado ? 0.6 : 1.0,
+                      child: Container(
+                        width: 120,
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: color ?? Colors.white,
+                          border: Border.all(
+                            color: color ?? Colors.grey,
+                            width: opcion['selected'] ? 2 : 1,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        children: [
-                          if (descripcion.isNotEmpty)
-                            Text(
-                              descripcion,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.w500,
+                        child: Column(
+                          children: [
+                            if (descripcion.isNotEmpty)
+                              Text(
+                                descripcion,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          if (imagen != null && imagen.isNotEmpty)
-                            Padding(
-                              padding: EdgeInsets.only(top: 8),
-                              child: Image.network(
-                                getImageUrl(imagen),
-                                height: 60,
-                                fit: BoxFit.contain,
+                            if (imagen != null && imagen.isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(top: 8),
+                                child: Image.network(
+                                  getImageUrl(imagen),
+                                  height: 60,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -189,7 +224,7 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
           ),
           SizedBox(height: 20),
           ElevatedButton(
-            onPressed: reiniciar,
+            onPressed: deshabilitado ? null : reiniciar,
             child: Text(
               'Reiniciar selecciones',
               style: TextStyle(fontFamily: 'Montserrat', fontSize: 15),
