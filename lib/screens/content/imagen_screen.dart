@@ -6,6 +6,7 @@ import 'package:app_uct/services/api_service.dart';
 import 'package:app_uct/widgets/breadcrumb_nav.dart';
 import 'package:app_uct/widgets/full_screen_viewer.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 class ImagenScreen extends StatefulWidget {
@@ -335,6 +336,16 @@ class _ImagenScreenState extends State<ImagenScreen> {
               );
             }
             break;
+          case 'INTERACTIVO':
+          case 'TEMPLATE':
+            if (parentContext.mounted) {
+              Navigator.pushNamed(
+                parentContext,
+                AppRoutes.interactive,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
           case 'EVALUACION':
             try {
               final response = await competenciaProvider.validarTemasUnidad(
@@ -620,7 +631,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacionIntro,
-                arguments: tema.idTema,
+                arguments: nuevoTema.idTema,
               );
             }
             break;
@@ -668,6 +679,20 @@ class _ImagenScreenState extends State<ImagenScreen> {
     );
     final size = MediaQuery.of(context).size;
     final isSmall = size.height < 600;
+
+    if (competenciaProvider.loadingDialog) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Lottie.asset(
+            "assets/animations/3g-tracto.json",
+            fit: BoxFit.cover,
+            width: size.width * 0.6,
+            height: size.width * 0.6,
+          ),
+        ),
+      );
+    }
 
     return SafeArea(
       child: Scaffold(

@@ -7,6 +7,7 @@ import 'package:app_uct/services/api_service.dart';
 import 'package:app_uct/widgets/breadcrumb_nav.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -424,6 +425,16 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
               );
             }
             break;
+          case 'INTERACTIVO':
+          case 'TEMPLATE':
+            if (parentContext.mounted) {
+              Navigator.pushNamed(
+                parentContext,
+                AppRoutes.interactive,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
           case 'EVALUACION':
             try {
               final response = await competenciaProvider.validarTemasUnidad(
@@ -709,7 +720,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacionIntro,
-                arguments: tema.idTema,
+                arguments: nuevoTema.idTema,
               );
             }
             break;
@@ -757,6 +768,20 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
     );
     final size = MediaQuery.of(context).size;
     final isSmall = size.height < 600;
+
+    if (competenciaProvider.loadingDialog) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Lottie.asset(
+            "assets/animations/3g-tracto.json",
+            fit: BoxFit.cover,
+            width: size.width * 0.6,
+            height: size.width * 0.6,
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(

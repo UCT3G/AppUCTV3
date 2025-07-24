@@ -35,81 +35,122 @@ class _QuestionCardState extends State<QuestionCard> {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-          side: BorderSide(color: getBordeColor(reactivo), width: 2.0),
-        ),
-        color: Colors.white,
-        child: Padding(
-          padding: EdgeInsets.all(15),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(25),
-                        color: Color.fromRGBO(87, 84, 153, 1),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${widget.index + 1}. ${getTextoInstruccion(reactivo.idInput)}',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.w700,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          SizedBox.expand(
+            child: Card(
+              margin: EdgeInsets.only(top: 30),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+                side: BorderSide(color: getBordeColor(reactivo), width: 2.0),
+              ),
+              color: Colors.white,
+              child: Padding(
+                padding: EdgeInsets.all(15),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(25),
+                              color: Color.fromRGBO(87, 84, 153, 1),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                right: 25.0,
+                                left: 25.0,
+                                bottom: 25.0,
+                                top: 40.0,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${widget.index + 1}. ${getTextoInstruccion(reactivo.idInput)}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontFamily: 'Montserrat',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  if (reactivo.textoInput.isNotEmpty)
+                                    Text(
+                                      reactivo.textoInput,
+                                      style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 18,
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.justify,
+                                    ),
+                                ],
                               ),
                             ),
-                            SizedBox(height: 5),
-                            if (reactivo.textoInput.isNotEmpty)
-                              Text(
-                                reactivo.textoInput,
-                                style: TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                                textAlign: TextAlign.justify,
+                          ),
+                          if (reactivo.temaIncorrecto != null &&
+                              reactivo.temaIncorrecto!.isNotEmpty)
+                            Text(
+                              'Tema incorrecto: ${reactivo.temaIncorrecto}',
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 15,
+                                color: Colors.redAccent,
                               ),
-                          ],
-                        ),
+                              textAlign: TextAlign.justify,
+                            ),
+                          if (reactivo.imagen.isNotEmpty)
+                            Center(
+                              child: Image.network(
+                                getImageUrl(reactivo),
+                                height: 100,
+                              ),
+                            ),
+                          SizedBox(height: 10),
+                          buildInputWidget(reactivo),
+                        ],
                       ),
-                    ),
-                    if (reactivo.temaIncorrecto != null &&
-                        reactivo.temaIncorrecto!.isNotEmpty)
-                      Text(
-                        'Tema incorrecto: ${reactivo.temaIncorrecto}',
-                        style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 15,
-                          color: Colors.redAccent,
-                        ),
-                        textAlign: TextAlign.justify,
-                      ),
-                    if (reactivo.imagen.isNotEmpty)
-                      Center(
-                        child: Image.network(
-                          getImageUrl(reactivo),
-                          height: 100,
-                        ),
-                      ),
-                    SizedBox(height: 10),
-                    buildInputWidget(reactivo),
-                  ],
+                    );
+                  },
                 ),
-              );
-            },
+              ),
+            ),
           ),
-        ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey.shade200,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 6,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+                border: Border.all(color: Colors.grey.shade400, width: 2.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/YowiPregunta.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

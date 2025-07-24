@@ -416,7 +416,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                             ),
                             child: const Text('Ver evaluación'),
                           ),
-                          if (tema.idUnidad < response['unidadMaxima'] &&
+                          if (tema.ordenUnidad < response['unidadMaxima'] &&
                               response['resultado'] == 'APROBADO')
                             ElevatedButton(
                               onPressed: () async {},
@@ -527,9 +527,15 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/bg_evaluacion.png'),
-                fit: BoxFit.cover,
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromRGBO(201, 195, 218, 1),
+                  Color.fromRGBO(233, 233, 233, 1),
+                  Color.fromRGBO(212, 221, 235, 1),
+                  Color.fromRGBO(218, 230, 240, 1),
+                ],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
               ),
             ),
           ),
