@@ -351,7 +351,7 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
           case 'INTERACTIVO':
           case 'TEMPLATE':
             if (parentContext.mounted) {
-              Navigator.pushNamed(
+              Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.interactive,
                 arguments: nuevoTema.idTema,

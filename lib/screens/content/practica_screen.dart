@@ -586,7 +586,7 @@ class _PracticaScreenState extends State<PracticaScreen> {
           case 'INTERACTIVO':
           case 'TEMPLATE':
             if (parentContext.mounted) {
-              Navigator.pushNamed(
+              Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.interactive,
                 arguments: nuevoTema.idTema,

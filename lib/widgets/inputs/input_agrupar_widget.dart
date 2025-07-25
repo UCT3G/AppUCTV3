@@ -16,7 +16,7 @@ class InputAgruparWidget extends StatefulWidget {
 class _InputAgruparWidgetState extends State<InputAgruparWidget> {
   List<Map<String, dynamic>> _opciones = [];
   List<List<Map<String, dynamic>>> _grupoRespuesta = [];
-  List<int> _seleccionActual = [];
+  final List<int> _seleccionActual = [];
   int _colorIndex = 0;
 
   final List<Color> _colores = [
@@ -161,6 +161,8 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
     final reactivo = evaluacionProvider.getReactivoById(widget.idReactivo);
     final bool deshabilitado = reactivo!.incorrecto != null;
 
+    final size = MediaQuery.of(context).size;
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -184,7 +186,8 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
                     child: Opacity(
                       opacity: deshabilitado ? 0.6 : 1.0,
                       child: Container(
-                        width: 120,
+                        width: size.width * 0.4,
+                        constraints: BoxConstraints(minHeight: 150),
                         padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: color ?? Colors.white,
@@ -195,6 +198,7 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             if (descripcion.isNotEmpty)
                               Text(

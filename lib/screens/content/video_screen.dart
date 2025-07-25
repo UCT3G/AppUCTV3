@@ -346,7 +346,7 @@ class _VideoScreenState extends State<VideoScreen> {
           case 'INTERACTIVO':
           case 'TEMPLATE':
             if (parentContext.mounted) {
-              Navigator.pushNamed(
+              Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.interactive,
                 arguments: nuevoTema.idTema,
