@@ -1,31 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 
 class BiometricService {
   final LocalAuthentication _localAuthentication = LocalAuthentication();
-  static final _storage = FlutterSecureStorage();
 
   // METODO QUE VERIFICA SI EL DISPOSITIVO SOPORTA AUTENTICACION BIOMETRICA
   Future<bool> isBiometricAvailable() async {
-    bool canCheck = await _localAuthentication.canCheckBiometrics;
-    List<BiometricType> availableBiometrics =
-        await _localAuthentication.getAvailableBiometrics();
-    return canCheck && availableBiometrics.isNotEmpty;
-  }
-
-  // METODO QUE AUTENTICA AL USUARIO USANDO BIOMETRICOS
-  Future<bool> authenticate() async {
     try {
-      if (!await isBiometricAvailable()) {
-        throw Exception('El dispositivo no tiene biometría configurada');
-      }
-      return await _localAuthentication.authenticate(
-        localizedReason: 'Por favor, autentícate para acceder',
-        options: const AuthenticationOptions(biometricOnly: true),
-      );
+      bool canCheck = await _localAuthentication.canCheckBiometrics;
+      List<BiometricType> availableBiometrics =
+          await _localAuthentication.getAvailableBiometrics();
+      return canCheck && availableBiometrics.isNotEmpty;
     } catch (e) {
-      debugPrint('Error en autenticación biométrica: $e');
+      debugPrint('Error al verificar biométricos: $e');
       return false;
     }
   }
@@ -40,23 +27,51 @@ class BiometricService {
     }
   }
 
-  // METODO PARA HABILITAR LA AUTENTICACION BIOMETRICA
-  static Future<void> enableBiometricAuth() async {
-    await _storage.write(key: 'biometric_auth_enabled', value: 'true');
+  // Ejecuta autenticación con biométricos si están disponibles
+  Future<bool> authenticateWithBiometrics() async {
+    try {
+      return await _localAuthentication.authenticate(
+        localizedReason: 'Usa tu huella o rostro para ingresar',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+          useErrorDialogs: true,
+        ),
+      );
+    } catch (e) {
+      debugPrint('Error en biométricos: $e');
+      return false;
+    }
   }
 
-  // METODO PARA DESHABILITAR LA AUTENTICACION BIOMETRICA
-  static Future<void> disableBiometricAuth() async {
-    await _storage.write(key: 'biometric_auth_enabled', value: 'false');
+  // Autenticación con cualquier método seguro configurado en el dispositivo
+  Future<bool> authenticateWithDeviceLock() async {
+    try {
+      return await _localAuthentication.authenticate(
+        localizedReason:
+            'Autentícate con el método de seguridad del dispositivo',
+        options: const AuthenticationOptions(
+          biometricOnly:
+              false, // Aquí se incluye el PIN/patrón si no hay biométricos
+          stickyAuth: true,
+          useErrorDialogs: true,
+        ),
+      );
+    } catch (e) {
+      debugPrint('Error al autenticar con lock screen: $e');
+      return false;
+    }
   }
 
-  // METODO PARA VERIFICAR SI LA AUTENTICACION BIOMETRICA ESTA HABILITADA
-  static Future<bool> isBiometricAuthEnabled() async {
-    final value = await _storage.read(key: 'biometric_auth_enabled');
-    return value != null;
-  }
+  // Verifica si el dispositivo tiene alguna forma de seguridad (lock o biométrico)
+  Future<bool> isLockScreen() async {
+    try {
+      final isSupported = await _localAuthentication.isDeviceSupported();
 
-  static Future<String?> getBiometricAuthPreference() async {
-    return await _storage.read(key: 'biometric_auth_enabled');
+      return isSupported;
+    } catch (e) {
+      debugPrint('Error al verificar seguridad del dispositivo: $e');
+      return false;
+    }
   }
 }

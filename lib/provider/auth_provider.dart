@@ -10,10 +10,14 @@ class AuthProvider extends ChangeNotifier {
   final BiometricService _biometricService = BiometricService();
   String? _accessToken;
   String? _refreshToken;
+  String? _username;
+  String? _password;
   Usuario? _currentUsuario;
 
   String? get accessToken => _accessToken;
   String? get refreshToken => _refreshToken;
+  String? get username => _username;
+  String? get password => _password;
   Usuario? get currentUsuario => _currentUsuario;
 
   // METODO QUE CARGA LOS TOKENS AL INICIAR LA APP
@@ -21,6 +25,8 @@ class AuthProvider extends ChangeNotifier {
     _accessToken = await TokenService.getAccessToken();
     _refreshToken = await TokenService.getRefreshToken();
     _currentUsuario = await TokenService.getUserData();
+    _username = await TokenService.getUsername();
+    _password = await TokenService.getPassword();
     notifyListeners();
   }
 
@@ -47,7 +53,21 @@ class AuthProvider extends ChangeNotifier {
   }
 
   //METODO PARA GUARDAR LA INFORMACION DEL USUARIO
-  Future<void> saveUser(Usuario usuario) async {
+  Future<void> saveUser(
+    Usuario usuario,
+    String username,
+    String password,
+  ) async {
+    _currentUsuario = usuario;
+    _username = username;
+    _password = password;
+    await TokenService.saveUserData(usuario);
+    await TokenService.saveCredentials(username, password);
+    notifyListeners();
+  }
+
+  //METODO PARA GUARDAR LA INFORMACION DEL USUARIO CON CREDENCIALES
+  Future<void> saveUserWithCredentials(Usuario usuario) async {
     _currentUsuario = usuario;
     await TokenService.saveUserData(usuario);
     notifyListeners();
@@ -57,8 +77,7 @@ class AuthProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await AuthService.login(username, password);
     await saveTokens(response['access_token'], response['refresh_token']);
-    await TokenService.saveCredentials(username, password);
-    await saveUser(Usuario.fromJson(response['data_user']));
+    await saveUser(Usuario.fromJson(response['data_user']), username, password);
     return response;
   }
 
@@ -66,7 +85,23 @@ class AuthProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> loginWithBiometrics() async {
     final response = await AuthService().loginWithBiometrics();
     await saveTokens(response['access_token'], response['refresh_token']);
-    await saveUser(Usuario.fromJson(response['data_user']));
+    await saveUserWithCredentials(Usuario.fromJson(response['data_user']));
+    return response;
+  }
+
+  //METODO PARA INICIAR SESION CON CREDENCIALES
+  Future<Map<String, dynamic>> loginWithLockScreen() async {
+    final response = await AuthService().loginWithLockScreen();
+    await saveTokens(response['access_token'], response['refresh_token']);
+    await saveUserWithCredentials(Usuario.fromJson(response['data_user']));
+    return response;
+  }
+
+  //METODO PARA INICIAR SESION CON CREDENCIALES
+  Future<Map<String, dynamic>> loginWithCredentials() async {
+    final response = await AuthService().loginWithCredentials();
+    await saveTokens(response['access_token'], response['refresh_token']);
+    await saveUserWithCredentials(Usuario.fromJson(response['data_user']));
     return response;
   }
 
@@ -91,30 +126,16 @@ class AuthProvider extends ChangeNotifier {
     return false;
   }
 
-  //METODO PARA HABILITAR/DESHABILITAR AUTENTICACION BIOMETRICA
-  Future<bool> hasBiometricPreference() async {
-    final value = await BiometricService.getBiometricAuthPreference();
-    return value?.toLowerCase() == 'true';
+  Future<bool> isLockScreen() async {
+    return await _biometricService.isLockScreen();
   }
 
-  Future<void> enableBiometricAuth() async {
-    await BiometricService.enableBiometricAuth();
-  }
-
-  Future<void> disableBiometricAuth() async {
-    await BiometricService.disableBiometricAuth();
-  }
-
-  Future<bool> isBiometricAuthEnabled() async {
-    return await BiometricService.isBiometricAuthEnabled();
+  Future<bool> isBiometricAvailable() async {
+    return await _biometricService.isBiometricAvailable();
   }
 
   Future<List<BiometricType>> getAvailableBiometrics() async {
     return await _authService.biometricService.getAvailableBiometrics();
-  }
-
-  Future<bool> checkBiometricSupport() async {
-    return await _biometricService.isBiometricAvailable();
   }
 
   //METODO PARA SABER SI UN USUARIO ESTA LOGUEADO

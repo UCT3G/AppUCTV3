@@ -8,6 +8,8 @@ class TokenService {
   static const _storage = FlutterSecureStorage();
   static String? _accessToken;
   static String? _refreshToken;
+  static String? _username;
+  static String? _password;
 
   // METODO PARA GUARDAR LOS TOKENS EN EL ALMACENAMIENTO SEGURO
   static Future<void> saveTokens(
@@ -40,6 +42,16 @@ class TokenService {
   static Future<String?> getRefreshToken() async {
     _refreshToken ??= await _storage.read(key: 'refresh_token');
     return _refreshToken;
+  }
+
+  static Future<String?> getUsername() async {
+    _username ??= await _storage.read(key: 'username');
+    return _username;
+  }
+
+  static Future<String?> getPassword() async {
+    _password ??= await _storage.read(key: 'password');
+    return _password;
   }
 
   static Future<Usuario?> getUserData() async {

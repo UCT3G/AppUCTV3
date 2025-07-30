@@ -1,7 +1,6 @@
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/screens/splash_screen.dart';
-import 'package:app_uct/services/token_service.dart';
 import 'package:app_uct/widgets/wave_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -23,18 +22,17 @@ class _LoginScreenState extends State<LoginScreen>
   late Animation<double> _animation2;
   late AnimationController _controller3;
   late Animation<double> _animation3;
-  BiometricType? _biometricType;
-  Future<BiometricType?>? _biometricTypeFuture;
 
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _supportsBiometric = false;
-  bool _isBiometricEnabled = false;
   bool _isLoadingCredentials = false;
-  bool _isBiometricAvailable = false;
   bool _isLoadingBiometrics = false;
-  bool _hasStoredCredentials = false;
+  bool _lockAvailable = false;
+  bool _biometricsAvailable = false;
+
+  BiometricType? _biometricType;
+  Future<BiometricType?>? _biometricTypeFuture;
 
   AuthProvider get authProvider =>
       Provider.of<AuthProvider>(context, listen: false);
@@ -79,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (response['access_token'] != null) {
-        if (_supportsBiometric && !_isBiometricEnabled) {
+        if (authProvider.username == null && authProvider.password == null) {
           await showSaveCredentialsDialog();
         }
 
@@ -142,19 +140,6 @@ class _LoginScreenState extends State<LoginScreen>
         });
       }
     }
-  }
-
-  // METODO PARA VERIFICAR SI EL DISPOSITIVO SOPORTA AUTENTICACION BIOMETRICA
-  Future<void> checkBiometricAvailability() async {
-    final supportsBiometric = await authProvider.checkBiometricSupport();
-    final isEnabled = await authProvider.isBiometricAuthEnabled();
-    final isBiometricAvailable = await authProvider.hasBiometricPreference();
-
-    setState(() {
-      _supportsBiometric = supportsBiometric;
-      _isBiometricEnabled = isEnabled;
-      _isBiometricAvailable = isBiometricAvailable;
-    });
   }
 
   // METODO PARA INICIAR SESION CON BIOMETRICOS
@@ -239,12 +224,164 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  // METODO PARA VERIFICAR SI HAY CREDENCIALES GUARDADAS
-  Future<void> checkStoredCredentials() async {
-    bool hasCredentials = await TokenService.hasCredentials();
+  Future<void> loginWithDeviceLock() async {
     setState(() {
-      _hasStoredCredentials = hasCredentials;
+      _isLoadingBiometrics = true;
     });
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder:
+          (context) => PopScope(
+            canPop: false,
+            child: SplashScreen(isInitialLoad: false),
+          ),
+    );
+
+    try {
+      final response = await authProvider.loginWithLockScreen();
+
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if (response['access_token'] != null) {
+        Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.teal,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              response['message'],
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.white,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Autenticación fallida',
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.redAccent,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      Navigator.of(context, rootNavigator: true).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.white,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            'Error: $e',
+            style: TextStyle(
+              fontFamily: 'Montserrat',
+              color: Colors.redAccent,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingBiometrics = false;
+        });
+      }
+    }
+  }
+
+  Future<void> loginWithCredentials() async {
+    setState(() {
+      _isLoadingCredentials = true;
+    });
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder:
+          (context) => PopScope(
+            canPop: false,
+            child: SplashScreen(isInitialLoad: false),
+          ),
+    );
+
+    try {
+      final response = await authProvider.loginWithCredentials();
+
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if (response['access_token'] != null) {
+        Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.teal,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              response['message'],
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.white,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Autenticación fallida',
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.redAccent,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      Navigator.of(context, rootNavigator: true).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.white,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            'Error: $e',
+            style: TextStyle(
+              fontFamily: 'Montserrat',
+              color: Colors.redAccent,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingCredentials = false;
+        });
+      }
+    }
   }
 
   // METODO PARA ABRIR EL ALERT DIALOG PARA GUARDAR CREDENCIALES
@@ -253,50 +390,99 @@ class _LoginScreenState extends State<LoginScreen>
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(
-            '¿Guardar credenciales?',
-            style: TextStyle(fontFamily: 'Montserrat', fontSize: 15),
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  '¿Deseas guardar tus credenciales para futuros inicios de sesión biométricos?',
-                  style: TextStyle(fontSize: 13, fontFamily: 'Montserrat'),
+        final imageHeight = MediaQuery.of(dialogContext).size.height * 0.25;
+
+        return Center(
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.topCenter,
+            children: [
+              Container(
+                margin: EdgeInsets.only(
+                  top: imageHeight / 2,
+                  left: 20,
+                  right: 20,
                 ),
-              ],
-            ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.2)),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(15.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Guardar credenciales',
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(dialogContext).primaryColor,
+                          decoration: TextDecoration.none,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 15),
+                      Text(
+                        'Estimado usuario, sus credenciales serán guardadas para futuros inicios de sesión.',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Montserrat',
+                          color: Colors.grey.shade700,
+                          fontWeight: FontWeight.w400,
+                          decoration: TextDecoration.none,
+                        ),
+                        textAlign: TextAlign.justify,
+                      ),
+                      SizedBox(height: 15),
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Theme.of(dialogContext).primaryColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text('Aceptar'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: -(imageHeight / 2), // Hace que la imagen sobresalga
+                child: SizedBox(
+                  height: imageHeight,
+                  child: Image.asset(
+                    'assets/images/ModalYowi.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                await authProvider.enableBiometricAuth();
-                if (dialogContext.mounted) {
-                  Navigator.of(dialogContext).pop();
-                }
-              },
-              child: Text(
-                'Aceptar',
-                style: TextStyle(fontSize: 12, fontFamily: 'Montserrat'),
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                await authProvider.disableBiometricAuth();
-                if (dialogContext.mounted) {
-                  Navigator.of(dialogContext).pop();
-                }
-              },
-              child: Text(
-                'Cancelar',
-                style: TextStyle(fontSize: 12, fontFamily: 'Montserrat'),
-              ),
-            ),
-          ],
         );
       },
     );
+  }
+
+  Future<void> checkAvailability() async {
+    final biometricsAvailable = await authProvider.isBiometricAvailable();
+    final lockAvailable = await authProvider.isLockScreen();
+
+    setState(() {
+      _biometricsAvailable = biometricsAvailable;
+      _lockAvailable = !biometricsAvailable && lockAvailable;
+    });
   }
 
   // METODO PRA OBTENER EL TIPO DE AUTENTICACION BIOMETRICA
@@ -313,7 +499,7 @@ class _LoginScreenState extends State<LoginScreen>
       }
 
       if (availableBiometrics.isNotEmpty) {
-        return availableBiometrics.first; // Devuelve el primero disponible
+        return availableBiometrics.first;
       }
 
       return null;
@@ -365,8 +551,7 @@ class _LoginScreenState extends State<LoginScreen>
       });
     _controller3.repeat();
 
-    checkStoredCredentials();
-    checkBiometricAvailability();
+    checkAvailability();
     loadBiometricType();
   }
 
@@ -438,167 +623,242 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.06),
-                  FractionallySizedBox(
-                    widthFactor: 0.8,
-                    child: TextFormField(
-                      controller: _usernameController,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'Montserrat',
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.transparent,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.white30,
-                            width: 2.0,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.white30,
-                            width: 2.0,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        prefixIcon: Icon(
-                          Icons.person,
-                          color: Color.fromRGBO(128, 185, 204, 1),
-                        ),
-                        hintText: 'Usuario',
-                        hintStyle: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
+                  if (authProvider.username == null) ...[
+                    FractionallySizedBox(
+                      widthFactor: 0.8,
+                      child: TextFormField(
+                        controller: _usernameController,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
                           fontFamily: 'Montserrat',
                         ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-                  FractionallySizedBox(
-                    widthFactor: 0.8,
-                    child: TextFormField(
-                      controller: _passwordController,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'Montserrat',
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.transparent,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.white30,
-                            width: 2.0,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.white30,
-                            width: 2.0,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        prefixIcon: Icon(
-                          Icons.password,
-                          color: Color.fromRGBO(128, 185, 204, 1),
-                        ),
-                        hintText: 'Contraseña',
-                        hintStyle: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat',
-                        ),
-                      ),
-                      obscureText: true,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.04),
-                  ElevatedButton(
-                    onPressed:
-                        _isLoadingCredentials
-                            ? null
-                            : () => login(
-                              _usernameController.text,
-                              _passwordController.text,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white30,
+                              width: 2.0,
                             ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 10,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white30,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.person,
+                            color: Color.fromRGBO(128, 185, 204, 1),
+                          ),
+                          hintText: 'Usuario',
+                          hintStyle: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                          ),
+                        ),
                       ),
                     ),
-                    child:
-                        _isLoadingCredentials
-                            ? CircularProgressIndicator()
-                            : Text(
-                              'Ingresar',
-                              style: TextStyle(
-                                color: Colors.black87,
-                                fontSize: 20,
-                                fontFamily: 'Montserrat',
+                    SizedBox(height: screenHeight * 0.02),
+                    FractionallySizedBox(
+                      widthFactor: 0.8,
+                      child: TextFormField(
+                        controller: _passwordController,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Montserrat',
+                        ),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white30,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white30,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.password,
+                            color: Color.fromRGBO(128, 185, 204, 1),
+                          ),
+                          hintText: 'Contraseña',
+                          hintStyle: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                          ),
+                        ),
+                        obscureText: true,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.04),
+                    ElevatedButton(
+                      onPressed:
+                          _isLoadingCredentials
+                              ? null
+                              : () => login(
+                                _usernameController.text,
+                                _passwordController.text,
+                              ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child:
+                          _isLoadingCredentials
+                              ? CircularProgressIndicator()
+                              : Text(
+                                'Ingresar',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 20,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                    ),
+                  ] else ...[
+                    Text(
+                      'BIENVENIDA/O DE NUEVO:',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                      ),
+                    ),
+                    Text(
+                      authProvider.username ?? 'Usuario',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat',
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    if (_biometricsAvailable) ...[
+                      _biometricType != null
+                          ? ElevatedButton(
+                            onPressed:
+                                _isLoadingBiometrics
+                                    ? null
+                                    : () => loginWithBiometrics(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              padding: EdgeInsets.all(10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
                             ),
-                  ),
-                  SizedBox(height: screenHeight * 0.04),
-                  if (_isBiometricAvailable && _hasStoredCredentials)
-                    _biometricType != null
-                        ? ElevatedButton(
-                          onPressed:
-                              _isLoadingBiometrics
-                                  ? null
-                                  : () => loginWithBiometrics(),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: EdgeInsets.all(10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child:
-                              _isLoadingBiometrics
-                                  ? CircularProgressIndicator()
-                                  : Column(
-                                    children: [
-                                      Icon(
-                                        _biometricType == BiometricType.face
-                                            ? Icons.face
-                                            : _biometricType ==
-                                                BiometricType.iris
-                                            ? Icons.remove_red_eye
-                                            : Icons.fingerprint,
-                                        color: Colors.black,
-                                        size: screenHeight * 0.08,
-                                      ),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        _biometricType == BiometricType.face
-                                            ? 'Reconocimiento facial'
-                                            : _biometricType ==
-                                                BiometricType.iris
-                                            ? 'Reconocimiento de iris'
-                                            : 'Huella dactilar',
-                                        style: TextStyle(
+                            child:
+                                _isLoadingBiometrics
+                                    ? CircularProgressIndicator()
+                                    : Column(
+                                      children: [
+                                        Icon(
+                                          _biometricType == BiometricType.face
+                                              ? Icons.face
+                                              : _biometricType ==
+                                                  BiometricType.iris
+                                              ? Icons.remove_red_eye
+                                              : Icons.fingerprint,
                                           color: Colors.black,
-                                          fontSize: 16,
-                                          fontFamily: 'Montserrat',
+                                          size: screenHeight * 0.08,
                                         ),
-                                      ),
-                                    ],
+                                        SizedBox(height: 5),
+                                        Text(
+                                          _biometricType == BiometricType.face
+                                              ? 'Reconocimiento facial'
+                                              : _biometricType ==
+                                                  BiometricType.iris
+                                              ? 'Reconocimiento de iris'
+                                              : 'Huella dactilar',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                            fontFamily: 'Montserrat',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                          )
+                          : CircularProgressIndicator(),
+                    ] else if (_lockAvailable) ...[
+                      ElevatedButton(
+                        onPressed:
+                            _isLoadingBiometrics
+                                ? null
+                                : () => loginWithDeviceLock(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 10,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child:
+                            _isLoadingBiometrics
+                                ? CircularProgressIndicator()
+                                : Icon(
+                                  Icons.lock,
+                                  color: Colors.black45,
+                                  size: screenHeight * 0.05,
+                                ),
+                      ),
+                    ] else ...[
+                      ElevatedButton(
+                        onPressed:
+                            _isLoadingCredentials
+                                ? null
+                                : () => loginWithCredentials(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 10,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child:
+                            _isLoadingCredentials
+                                ? CircularProgressIndicator()
+                                : Text(
+                                  'Ingresar nuevamente',
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 20,
+                                    fontFamily: 'Montserrat',
                                   ),
-                        )
-                        : CircularProgressIndicator(),
+                                ),
+                      ),
+                    ],
+                  ],
                 ],
               ),
             ),

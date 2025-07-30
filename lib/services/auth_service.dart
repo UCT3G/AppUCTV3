@@ -45,7 +45,8 @@ class AuthService {
         throw Exception('No se encontraron credenciales guardadas');
       }
 
-      bool isAuthenticated = await biometricService.authenticate();
+      bool isAuthenticated =
+          await biometricService.authenticateWithBiometrics();
 
       if (isAuthenticated) {
         final username = await _storage.read(key: 'username');
@@ -64,17 +65,56 @@ class AuthService {
     }
   }
 
+  // METODO PARA INICIAR SESION CON CREDENCIALES
+  Future<Map<String, dynamic>> loginWithLockScreen() async {
+    try {
+      if (!await TokenService.hasCredentials()) {
+        throw Exception('No se encontraron credenciales guardadas');
+      }
+
+      bool isAuthenticated =
+          await biometricService.authenticateWithDeviceLock();
+
+      if (isAuthenticated) {
+        final username = await _storage.read(key: 'username');
+        final password = await _storage.read(key: 'password');
+
+        if (username != null && password != null) {
+          return await login(username, password);
+        } else {
+          throw Exception('No se encontraron credenciales guardadas');
+        }
+      } else {
+        throw Exception('Autenticación fallida');
+      }
+    } catch (e) {
+      throw Exception('Error en la autenticación with lock screen: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> loginWithCredentials() async {
+    try {
+      if (!await TokenService.hasCredentials()) {
+        throw Exception('No se encontraron credenciales guardadas');
+      }
+
+      final username = await _storage.read(key: 'username');
+      final password = await _storage.read(key: 'password');
+
+      if (username != null && password != null) {
+        return await login(username, password);
+      } else {
+        throw Exception('No se encontraron credenciales guardadas');
+      }
+    } catch (e) {
+      throw Exception('Error en la autenticación: $e');
+    }
+  }
+
   // METODO PARA CERRAR SESION
   static Future<void> logout() async {
     await _storage.delete(key: 'access_token');
     await _storage.delete(key: 'refresh_token');
-
-    final value = await BiometricService.getBiometricAuthPreference();
-
-    if (value?.toLowerCase() == 'false') {
-      await _storage.delete(key: 'username');
-      await _storage.delete(key: 'password');
-    }
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('userData');
