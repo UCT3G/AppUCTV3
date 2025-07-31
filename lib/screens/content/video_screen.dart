@@ -642,6 +642,15 @@ class _VideoScreenState extends State<VideoScreen> {
               );
             }
             break;
+          default:
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.recurso,
+                arguments: tema.idTema,
+              );
+            }
+            break;
         }
       }
     } catch (e) {

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/models/usuario_model.dart';
 import 'package:app_uct/services/auth_service.dart';
 import 'package:app_uct/services/biometric_service.dart';
@@ -76,17 +78,48 @@ class AuthProvider extends ChangeNotifier {
   //METODO PARA INICIAR SESION
   Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await AuthService.login(username, password);
-    await saveTokens(response['access_token'], response['refresh_token']);
-    await saveUser(Usuario.fromJson(response['data_user']), username, password);
-    return response;
+    if (!response['success']) {
+      return {
+        'success': false,
+        'message': response['message'],
+        'tipo': response['tipo'],
+      };
+    }
+    final data = response['data'];
+    await saveTokens(data['access_token'], data['refresh_token']);
+    await saveUser(Usuario.fromJson(data['data_user']), username, password);
+    return {
+      'success': true,
+      'access_token': data['access_token'],
+      'message': data['message'],
+    };
   }
 
   //METODO PARA INICIAR SESION CON BIOMETRICOS
   Future<Map<String, dynamic>> loginWithBiometrics() async {
     final response = await AuthService().loginWithBiometrics();
-    await saveTokens(response['access_token'], response['refresh_token']);
-    await saveUserWithCredentials(Usuario.fromJson(response['data_user']));
-    return response;
+
+    if (!response['success']) {
+      if (response['tipo'] == 1) {
+        _password = null;
+      } else if (response['tipo'] == 2) {
+        _username = null;
+        _password = null;
+      }
+      return {
+        'success': false,
+        'message': response['message'],
+        'tipo': response['tipo'],
+      };
+    }
+    final data = response['data'];
+    await saveTokens(data['access_token'], data['refresh_token']);
+    await saveUserWithCredentials(Usuario.fromJson(data['data_user']));
+    return {
+      'success': true,
+      'access_token': data['access_token'],
+      'message': data['message'],
+    };
   }
 
   //METODO PARA INICIAR SESION CON CREDENCIALES

@@ -2,6 +2,7 @@
 
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
+import 'package:app_uct/widgets/connection_error_widget.dart';
 import 'package:app_uct/widgets/painter_welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,11 +23,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   late Animation<double> _animation2;
   String _comentario = "";
 
+  bool _hasConnectionError = false;
+
   Future<void> loadCompetencia() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
       listen: false,
     );
+
+    setState(() {
+      _hasConnectionError = false;
+    });
 
     try {
       final competenciaData =
@@ -57,8 +64,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
         return;
       }
+      setState(() {
+        _hasConnectionError = true;
+      });
       if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
+        // Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -131,6 +141,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             width: screenSize.width * 0.6,
             height: screenSize.width * 0.6,
           ),
+        ),
+      );
+    }
+
+    if (_hasConnectionError) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: ConnectionErrorWidget(
+          onRetry: loadCompetencia,
+          message:
+              'Error al recuperar la competencia actual, intenta de nuevo.',
         ),
       );
     }

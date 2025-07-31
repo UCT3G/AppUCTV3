@@ -700,6 +700,15 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
               );
             }
             break;
+          default:
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.recurso,
+                arguments: tema.idTema,
+              );
+            }
+            break;
         }
       }
     } catch (e) {
@@ -806,7 +815,7 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
                             return WebViewWidget(controller: controller);
                           },
                         )
-                        : Center(child: CircularProgressIndicator(),),
+                        : Center(child: CircularProgressIndicator()),
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),

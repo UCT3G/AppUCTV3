@@ -281,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               setState(() {
                                 _showFiltrado = true;
                               });
-                              if(context.mounted) Navigator.of(context).pop();
+                              if (context.mounted) Navigator.of(context).pop();
                             } catch (e) {
                               if (e.toString().contains('Sesión expirada.')) {
                                 if (context.mounted) {

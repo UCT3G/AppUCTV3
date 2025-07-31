@@ -882,6 +882,15 @@ class _PracticaScreenState extends State<PracticaScreen> {
               );
             }
             break;
+          default:
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.recurso,
+                arguments: tema.idTema,
+              );
+            }
+            break;
         }
       }
     } catch (e) {

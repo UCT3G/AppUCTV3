@@ -491,6 +491,15 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     );
                                   }
                                   break;
+                                default:
+                                  if (parentContext.mounted) {
+                                    Navigator.pushNamed(
+                                      parentContext,
+                                      AppRoutes.recurso,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
+                                  break;
                               }
                             },
                             style: ElevatedButton.styleFrom(

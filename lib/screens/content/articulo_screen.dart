@@ -623,6 +623,15 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
               );
             }
             break;
+          default:
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.recurso,
+                arguments: tema.idTema,
+              );
+            }
+            break;
         }
       }
     } catch (e) {

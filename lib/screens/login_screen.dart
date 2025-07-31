@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/screens/splash_screen.dart';
@@ -30,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen>
   bool _isLoadingBiometrics = false;
   bool _lockAvailable = false;
   bool _biometricsAvailable = false;
+  bool _passwordIncorrect = false;
 
   BiometricType? _biometricType;
   Future<BiometricType?>? _biometricTypeFuture;
@@ -76,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen>
 
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
-      if (response['access_token'] != null) {
+      if (response['success'] == true && response['access_token'] != null) {
         if (authProvider.username == null && authProvider.password == null) {
           await showSaveCredentialsDialog();
         }
@@ -105,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen>
               backgroundColor: Colors.white,
               behavior: SnackBarBehavior.floating,
               content: Text(
-                'Error al iniciar sesión',
+                response['message'],
                 style: TextStyle(
                   fontFamily: 'Montserrat',
                   color: Colors.redAccent,
@@ -164,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
 
-      if (response['access_token'] != null) {
+      if (response['success'] == true && response['access_token'] != null) {
         Navigator.pushReplacementNamed(context, AppRoutes.welcome);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -181,21 +184,43 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         );
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.white,
-              behavior: SnackBarBehavior.floating,
-              content: Text(
-                'Autenticación biométrica fallida',
-                style: TextStyle(
-                  fontFamily: 'Montserrat',
-                  color: Colors.redAccent,
-                  fontSize: 14,
+        final tipo = response['tipo'];
+
+        if (tipo == 1) {
+          _passwordIncorrect = true;
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.white,
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  response['message'],
+                  style: TextStyle(
+                    fontFamily: 'Montserrat',
+                    color: Colors.redAccent,
+                    fontSize: 14,
+                  ),
                 ),
               ),
-            ),
-          );
+            );
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.white,
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  response['message'],
+                  style: TextStyle(
+                    fontFamily: 'Montserrat',
+                    color: Colors.redAccent,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            );
+          }
         }
       }
     } catch (e) {
@@ -713,6 +738,98 @@ class _LoginScreenState extends State<LoginScreen>
                               ? null
                               : () => login(
                                 _usernameController.text,
+                                _passwordController.text,
+                              ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child:
+                          _isLoadingCredentials
+                              ? CircularProgressIndicator()
+                              : Text(
+                                'Ingresar',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 20,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                    ),
+                  ] else if (_passwordIncorrect) ...[
+                    Text(
+                      'BIENVENIDA/O DE NUEVO:',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat',
+                        fontSize: 20,
+                      ),
+                    ),
+                    Text(
+                      authProvider.username ?? 'Usuario',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat',
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    FractionallySizedBox(
+                      widthFactor: 0.8,
+                      child: TextFormField(
+                        controller: _passwordController,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Montserrat',
+                        ),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white30,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white30,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.password,
+                            color: Color.fromRGBO(128, 185, 204, 1),
+                          ),
+                          hintText: 'Contraseña',
+                          hintStyle: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                          ),
+                        ),
+                        obscureText: true,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.04),
+                    ElevatedButton(
+                      onPressed:
+                          _isLoadingCredentials
+                              ? null
+                              : () => login(
+                                authProvider.username ?? '',
                                 _passwordController.text,
                               ),
                       style: ElevatedButton.styleFrom(

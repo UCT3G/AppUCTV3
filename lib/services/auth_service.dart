@@ -29,7 +29,14 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return {'success': true, 'data': json.decode(response.body)};
+      }
+      if (response.statusCode == 401) {
+        return {
+          'success': false,
+          'message': json.decode(response.body)['message'],
+          'tipo': json.decode(response.body)['tipo'],
+        };
       } else {
         throw Exception('Error en el login: ${response.statusCode}');
       }

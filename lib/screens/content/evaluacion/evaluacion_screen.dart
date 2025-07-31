@@ -847,6 +847,15 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
               );
             }
             break;
+          default:
+            if (parentContext.mounted) {
+              Navigator.pushReplacementNamed(
+                parentContext,
+                AppRoutes.recurso,
+                arguments: tema.idTema,
+              );
+            }
+            break;
         }
       }
     } catch (e) {
@@ -887,7 +896,9 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
         final competenciaProvider = Provider.of<CompetenciaProvider>(
           dialogContext,
         );
-        final evaluacionProvider = Provider.of<EvaluacionProvider>(dialogContext);
+        final evaluacionProvider = Provider.of<EvaluacionProvider>(
+          dialogContext,
+        );
         final tema = competenciaProvider.getTemaById(widget.idTema)!;
         final imageHeight = MediaQuery.of(dialogContext).size.height * 0.15;
 
