@@ -8,13 +8,15 @@ class ConnectionErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.wifi_off_rounded, color: Colors.grey, size: 100),
+            Image.asset('assets/images/YowiError.png', height: size.height * 0.5,),
             SizedBox(height: 20),
             Text(
               'Problemas de conexión',

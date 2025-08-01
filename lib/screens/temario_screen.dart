@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/utils/session_helper.dart';
+import 'package:app_uct/widgets/connection_error_widget.dart';
 import 'package:app_uct/widgets/flull_text_temario.dart';
 import 'package:app_uct/widgets/normal_view_temario.dart';
 import 'package:app_uct/widgets/road_segment.dart';
@@ -24,6 +25,7 @@ class TemarioScreen extends StatefulWidget {
 class _TemarioScreenState extends State<TemarioScreen> {
   bool _showFullText = false;
   Timer? _debounce;
+  bool _hasConnectionError = false;
 
   static const List<List<Color>> _predefinedGradients = [
     [Color(0xFF574293), Color(0xFF86CBC8)],
@@ -38,8 +40,11 @@ class _TemarioScreenState extends State<TemarioScreen> {
       listen: false,
     );
 
+    setState(() {
+      _hasConnectionError = false;
+    });
+
     final idCurso = competenciaProvider.competencia?.idCurso;
-    // final idCurso = 31;
 
     if (idCurso != null) {
       try {
@@ -66,8 +71,10 @@ class _TemarioScreenState extends State<TemarioScreen> {
           return;
         }
         debugPrint('Error: $e');
+        setState(() {
+          _hasConnectionError = true;
+        });
         if (mounted) {
-          Navigator.of(context, rootNavigator: true).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               behavior: SnackBarBehavior.floating,
@@ -138,6 +145,32 @@ class _TemarioScreenState extends State<TemarioScreen> {
             fit: BoxFit.cover,
             width: screenSize.width * 0.6,
             height: screenSize.width * 0.6,
+          ),
+        ),
+      );
+    }
+
+    if (_hasConnectionError) {
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          competenciaProvider.clear();
+          if (widget.fromHome) {
+            Navigator.pop(context);
+          } else {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRoutes.home,
+              (route) => false,
+            );
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: ConnectionErrorWidget(
+            onRetry: loadTemario,
+            message:
+                'Error al recuperar el temario de la competencia, intenta de nuevo.',
           ),
         ),
       );
@@ -217,26 +250,26 @@ class _TemarioScreenState extends State<TemarioScreen> {
                           icon: Icon(Icons.arrow_back, color: Colors.white),
                         ),
                       ),
-                      Positioned(
-                        right: 0,
-                        top: MediaQuery.of(context).padding.top,
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Color.fromRGBO(87, 66, 147, 1),
-                            borderRadius: BorderRadius.horizontal(
-                              left: Radius.circular(15),
-                            ),
-                          ),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            iconSize: 30,
-                            onPressed: () {},
-                            icon: Icon(Icons.menu, color: Colors.white),
-                          ),
-                        ),
-                      ),
+                      // Positioned(
+                      //   right: 0,
+                      //   top: MediaQuery.of(context).padding.top,
+                      //   child: Container(
+                      //     width: 50,
+                      //     height: 50,
+                      //     decoration: BoxDecoration(
+                      //       color: Color.fromRGBO(87, 66, 147, 1),
+                      //       borderRadius: BorderRadius.horizontal(
+                      //         left: Radius.circular(15),
+                      //       ),
+                      //     ),
+                      //     child: IconButton(
+                      //       padding: EdgeInsets.zero,
+                      //       iconSize: 30,
+                      //       onPressed: () {},
+                      //       icon: Icon(Icons.menu, color: Colors.white),
+                      //     ),
+                      //   ),
+                      // ),
                       Positioned(
                         left: 0,
                         bottom: 0,

@@ -5,6 +5,7 @@ import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/competencia_card.dart';
 import 'package:app_uct/widgets/competencia_card_horizontal.dart';
+import 'package:app_uct/widgets/connection_error_widget.dart';
 import 'package:app_uct/widgets/painter_home.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -22,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _showScrollButton = false;
   bool _showObligatorias = false;
   bool _showFiltrado = false;
+  bool _hasConnectionError = false;
 
   Future<void> loadCompetencias() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
@@ -51,23 +53,23 @@ class _HomeScreenState extends State<HomeScreen> {
       if (e.toString().contains('Sesión expirada.')) {
         if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
         return;
-      }
-      debugPrint('Error: $e');
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              'Error: $e',
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                color: Colors.white,
-                fontSize: 14,
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Error: $e',
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
               ),
             ),
-          ),
-        );
+          );
+        }
+        rethrow;
       }
     }
   }
@@ -100,23 +102,23 @@ class _HomeScreenState extends State<HomeScreen> {
       if (e.toString().contains('Sesión expirada.')) {
         if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
         return;
-      }
-      debugPrint('Error: $e');
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              'Error: $e',
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                color: Colors.white,
-                fontSize: 14,
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Error: $e',
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
               ),
             ),
-          ),
-        );
+          );
+        }
+        rethrow;
       }
     }
   }
@@ -137,6 +139,8 @@ class _HomeScreenState extends State<HomeScreen> {
       "¿Buscas algo en especial? Estoy aquí para ayudarte.",
       "¡Hey! ¿Qué curso necesitas encontrar?",
     ];
+
+    final String mensajeElegido = mensajes[Random().nextInt(mensajes.length)];
 
     return showModalBottomSheet(
       context: context,
@@ -201,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         child: Text(
-                          mensajes[Random().nextInt(mensajes.length)],
+                          mensajeElegido,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 20,
@@ -258,63 +262,163 @@ class _HomeScreenState extends State<HomeScreen> {
                             try {
                               final response = await competenciaProvider
                                   .buscarCompetencias(texto);
-                              if (context.mounted) {
-                                Navigator.of(
-                                  context,
-                                  rootNavigator: true,
-                                ).pop();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    backgroundColor: Colors.teal,
-                                    behavior: SnackBarBehavior.floating,
-                                    content: Text(
-                                      response['comentario'],
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontFamily: 'Montserrat',
-                                      ),
+
+                              if (!context.mounted) return;
+                              Navigator.of(context, rootNavigator: true).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Colors.teal,
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text(
+                                    response['comentario'],
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontFamily: 'Montserrat',
                                     ),
                                   ),
-                                );
-                              }
+                                ),
+                              );
+
                               setState(() {
                                 _showFiltrado = true;
                               });
                               if (context.mounted) Navigator.of(context).pop();
                             } catch (e) {
-                              if (e.toString().contains('Sesión expirada.')) {
-                                if (context.mounted) {
-                                  Navigator.of(
-                                    context,
-                                    rootNavigator: true,
-                                  ).pop();
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    AppRoutes.login,
-                                  );
-                                }
-                                return;
-                              }
-                              debugPrint('Error: $e');
                               if (context.mounted) {
                                 Navigator.of(
                                   context,
                                   rootNavigator: true,
                                 ).pop();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    behavior: SnackBarBehavior.floating,
-                                    content: Text(
-                                      'Error: $e',
-                                      style: TextStyle(
-                                        fontFamily: 'Montserrat',
-                                        color: Colors.white,
-                                        fontSize: 14,
+                                if (e.toString().contains('Sesión expirada.')) {
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    AppRoutes.login,
+                                  );
+                                  return;
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      behavior: SnackBarBehavior.floating,
+                                      content: Text(
+                                        'Error: $e',
+                                        style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                  await showDialog(
+                                    context: context,
+                                    builder: (BuildContext dialogContext) {
+                                      final imageHeight =
+                                          MediaQuery.of(
+                                            dialogContext,
+                                          ).size.height *
+                                          0.30;
+
+                                      return Center(
+                                        child: Stack(
+                                          clipBehavior: Clip.none,
+                                          alignment: Alignment.topCenter,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(
+                                                top: imageHeight / 2,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                color: Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withValues(alpha: 0.2),
+                                                    blurRadius: 10,
+                                                    spreadRadius: 2,
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    EdgeInsetsGeometry.only(
+                                                      top: imageHeight / 4,
+                                                      bottom: 15,
+                                                      right: 15,
+                                                      left: 15,
+                                                    ),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      "Problemas de conexión",
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Montserrat',
+                                                        fontSize: 22,
+                                                        color: Colors.grey,
+                                                        decoration:
+                                                            TextDecoration.none,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 10),
+                                                    Text(
+                                                      "No se pudo realizar la búsqueda. Intenta de nuevo.",
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Montserrat',
+                                                        fontSize: 18,
+                                                        color: Colors.grey,
+                                                        decoration:
+                                                            TextDecoration.none,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 20),
+                                                    TextButton(
+                                                      onPressed:
+                                                          () => Navigator.pop(
+                                                            dialogContext,
+                                                          ),
+                                                      style: TextButton.styleFrom(
+                                                        foregroundColor:
+                                                            Colors
+                                                                .grey
+                                                                .shade600,
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 24,
+                                                              vertical: 12,
+                                                            ),
+                                                      ),
+                                                      child: const Text(
+                                                        'Aceptar',
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top:
+                                                  -(imageHeight /
+                                                      4), // Hace que la imagen sobresalga
+                                              child: SizedBox(
+                                                height: imageHeight,
+                                                child: Image.asset(
+                                                  'assets/images/YowiError.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
                               }
                             }
                           },
@@ -367,17 +471,36 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> loadData() async {
+    final competenciaProvider = Provider.of<CompetenciaProvider>(
+      context,
+      listen: false,
+    );
+    setState(() {
+      competenciaProvider.setLoading(true);
+      _hasConnectionError = false;
+    });
+
+    try {
+      await Future.wait([loadCompetenciasRecientes(), loadCompetencias()]);
+    } catch (e) {
+      setState(() {
+        _hasConnectionError = true;
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          competenciaProvider.setLoading(false);
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final competenciaProvider = Provider.of<CompetenciaProvider>(
-        context,
-        listen: false,
-      );
-      competenciaProvider.setLoading(true);
-      await Future.wait([loadCompetenciasRecientes(), loadCompetencias()]);
-      competenciaProvider.setLoading(false);
+      loadData();
     });
 
     _scrollController.addListener(() {
@@ -416,6 +539,17 @@ class _HomeScreenState extends State<HomeScreen> {
             width: screenSize.width * 0.6,
             height: screenSize.width * 0.6,
           ),
+        ),
+      );
+    }
+
+    if (_hasConnectionError) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: ConnectionErrorWidget(
+          onRetry: loadData,
+          message:
+              'Error al cargar las competencias del usuario, intenta de nuevo.',
         ),
       );
     }

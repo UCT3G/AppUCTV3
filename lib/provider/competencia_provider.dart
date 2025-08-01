@@ -233,7 +233,7 @@ class CompetenciaProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> subirPractica(int idTema, File archivo) async {
-    _loading = true;
+    _loadingDialog = true;
     notifyListeners();
 
     try {
@@ -278,7 +278,7 @@ class CompetenciaProvider with ChangeNotifier {
       }
       throw Exception('Error al subir la practica: ${e.toString()}');
     } finally {
-      _loading = false;
+      _loadingDialog = false;
       notifyListeners();
     }
   }
@@ -287,7 +287,7 @@ class CompetenciaProvider with ChangeNotifier {
     int idCurso,
     int idTema,
   ) async {
-    _loading = true;
+    _loadingDialog = true;
 
     notifyListeners();
 
@@ -334,7 +334,7 @@ class CompetenciaProvider with ChangeNotifier {
       }
       throw Exception('Error al cargar la competencia actual: ${e.toString()}');
     } finally {
-      _loading = false;
+      _loadingDialog = false;
       notifyListeners();
     }
   }

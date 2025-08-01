@@ -3,7 +3,6 @@
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/widgets/breadcrumb_nav.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 class RecursoScreen extends StatelessWidget {
@@ -19,20 +18,6 @@ class RecursoScreen extends StatelessWidget {
       (u) => u.idUnidad == tema.idUnidad,
     );
     final size = MediaQuery.of(context).size;
-
-    if (competenciaProvider.loadingDialog) {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: Lottie.asset(
-            "assets/animations/3g-tracto.json",
-            fit: BoxFit.cover,
-            width: size.width * 0.6,
-            height: size.width * 0.6,
-          ),
-        ),
-      );
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -92,6 +77,8 @@ class RecursoScreen extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          Image.asset('assets/images/YowiError.png', height: size.height * 0.3,),
+                          SizedBox(height: 20),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 20),
                             child: Text(

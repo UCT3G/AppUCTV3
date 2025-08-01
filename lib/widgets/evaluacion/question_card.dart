@@ -1,6 +1,8 @@
 import 'package:app_uct/models/reactivo_model.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
+import 'package:app_uct/services/api_service.dart';
+import 'package:app_uct/widgets/full_screen_viewer.dart';
 import 'package:app_uct/widgets/inputs/input_agrupar_widget.dart';
 import 'package:app_uct/widgets/inputs/input_checkbox_widget.dart';
 import 'package:app_uct/widgets/inputs/input_draggable_widget.dart';
@@ -95,7 +97,8 @@ class _QuestionCardState extends State<QuestionCard> {
                             ),
                           ),
                           if (reactivo.temaIncorrecto != null &&
-                              reactivo.temaIncorrecto!.isNotEmpty)
+                              reactivo.temaIncorrecto!.isNotEmpty) ...[
+                            SizedBox(height: 10),
                             Text(
                               'Tema incorrecto: ${reactivo.temaIncorrecto}',
                               style: TextStyle(
@@ -105,13 +108,46 @@ class _QuestionCardState extends State<QuestionCard> {
                               ),
                               textAlign: TextAlign.justify,
                             ),
-                          if (reactivo.imagen.isNotEmpty)
+                          ],
+                          if (reactivo.imagen.isNotEmpty) ...[
+                            SizedBox(height: 10),
                             Center(
-                              child: Image.network(
-                                getImageUrl(reactivo),
-                                height: 100,
-                              ),
+                              child:
+                                  getImageUrl(reactivo).isEmpty
+                                      ? CircularProgressIndicator()
+                                      : GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (_) => FullScreenViewer(
+                                                    images: [
+                                                      getImageUrl(reactivo),
+                                                    ],
+                                                  ),
+                                            ),
+                                          );
+                                        },
+                                        child: Image.network(
+                                          getImageUrl(reactivo),
+                                          fit: BoxFit.contain,
+                                          height: 100,
+                                          errorBuilder: (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) {
+                                            return Image.asset(
+                                              'assets/images/sinImagen.png',
+                                              fit: BoxFit.contain,
+                                              height: 100,
+                                            );
+                                          },
+                                        ),
+                                      ),
                             ),
+                          ],
                           SizedBox(height: 10),
                           buildInputWidget(reactivo),
                         ],
@@ -202,7 +238,7 @@ class _QuestionCardState extends State<QuestionCard> {
     final formulario = evaluacionProvider.formulario;
     final tema = competenciaProvider.getTemaById(formulario!.idTema);
 
-    return "http://uct.tresguerras.com.mx:8007/imagenEvaluacion/${tema!.idCurso}/${tema.idUnidad}/${tema.idTema}/${reactivo.idReactivo}/${reactivo.imagen}";
+    return "${ApiService.baseURL}/imagenEvaluacion/${tema!.idCurso}/${tema.idUnidad}/${tema.idTema}/${reactivo.idReactivo}/${reactivo.imagen}";
   }
 
   Color getBordeColor(Reactivo reactivo) {

@@ -27,6 +27,11 @@ class FullScreenViewer extends StatelessWidget {
             builder: (context, index) {
               return PhotoViewGalleryPageOptions(
                 imageProvider: NetworkImage(images[index]),
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/sinImagen.png'
+                  );
+                },
                 minScale: PhotoViewComputedScale.contained,
                 maxScale: PhotoViewComputedScale.covered * 4,
               );

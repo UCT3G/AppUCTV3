@@ -200,7 +200,22 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   final comentario =
                                       response['comentario'] ?? '';
 
-                                  if (dialogContext.mounted) {
+                                  if (comentario.contains(
+                                    'Unidad anterior no aprobada',
+                                  )) {
+                                    if (dialogContext.mounted) {
+                                      Navigator.pop(dialogContext);
+                                    }
+                                    if (parentContext.mounted) {
+                                      showAlertDialog(
+                                        parentContext,
+                                        '¡Tienes que pasar las unidades anteriores para ver este recurso!',
+                                      );
+                                    }
+                                    return;
+                                  }
+
+                                  if (parentContext.mounted) {
                                     ScaffoldMessenger.of(
                                       parentContext,
                                     ).showSnackBar(
@@ -217,20 +232,6 @@ class _RoadSegmentState extends State<RoadSegment> {
                                         ),
                                       ),
                                     );
-                                  }
-                                  if (comentario.contains(
-                                    'Unidad anterior no aprobada',
-                                  )) {
-                                    if (dialogContext.mounted) {
-                                      Navigator.pop(dialogContext);
-                                    }
-                                    if (parentContext.mounted) {
-                                      showAlertDialog(
-                                        parentContext,
-                                        '¡Tienes que pasar las unidades anteriores para ver este recurso!',
-                                      );
-                                    }
-                                    return;
                                   }
                                 } catch (e) {
                                   if (e.toString().contains(
@@ -249,6 +250,118 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   }
                                   debugPrint('Error: $e');
                                   if (parentContext.mounted) {
+                                    showDialog(
+                                      context: parentContext,
+                                      builder: (BuildContext dialogContext) {
+                                        final imageHeight =
+                                            MediaQuery.of(
+                                              dialogContext,
+                                            ).size.height *
+                                            0.30;
+
+                                        return Center(
+                                          child: Stack(
+                                            clipBehavior: Clip.none,
+                                            alignment: Alignment.topCenter,
+                                            children: [
+                                              Container(
+                                                margin: EdgeInsets.only(
+                                                  top: imageHeight / 2,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  color: Colors.white,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withValues(
+                                                            alpha: 0.2,
+                                                          ),
+                                                      blurRadius: 10,
+                                                      spreadRadius: 2,
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                      EdgeInsetsGeometry.only(
+                                                        top: imageHeight / 4,
+                                                        bottom: 15,
+                                                        right: 15,
+                                                        left: 15,
+                                                      ),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Text(
+                                                        "Problemas de conexión",
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                          fontSize: 22,
+                                                          color: Colors.grey,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .none,
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 10),
+                                                      Text(
+                                                        "Error al validar las unidades. Intenta de nuevo.",
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                          fontSize: 18,
+                                                          color: Colors.grey,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .none,
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 20),
+                                                      TextButton(
+                                                        onPressed:
+                                                            () => Navigator.pop(
+                                                              dialogContext,
+                                                            ),
+                                                        style: TextButton.styleFrom(
+                                                          foregroundColor:
+                                                              Colors
+                                                                  .grey
+                                                                  .shade600,
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 24,
+                                                                vertical: 12,
+                                                              ),
+                                                        ),
+                                                        child: const Text(
+                                                          'Aceptar',
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top:
+                                                    -(imageHeight /
+                                                        4), // Hace que la imagen sobresalga
+                                                child: SizedBox(
+                                                  height: imageHeight,
+                                                  child: Image.asset(
+                                                    'assets/images/YowiError.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
                                     ScaffoldMessenger.of(
                                       parentContext,
                                     ).showSnackBar(
@@ -465,6 +578,121 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     }
                                     debugPrint('Error: $e');
                                     if (parentContext.mounted) {
+                                      showDialog(
+                                        context: parentContext,
+                                        builder: (BuildContext dialogContext) {
+                                          final imageHeight =
+                                              MediaQuery.of(
+                                                dialogContext,
+                                              ).size.height *
+                                              0.30;
+
+                                          return Center(
+                                            child: Stack(
+                                              clipBehavior: Clip.none,
+                                              alignment: Alignment.topCenter,
+                                              children: [
+                                                Container(
+                                                  margin: EdgeInsets.only(
+                                                    top: imageHeight / 2,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                    color: Colors.white,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withValues(
+                                                              alpha: 0.2,
+                                                            ),
+                                                        blurRadius: 10,
+                                                        spreadRadius: 2,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Padding(
+                                                    padding:
+                                                        EdgeInsetsGeometry.only(
+                                                          top: imageHeight / 4,
+                                                          bottom: 15,
+                                                          right: 15,
+                                                          left: 15,
+                                                        ),
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Text(
+                                                          "Problemas de conexión",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Montserrat',
+                                                            fontSize: 22,
+                                                            color: Colors.grey,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .none,
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 10),
+                                                        Text(
+                                                          "Error al validar los temas. Intenta de nuevo.",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Montserrat',
+                                                            fontSize: 18,
+                                                            color: Colors.grey,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .none,
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 20),
+                                                        TextButton(
+                                                          onPressed:
+                                                              () => Navigator.pop(
+                                                                dialogContext,
+                                                              ),
+                                                          style: TextButton.styleFrom(
+                                                            foregroundColor:
+                                                                Colors
+                                                                    .grey
+                                                                    .shade600,
+                                                            padding:
+                                                                const EdgeInsets.symmetric(
+                                                                  horizontal:
+                                                                      24,
+                                                                  vertical: 12,
+                                                                ),
+                                                          ),
+                                                          child: const Text(
+                                                            'Aceptar',
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top:
+                                                      -(imageHeight /
+                                                          4), // Hace que la imagen sobresalga
+                                                  child: SizedBox(
+                                                    height: imageHeight,
+                                                    child: Image.asset(
+                                                      'assets/images/YowiError.png',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
                                       ScaffoldMessenger.of(
                                         parentContext,
                                       ).showSnackBar(

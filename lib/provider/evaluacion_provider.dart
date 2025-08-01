@@ -69,10 +69,6 @@ class EvaluacionProvider with ChangeNotifier {
     int idUnidad,
     int user,
   ) async {
-    _loading = true;
-
-    notifyListeners();
-
     try {
       final response = await EvaluacionService.getFormularioEvaluacion(
         idEvaluacion,
@@ -127,9 +123,6 @@ class EvaluacionProvider with ChangeNotifier {
       throw Exception(
         'Error al cargar el formulario de la evaluacion: ${e.toString()}',
       );
-    } finally {
-      _loading = false;
-      notifyListeners();
     }
   }
 
@@ -224,6 +217,11 @@ class EvaluacionProvider with ChangeNotifier {
 
   void clearRespuestas() {
     _respuestas = [];
+    notifyListeners();
+  }
+
+  void setLoading(bool value) {
+    _loading = value;
     notifyListeners();
   }
 }

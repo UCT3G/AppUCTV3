@@ -1,4 +1,5 @@
 import 'package:app_uct/provider/evaluacion_provider.dart';
+import 'package:app_uct/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -86,6 +87,6 @@ class InputRadioWidget extends StatelessWidget {
   }
 
   String getImageUrl(String nombreArchivo) {
-    return "http://uct.tresguerras.com.mx:8007/media/${nombreArchivo.replaceFirst('data/', '')}";
+    return "${ApiService.baseURL}/media/${nombreArchivo.replaceFirst('data/', '')}";
   }
 }
