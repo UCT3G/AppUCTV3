@@ -1,4 +1,4 @@
-import 'dart:developer';
+// import 'dart:developer';
 
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
@@ -120,7 +120,11 @@ class _EvaluacionIntroScreenState extends State<EvaluacionIntroScreen> {
                                 arguments: tema.idTema,
                               );
                             } else if (tema.recursoBasicoTipo == 'ENCUESTA') {
-                              log('Holaa encuesta');
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.encuesta,
+                                arguments: tema.idTema,
+                              );
                             }
                           },
                           style: ElevatedButton.styleFrom(

@@ -68,7 +68,6 @@ class CompetenciaProvider with ChangeNotifier {
         final tiposNoCalificables = [
           'PRACTICA',
           'EVALUACION',
-          'ENCUESTA',
           'PRESENCIAL',
         ];
 
@@ -638,7 +637,6 @@ class CompetenciaProvider with ChangeNotifier {
         _authProvider.accessToken!,
       );
 
-      _idEvaluacion = idEncuesta;
       return response;
     } catch (e) {
       if (e.toString().contains('Token expirado o inválido')) {
@@ -658,7 +656,6 @@ class CompetenciaProvider with ChangeNotifier {
                 _authProvider.accessToken!,
               );
 
-              _idEvaluacion = idEncuesta;
               return response;
             } catch (e) {
               throw Exception(

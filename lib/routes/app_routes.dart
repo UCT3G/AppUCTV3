@@ -1,5 +1,6 @@
 import 'package:app_uct/screens/content/archivo_screen.dart';
 import 'package:app_uct/screens/content/articulo_screen.dart';
+import 'package:app_uct/screens/content/evaluacion/encuesta_screen.dart';
 import 'package:app_uct/screens/content/evaluacion/evaluacion_intro_screen.dart';
 import 'package:app_uct/screens/content/evaluacion/evaluacion_screen.dart';
 import 'package:app_uct/screens/content/imagen_screen.dart';
@@ -99,8 +100,9 @@ class AppRoutes {
       final idTema = ModalRoute.of(context)!.settings.arguments as int;
       return RecursoScreen(idTema: idTema);
     },
-    // encuesta: (context) {
-    //   final idTema = ModalRoute.of(context)!.settings.arguments as int;
-    // },
+    encuesta: (context) {
+      final idTema = ModalRoute.of(context)!.settings.arguments as int;
+      return EncuestaScreen(idTema: idTema);
+    },
   };
 }

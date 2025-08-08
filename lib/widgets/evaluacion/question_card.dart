@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/models/reactivo_model.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
@@ -7,6 +9,7 @@ import 'package:app_uct/widgets/inputs/input_agrupar_widget.dart';
 import 'package:app_uct/widgets/inputs/input_checkbox_widget.dart';
 import 'package:app_uct/widgets/inputs/input_draggable_widget.dart';
 import 'package:app_uct/widgets/inputs/input_radio_widget.dart';
+import 'package:app_uct/widgets/inputs/input_texarea_widget.dart';
 import 'package:app_uct/widgets/inputs/input_undefined_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -226,6 +229,8 @@ class _QuestionCardState extends State<QuestionCard> {
         break;
       case 'div-rela':
         return InputAgruparWidget(idReactivo: reactivo.idReactivo);
+      case 'textarea':
+        return InputTexareaWidget(idReactivo: reactivo.idReactivo);
       default:
         return InputUndefinedWidget();
     }

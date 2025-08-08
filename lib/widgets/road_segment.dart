@@ -511,39 +511,31 @@ class _RoadSegmentState extends State<RoadSegment> {
                                           int.parse(tema.rutaRecurso),
                                         );
 
-                                    final comentario =
-                                        response['comentario'] ?? '';
-
-                                    if (parentContext.mounted) {
-                                      ScaffoldMessenger.of(
-                                        parentContext,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          backgroundColor: Colors.teal,
-                                          behavior: SnackBarBehavior.floating,
-                                          content: Text(
-                                            response['comentario'],
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontFamily: 'Montserrat',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }
-
                                     if (dialogContext.mounted) {
                                       Navigator.pop(dialogContext);
                                     }
 
-                                    if (comentario.contains(
-                                      'No puede contestar esta encuesta',
-                                    )) {
+                                    if (response['count'] > 0) {
                                       if (parentContext.mounted) {
                                         showAlertDialog(
                                           parentContext,
                                           'Ya contestaste esta encuesta. ¡Gracias!',
+                                        );
+                                        ScaffoldMessenger.of(
+                                          parentContext,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            backgroundColor: Colors.teal,
+                                            behavior: SnackBarBehavior.floating,
+                                            content: Text(
+                                              response['comentario'],
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontFamily: 'Montserrat',
+                                              ),
+                                            ),
+                                          ),
                                         );
                                       }
                                       return;
@@ -696,9 +688,6 @@ class _RoadSegmentState extends State<RoadSegment> {
                                       );
                                     }
                                     return;
-                                  }
-                                  if (dialogContext.mounted) {
-                                    Navigator.pop(dialogContext);
                                   }
                                   if (parentContext.mounted) {
                                     Navigator.pushNamed(

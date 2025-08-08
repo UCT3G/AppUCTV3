@@ -1,0 +1,655 @@
+import 'dart:developer';
+
+import 'package:app_uct/provider/competencia_provider.dart';
+import 'package:app_uct/provider/evaluacion_provider.dart';
+import 'package:app_uct/routes/app_routes.dart';
+import 'package:app_uct/widgets/connection_error_widget.dart';
+import 'package:app_uct/widgets/evaluacion/question_card.dart';
+import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+class EncuestaScreen extends StatefulWidget {
+  final int idTema;
+
+  const EncuestaScreen({super.key, required this.idTema});
+
+  @override
+  State<EncuestaScreen> createState() => _EncuestaScreenState();
+}
+
+class _EncuestaScreenState extends State<EncuestaScreen> {
+  late PageController _pageController;
+  int _currentPage = 0;
+  bool calificado = false;
+  bool _hasConnectionError = false;
+
+  Future<void> getFormularioEncuesta() async {
+    final competenciaProvider = Provider.of<CompetenciaProvider>(
+      context,
+      listen: false,
+    );
+    final evaluacionProvider = Provider.of<EvaluacionProvider>(
+      context,
+      listen: false,
+    );
+    final tema = competenciaProvider.getTemaById(widget.idTema);
+    final idEncuesta = int.parse(tema!.rutaRecurso);
+
+    setState(() {
+      evaluacionProvider.setLoading(true);
+      evaluacionProvider.clearRespuestas();
+      _hasConnectionError = false;
+    });
+
+    try {
+      final response = await evaluacionProvider.getFormularioEncuesta(
+        idEncuesta,
+        2,
+      );
+
+      log(response.toString());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.teal,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              response['comentario'],
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (e.toString().contains('Sesión expirada.')) {
+        if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
+        return;
+      }
+      setState(() {
+        _hasConnectionError = true;
+      });
+      debugPrint('Error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error al cargar la encuesta: $e',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      }
+    } finally {
+      setState(() {
+        evaluacionProvider.setLoading(false);
+      });
+    }
+  }
+
+  bool verificarRespuestas() {
+    final evaluacionProvider = Provider.of<EvaluacionProvider>(
+      context,
+      listen: false,
+    );
+    final reactivos = evaluacionProvider.formulario!.reactivos;
+    final respuestas = evaluacionProvider.respuestas;
+    bool errores = false;
+
+    for (var reactivo in reactivos) {
+      if (reactivo.obligatorio == 'A') {
+        final respuesta = respuestas.firstWhere(
+          (r) => r['id_reactivo'] == reactivo.idReactivo,
+          orElse: () => {},
+        );
+
+        if (respuesta.isEmpty) {
+          evaluacionProvider.marcarError(reactivo.idReactivo, true);
+          errores = true;
+        } else {
+          evaluacionProvider.marcarError(reactivo.idReactivo, false);
+        }
+      }
+    }
+
+    if (errores) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          final screenWidth = MediaQuery.of(dialogContext).size.width;
+          final imageSize = screenWidth * 0.4;
+
+          return Center(
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.centerLeft,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(left: imageSize / 2),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(width: imageSize / 2), // Espacio para la imagen
+                      Flexible(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Estimado Usuario",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(dialogContext).primaryColor,
+                                decoration: TextDecoration.none,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Hay preguntas sin responder, por favor verifique que todas las preguntas esten respondidas e intente de nuevo',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey.shade700,
+                                decoration: TextDecoration.none,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                            const SizedBox(height: 20),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton(
+                                onPressed: () => Navigator.pop(dialogContext),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(dialogContext).primaryColor,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text("Cerrar"),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Imagen a la izquierda, sobrepuesta
+                Positioned(
+                  left: 0,
+                  child: SizedBox(
+                    width: imageSize,
+                    child: Image.asset(
+                      'assets/images/yowi_perfil.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+    return errores;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      getFormularioEncuesta();
+    });
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final evaluacionProvider = Provider.of<EvaluacionProvider>(context);
+    final competenciaProvider = Provider.of<CompetenciaProvider>(context);
+    final formulario = evaluacionProvider.formulario;
+    final screenSize = MediaQuery.of(context).size;
+
+    if (_hasConnectionError) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: ConnectionErrorWidget(
+          onRetry: getFormularioEncuesta,
+          message: 'Error al cargar la encuesta, intenta de nuevo.',
+        ),
+      );
+    }
+
+    if (evaluacionProvider.loading ||
+        competenciaProvider.loadingDialog ||
+        formulario == null) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Lottie.asset(
+            "assets/animations/3g-tracto.json",
+            fit: BoxFit.cover,
+            width: screenSize.width * 0.6,
+            height: screenSize.width * 0.6,
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromRGBO(162, 157, 205, 1),
+                Color.fromRGBO(165, 210, 241, 1),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        title: Text(
+          formulario.tituloFormulario,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontFamily: 'Montserrat',
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            evaluacionProvider.clearRespuestas();
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromRGBO(201, 195, 218, 1),
+                  Color.fromRGBO(233, 233, 233, 1),
+                  Color.fromRGBO(212, 221, 235, 1),
+                  Color.fromRGBO(218, 230, 240, 1),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: formulario.reactivos.length,
+                  onPageChanged:
+                      (index) => setState(() => _currentPage = index),
+                  itemBuilder: (context, index) {
+                    final reactivo = formulario.reactivos[index];
+                    return QuestionCard(
+                      idReactivo: reactivo.idReactivo,
+                      index: index,
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: 10),
+              if (formulario.reactivos.length <= 10)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: SmoothPageIndicator(
+                    controller: _pageController,
+                    count: formulario.reactivos.length,
+                    effect: JumpingDotEffect(
+                      dotHeight: 10,
+                      dotWidth: 10,
+                      dotColor: Color.fromRGBO(87, 84, 153, 1),
+                      activeDotColor: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+              if (formulario.reactivos.length > 10)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: LinearProgressIndicator(
+                    value: (_currentPage + 1) / formulario.reactivos.length,
+                    minHeight: 8,
+                    backgroundColor: Colors.grey.shade300,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Color.fromRGBO(87, 84, 153, 1),
+                    ),
+                  ),
+                ),
+              SizedBox(height: 5),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed:
+                          _currentPage > 0
+                              ? () => _pageController.previousPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease,
+                              )
+                              : null,
+                      icon: Icon(Icons.arrow_back),
+                    ),
+                    Text(
+                      'Pregunta ${_currentPage + 1} de ${formulario.reactivos.length}',
+                    ),
+                    IconButton(
+                      onPressed:
+                          _currentPage < formulario.reactivos.length - 1
+                              ? () => _pageController.nextPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease,
+                              )
+                              : null,
+                      icon: Icon(Icons.arrow_forward),
+                    ),
+                  ],
+                ),
+              ),
+              if (!calificado)
+                SizedBox(
+                  width: 250,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (!verificarRespuestas()) {
+                        // final authProvider = Provider.of<AuthProvider>(
+                        //   context,
+                        //   listen: false,
+                        // );
+                        // final competenciaProvider =
+                        //     Provider.of<CompetenciaProvider>(
+                        //       context,
+                        //       listen: false,
+                        //     );
+                        // final tema = competenciaProvider.getTemaById(
+                        //   widget.idTema,
+                        // );
+
+                        // final jsonEvaluacion = {
+                        //   'id_user': authProvider.currentUsuario!.idUsuario,
+                        //   'idencuesta': formulario.idFormulario,
+                        //   'evaluacion': evaluacionProvider.respuestas,
+                        //   'NoReactivos': formulario.reactivos.length,
+                        //   'idcurso': tema!.idCurso,
+                        //   'ordenunidad': tema.ordenUnidad,
+                        //   'idMapaFuncional':
+                        //       competenciaProvider
+                        //           .competencia!
+                        //           .idMapaFuncionalFk,
+                        //   'saveRespuestas': {
+                        //     'id_formu': formulario.idFormulario,
+                        //     'id_sistema_fk': 0,
+                        //     'id_categoria_fk': formulario.idCategoria,
+                        //     'categoria_detalles': 0,
+                        //     'sistema_detalles': 0,
+                        //     'nombre': formulario.nombre,
+                        //     'titulo_formulario': formulario.tituloFormulario,
+                        //     'descripcion': formulario.descripcion,
+                        //     'auto_update': '',
+                        //     'estado': formulario.estado,
+                        //     'id_tema_fk': formulario.idTema,
+                        //     'registro_usuario': formulario.registroUsuario,
+                        //     'registro_fecha': formulario.registroFecha,
+                        //     'modificacion_usuario':
+                        //         formulario.modificacionUsuario,
+                        //     'modificacion_fecha': formulario.modificacionFecha,
+                        //     'id_area_encuesta_fk': formulario.idAreaEncuesta,
+                        //     'reactivos': evaluacionProvider.respuestas,
+                        //   },
+                        //   'datostema': {
+                        //     'id_tema': tema.idTema,
+                        //     'titulo': tema.titulo,
+                        //     'descripcion': tema.descripcion,
+                        //     'duracion': tema.duracion,
+                        //     'orden': tema.orden,
+                        //     'estado': tema.estado,
+                        //     'duracion_minutos': tema.duracionMinutos,
+                        //     'reactivos_mostrar': tema.reactivosMostrar,
+                        //     'id_unidad_fk': tema.idUnidad,
+                        //     'intentos_consumidos': tema.intentosConsumidos,
+                        //     'recurso_url': tema.recursoUrl,
+                        //     'ruta_recurso': tema.rutaRecurso,
+                        //     'slide_images': tema.slideImages,
+                        //     'recurso_basico_tipo': tema.recursoBasicoTipo,
+                        //     'id_tema_tipo_fk': tema.idTemaTipo,
+                        //     'registro_fecha': tema.registroFecha,
+                        //     'registro_usuario': tema.registroUsuario,
+                        //     'modificacion_fecha': tema.modificacionFecha,
+                        //     'modificacion_usuario': tema.modificacionUsuario,
+                        //     'id_curso_fk': tema.idCurso,
+                        //     'orden_unidad': tema.ordenUnidad,
+                        //     'intentos_disponibles': tema.intentosDisponibles,
+                        //     'resultado': tema.resultado,
+                        //     'observaciones': tema.observaciones,
+                        //   },
+                        // };
+
+                        // try {
+                        //   final response = await evaluacionProvider
+                        //       .guardarEvaluacion(jsonEvaluacion);
+
+                        //   if (context.mounted) {
+                        //     ScaffoldMessenger.of(context).showSnackBar(
+                        //       SnackBar(
+                        //         backgroundColor: Colors.teal,
+                        //         behavior: SnackBarBehavior.floating,
+                        //         content: Text(
+                        //           response['comentario'],
+                        //           style: TextStyle(
+                        //             color: Colors.white,
+                        //             fontSize: 14,
+                        //             fontFamily: 'Montserrat',
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     );
+                        //   }
+
+                        //   _currentPage = 0;
+                        //   calificado = true;
+
+                        //   if (context.mounted) {
+                        //     showResultadosEvaluacion(context, response);
+                        //   }
+                        //   competenciaProvider.actualizarEvaluacion(
+                        //     widget.idTema,
+                        //     response['calificacion_total'],
+                        //   );
+                        // } catch (e) {
+                        //   _currentPage = 0;
+                        //   if (e.toString().contains('Sesión expirada.')) {
+                        //     if (context.mounted) {
+                        //       Navigator.pushReplacementNamed(
+                        //         context,
+                        //         AppRoutes.login,
+                        //       );
+                        //     }
+                        //     return;
+                        //   }
+                        //   debugPrint('Error: $e');
+                        //   if (context.mounted) {
+                        //     showDialog(
+                        //       context: context,
+                        //       builder: (BuildContext dialogContext) {
+                        //         final imageHeight =
+                        //             MediaQuery.of(dialogContext).size.height *
+                        //             0.30;
+
+                        //         return Center(
+                        //           child: Stack(
+                        //             clipBehavior: Clip.none,
+                        //             alignment: Alignment.topCenter,
+                        //             children: [
+                        //               Container(
+                        //                 margin: EdgeInsets.only(
+                        //                   top: imageHeight / 2,
+                        //                 ),
+                        //                 decoration: BoxDecoration(
+                        //                   borderRadius: BorderRadius.circular(
+                        //                     20,
+                        //                   ),
+                        //                   color: Colors.white,
+                        //                   boxShadow: [
+                        //                     BoxShadow(
+                        //                       color: Colors.black.withValues(
+                        //                         alpha: 0.2,
+                        //                       ),
+                        //                       blurRadius: 10,
+                        //                       spreadRadius: 2,
+                        //                     ),
+                        //                   ],
+                        //                 ),
+                        //                 child: Padding(
+                        //                   padding: EdgeInsets.only(
+                        //                     top: imageHeight / 4,
+                        //                     bottom: 15,
+                        //                     right: 15,
+                        //                     left: 15,
+                        //                   ),
+                        //                   child: Column(
+                        //                     mainAxisSize: MainAxisSize.min,
+                        //                     children: [
+                        //                       Text(
+                        //                         "Problemas de conexión",
+                        //                         style: TextStyle(
+                        //                           fontFamily: 'Montserrat',
+                        //                           fontSize: 22,
+                        //                           color: Colors.grey,
+                        //                           decoration:
+                        //                               TextDecoration.none,
+                        //                         ),
+                        //                       ),
+                        //                       SizedBox(height: 10),
+                        //                       Text(
+                        //                         "No se pudo guardar la evaluación. Intenta de nuevo.",
+                        //                         style: TextStyle(
+                        //                           fontFamily: 'Montserrat',
+                        //                           fontSize: 18,
+                        //                           color: Colors.grey,
+                        //                           decoration:
+                        //                               TextDecoration.none,
+                        //                         ),
+                        //                       ),
+                        //                       SizedBox(height: 20),
+                        //                       TextButton(
+                        //                         onPressed:
+                        //                             () => Navigator.pop(
+                        //                               dialogContext,
+                        //                             ),
+                        //                         style: TextButton.styleFrom(
+                        //                           foregroundColor:
+                        //                               Colors.grey.shade600,
+                        //                           padding:
+                        //                               const EdgeInsets.symmetric(
+                        //                                 horizontal: 24,
+                        //                                 vertical: 12,
+                        //                               ),
+                        //                         ),
+                        //                         child: const Text('Aceptar'),
+                        //                       ),
+                        //                     ],
+                        //                   ),
+                        //                 ),
+                        //               ),
+                        //               Positioned(
+                        //                 top:
+                        //                     -(imageHeight /
+                        //                         4), // Hace que la imagen sobresalga
+                        //                 child: SizedBox(
+                        //                   height: imageHeight,
+                        //                   child: Image.asset(
+                        //                     'assets/images/YowiError.png',
+                        //                     fit: BoxFit.cover,
+                        //                   ),
+                        //                 ),
+                        //               ),
+                        //             ],
+                        //           ),
+                        //         );
+                        //       },
+                        //     );
+                        //     ScaffoldMessenger.of(context).showSnackBar(
+                        //       SnackBar(
+                        //         behavior: SnackBarBehavior.floating,
+                        //         content: Text(
+                        //           'Error al guardar la evaluación: $e',
+                        //           style: TextStyle(
+                        //             fontFamily: 'Montserrat',
+                        //             color: Colors.white,
+                        //             fontSize: 14,
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     );
+                        //   }
+                        // }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(87, 84, 153, 1),
+                    ),
+                    child: Text(
+                      'Terminar evaluacion',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Montserrat',
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
