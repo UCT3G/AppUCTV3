@@ -35,6 +35,7 @@ class AppRoutes {
   static const String evaluacionIntro = '/evaluacion_intro';
   static const String evaluacion = '/evaluacion';
   static const String recurso = '/recurso';
+  static const String encuesta = '/encuesta';
 
   static final routes = {
     login: (context) => LoginScreen(),
@@ -98,5 +99,8 @@ class AppRoutes {
       final idTema = ModalRoute.of(context)!.settings.arguments as int;
       return RecursoScreen(idTema: idTema);
     },
+    // encuesta: (context) {
+    //   final idTema = ModalRoute.of(context)!.settings.arguments as int;
+    // },
   };
 }

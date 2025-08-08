@@ -283,7 +283,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                                child: const Text("Salir"),
+                                child: const Text("Cerrar"),
                               ),
                             ),
                           ],
@@ -429,7 +429,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                                           ),
                                         ),
                                       ),
-                                      child: const Text("Salir"),
+                                      child: const Text("Cerrar"),
                                     ),
                                   ),
                                 ],
@@ -682,7 +682,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -795,7 +795,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -860,7 +860,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                               ],
                             ),
                             child: Padding(
-                              padding: EdgeInsetsGeometry.only(
+                              padding: EdgeInsets.only(
                                 top: imageHeight / 4,
                                 bottom: 15,
                                 right: 15,
@@ -989,7 +989,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                       ],
                     ),
                     child: Padding(
-                      padding: EdgeInsetsGeometry.only(
+                      padding: EdgeInsets.only(
                         top: imageHeight / 4,
                         bottom: 15,
                         right: 15,
@@ -1555,7 +1555,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                                           ],
                                         ),
                                         child: Padding(
-                                          padding: EdgeInsetsGeometry.only(
+                                          padding: EdgeInsets.only(
                                             top: imageHeight / 4,
                                             bottom: 15,
                                             right: 15,
@@ -1644,7 +1644,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                       backgroundColor: Color.fromRGBO(87, 84, 153, 1),
                     ),
                     child: Text(
-                      'Guardar evaluacion',
+                      'Terminar evaluacion',
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Montserrat',

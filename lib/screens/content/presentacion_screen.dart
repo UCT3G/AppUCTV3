@@ -4,6 +4,7 @@ import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/services/api_service.dart';
 import 'package:app_uct/widgets/breadcrumb_nav.dart';
+import 'package:app_uct/widgets/connection_error_widget.dart';
 import 'package:app_uct/widgets/full_screen_viewer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ class PresentacionScreen extends StatefulWidget {
 class _PresentacionScreenState extends State<PresentacionScreen> {
   late PageController _pageController;
   int _currentPage = 0;
+  bool _hasConnectionError = false;
 
   void openFullScreen(int initialIndex) {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
@@ -56,6 +58,10 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
     );
     final tema = competenciaProvider.getTemaById(widget.idTema)!;
 
+    setState(() {
+      _hasConnectionError = false;
+    });
+
     try {
       final response = await competenciaProvider.actualizarTemaUsuario(
         tema.idCurso,
@@ -83,8 +89,10 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
         return;
       }
       debugPrint('Error: $e');
+      setState(() {
+        _hasConnectionError = true;
+      });
       if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -219,7 +227,7 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                                           ),
                                         ),
                                       ),
-                                      child: const Text("Salir"),
+                                      child: const Text("Cerrar"),
                                     ),
                                   ),
                                 ],
@@ -469,7 +477,7 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -580,7 +588,7 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -620,7 +628,93 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
               }
               debugPrint('Error: $e');
               if (parentContext.mounted) {
-                Navigator.of(parentContext, rootNavigator: true).pop();
+                showDialog(
+                  context: parentContext,
+                  builder: (BuildContext dialogContext) {
+                    final imageHeight =
+                        MediaQuery.of(dialogContext).size.height * 0.30;
+
+                    return Center(
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(top: imageHeight / 2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                top: imageHeight / 4,
+                                bottom: 15,
+                                right: 15,
+                                left: 15,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Problemas de conexión",
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 22,
+                                      color: Colors.grey,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "No se pudieron validar los temas. Intenta de nuevo.",
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(dialogContext),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.grey.shade600,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                    child: const Text('Aceptar'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top:
+                                -(imageHeight /
+                                    4), // Hace que la imagen sobresalga
+                            child: SizedBox(
+                              height: imageHeight,
+                              child: Image.asset(
+                                'assets/images/YowiError.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
                 ScaffoldMessenger.of(parentContext).showSnackBar(
                   SnackBar(
                     behavior: SnackBarBehavior.floating,
@@ -650,7 +744,7 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.recurso,
-                arguments: tema.idTema,
+                arguments: nuevoTema.idTema,
               );
             }
             break;
@@ -663,7 +757,89 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
       }
       debugPrint('Error: $e');
       if (parentContext.mounted) {
-        Navigator.of(parentContext, rootNavigator: true).pop();
+        showDialog(
+          context: parentContext,
+          builder: (BuildContext dialogContext) {
+            final imageHeight = MediaQuery.of(dialogContext).size.height * 0.30;
+
+            return Center(
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.topCenter,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: imageHeight / 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        top: imageHeight / 4,
+                        bottom: 15,
+                        right: 15,
+                        left: 15,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Problemas de conexión",
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 22,
+                              color: Colors.grey,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "No se pudo navegar entre los temas. Intenta de nuevo.",
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 18,
+                              color: Colors.grey,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey.shade600,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: const Text('Aceptar'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: -(imageHeight / 4), // Hace que la imagen sobresalga
+                    child: SizedBox(
+                      height: imageHeight,
+                      child: Image.asset(
+                        'assets/images/YowiError.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
         ScaffoldMessenger.of(parentContext).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -720,6 +896,16 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
             width: size.width * 0.6,
             height: size.width * 0.6,
           ),
+        ),
+      );
+    }
+
+    if (_hasConnectionError) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: ConnectionErrorWidget(
+          onRetry: actualizarTemaVisto,
+          message: 'Error al cargar el recurso, intenta de nuevo.',
         ),
       );
     }
@@ -808,16 +994,12 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                                         child: CircularProgressIndicator(),
                                       ),
                                   errorWidget:
-                                      (context, error, stackTrace) =>
-                                          const Center(
-                                            child: Text(
-                                              'Error al cargar la imagen',
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                                fontFamily: 'Montserrat',
-                                              ),
-                                            ),
-                                          ),
+                                      (context, error, stackTrace) => Center(
+                                        child: Image.asset(
+                                          'assets/images/sinImagen.png',
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
                                 ),
                               ),
                             );

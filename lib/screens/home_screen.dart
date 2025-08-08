@@ -342,13 +342,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 ],
                                               ),
                                               child: Padding(
-                                                padding:
-                                                    EdgeInsetsGeometry.only(
-                                                      top: imageHeight / 4,
-                                                      bottom: 15,
-                                                      right: 15,
-                                                      left: 15,
-                                                    ),
+                                                padding: EdgeInsets.only(
+                                                  top: imageHeight / 4,
+                                                  bottom: 15,
+                                                  right: 15,
+                                                  left: 15,
+                                                ),
                                                 child: Column(
                                                   mainAxisSize:
                                                       MainAxisSize.min,

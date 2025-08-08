@@ -1,4 +1,4 @@
-import 'dart:developer';
+// import 'dart:developer';
 
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
@@ -80,9 +80,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (response['success'] == true && response['access_token'] != null) {
-        if (authProvider.username == null && authProvider.password == null) {
-          await showSaveCredentialsDialog();
-        }
+        await showSaveCredentialsDialog();
 
         if (mounted) {
           Navigator.pushReplacementNamed(context, AppRoutes.welcome);

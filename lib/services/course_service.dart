@@ -284,6 +284,37 @@ class CourseService {
     }
   }
 
+  static Future<Map<String, dynamic>> validarEncuesta(
+    int idTema,
+    int idEncuesta,
+    String accessToken,
+  ) async {
+    final url = Uri.parse('${ApiService.baseURL}/CURSOS_MOVIL/validarEncuesta');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: json.encode({'idtema': idTema, 'idencuesta': idEncuesta}),
+        encoding: Encoding.getByName('utf-8'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data;
+      } else if (response.statusCode == 401) {
+        throw Exception('Token expirado o inválido');
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error de conexión: $e');
+    }
+  }
+
   static Future<Map<String, dynamic>> adelantarAtrasar(
     int idCurso,
     int idUnidad,

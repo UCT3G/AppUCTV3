@@ -80,16 +80,18 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
     }
   }
 
-  Future<void> abrirURL(Uri url) async {
-    try {
-      await launchUrl(url, mode: LaunchMode.inAppBrowserView);
-    } catch (e) {
-      if (!mounted) return;
+  Future<void> abrirURL(BuildContext context, String url) async {
+    final uri = Uri.parse(
+      (url.isEmpty) ? 'https://uct.tresguerras.com.mx' : url,
+    );
+
+    if (uri.scheme != 'http' && uri.scheme != 'https') {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
           content: Text(
-            'Error: $e',
+            'Error: Could not launc $url',
             style: TextStyle(
               fontFamily: 'Montserrat',
               color: Colors.white,
@@ -122,7 +124,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                     ],
                   ),
                   child: Padding(
-                    padding: EdgeInsetsGeometry.only(
+                    padding: EdgeInsets.only(
                       top: imageHeight / 4,
                       bottom: 15,
                       right: 15,
@@ -142,7 +144,108 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          "No se pudo abrir el recurso externo. Intenta de nuevo.",
+                          "No se pudo abrir la url. Intenta de nuevo.",
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 18,
+                            color: Colors.grey,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        TextButton(
+                          onPressed: () => Navigator.pop(dialogContext),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.grey.shade600,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
+                          child: const Text('Aceptar'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: -(imageHeight / 4), // Hace que la imagen sobresalga
+                  child: SizedBox(
+                    height: imageHeight,
+                    child: Image.asset(
+                      'assets/images/YowiError.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+      return;
+    }
+
+    if (!await launchUrl(uri, mode: LaunchMode.inAppBrowserView)) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            'Error: Could not launc $url',
+            style: TextStyle(
+              fontFamily: 'Montserrat',
+              color: Colors.white,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      );
+      await showDialog(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          final imageHeight = MediaQuery.of(dialogContext).size.height * 0.30;
+
+          return Center(
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: imageHeight / 2),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: imageHeight / 4,
+                      bottom: 15,
+                      right: 15,
+                      left: 15,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Problemas de conexión",
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 22,
+                            color: Colors.grey,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          "No se pudo abrir la url. Intenta de nuevo.",
                           style: TextStyle(
                             fontFamily: 'Montserrat',
                             fontSize: 18,
@@ -301,7 +404,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                                           ),
                                         ),
                                       ),
-                                      child: const Text("Salir"),
+                                      child: const Text("Cerrar"),
                                     ),
                                   ),
                                 ],
@@ -551,7 +654,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -664,7 +767,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -729,7 +832,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                               ],
                             ),
                             child: Padding(
-                              padding: EdgeInsetsGeometry.only(
+                              padding: EdgeInsets.only(
                                 top: imageHeight / 4,
                                 bottom: 15,
                                 right: 15,
@@ -857,7 +960,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                       ],
                     ),
                     child: Padding(
-                      padding: EdgeInsetsGeometry.only(
+                      padding: EdgeInsets.only(
                         top: imageHeight / 4,
                         bottom: 15,
                         right: 15,
@@ -1024,7 +1127,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
               Expanded(
                 child: Center(
                   child: GestureDetector(
-                    onTap: () => abrirURL(Uri.parse(tema.rutaRecurso)),
+                    onTap: () => abrirURL(context, tema.rutaRecurso),
                     child: Image.asset('assets/images/Recurso.png'),
                   ),
                 ),

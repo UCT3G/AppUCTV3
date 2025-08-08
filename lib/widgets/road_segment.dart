@@ -284,13 +284,12 @@ class _RoadSegmentState extends State<RoadSegment> {
                                                   ],
                                                 ),
                                                 child: Padding(
-                                                  padding:
-                                                      EdgeInsetsGeometry.only(
-                                                        top: imageHeight / 4,
-                                                        bottom: 15,
-                                                        right: 15,
-                                                        left: 15,
-                                                      ),
+                                                  padding: EdgeInsets.only(
+                                                    top: imageHeight / 4,
+                                                    bottom: 15,
+                                                    right: 15,
+                                                    left: 15,
+                                                  ),
                                                   child: Column(
                                                     mainAxisSize:
                                                         MainAxisSize.min,
@@ -504,6 +503,211 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     );
                                   }
                                   break;
+                                case 'ENCUESTA':
+                                  try {
+                                    final response = await competenciaProvider
+                                        .validarEncuesta(
+                                          tema.idTema,
+                                          int.parse(tema.rutaRecurso),
+                                        );
+
+                                    final comentario =
+                                        response['comentario'] ?? '';
+
+                                    if (parentContext.mounted) {
+                                      ScaffoldMessenger.of(
+                                        parentContext,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          backgroundColor: Colors.teal,
+                                          behavior: SnackBarBehavior.floating,
+                                          content: Text(
+                                            response['comentario'],
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontFamily: 'Montserrat',
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+                                    if (dialogContext.mounted) {
+                                      Navigator.pop(dialogContext);
+                                    }
+
+                                    if (comentario.contains(
+                                      'No puede contestar esta encuesta',
+                                    )) {
+                                      if (parentContext.mounted) {
+                                        showAlertDialog(
+                                          parentContext,
+                                          'Ya contestaste esta encuesta. ¡Gracias!',
+                                        );
+                                      }
+                                      return;
+                                    }
+                                  } catch (e) {
+                                    if (e.toString().contains(
+                                      'Sesión expirada.',
+                                    )) {
+                                      if (parentContext.mounted) {
+                                        Navigator.pushReplacementNamed(
+                                          parentContext,
+                                          AppRoutes.login,
+                                        );
+                                        return;
+                                      }
+                                    }
+                                    if (dialogContext.mounted) {
+                                      Navigator.pop(dialogContext);
+                                    }
+                                    debugPrint('Error: $e');
+                                    if (parentContext.mounted) {
+                                      showDialog(
+                                        context: parentContext,
+                                        builder: (BuildContext dialogContext) {
+                                          final imageHeight =
+                                              MediaQuery.of(
+                                                dialogContext,
+                                              ).size.height *
+                                              0.30;
+
+                                          return Center(
+                                            child: Stack(
+                                              clipBehavior: Clip.none,
+                                              alignment: Alignment.topCenter,
+                                              children: [
+                                                Container(
+                                                  margin: EdgeInsets.only(
+                                                    top: imageHeight / 2,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                    color: Colors.white,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withValues(
+                                                              alpha: 0.2,
+                                                            ),
+                                                        blurRadius: 10,
+                                                        spreadRadius: 2,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                      top: imageHeight / 4,
+                                                      bottom: 15,
+                                                      right: 15,
+                                                      left: 15,
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Text(
+                                                          "Problemas de conexión",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Montserrat',
+                                                            fontSize: 22,
+                                                            color: Colors.grey,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .none,
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 10),
+                                                        Text(
+                                                          "Error al validar la encuesta. Intenta de nuevo.",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Montserrat',
+                                                            fontSize: 18,
+                                                            color: Colors.grey,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .none,
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 20),
+                                                        TextButton(
+                                                          onPressed:
+                                                              () => Navigator.pop(
+                                                                dialogContext,
+                                                              ),
+                                                          style: TextButton.styleFrom(
+                                                            foregroundColor:
+                                                                Colors
+                                                                    .grey
+                                                                    .shade600,
+                                                            padding:
+                                                                const EdgeInsets.symmetric(
+                                                                  horizontal:
+                                                                      24,
+                                                                  vertical: 12,
+                                                                ),
+                                                          ),
+                                                          child: const Text(
+                                                            'Aceptar',
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top:
+                                                      -(imageHeight /
+                                                          4), // Hace que la imagen sobresalga
+                                                  child: SizedBox(
+                                                    height: imageHeight,
+                                                    child: Image.asset(
+                                                      'assets/images/YowiError.png',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                      ScaffoldMessenger.of(
+                                        parentContext,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          behavior: SnackBarBehavior.floating,
+                                          content: Text(
+                                            'Error: $e',
+                                            style: TextStyle(
+                                              fontFamily: 'Montserrat',
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return;
+                                  }
+                                  if (dialogContext.mounted) {
+                                    Navigator.pop(dialogContext);
+                                  }
+                                  if (parentContext.mounted) {
+                                    Navigator.pushNamed(
+                                      parentContext,
+                                      AppRoutes.evaluacionIntro,
+                                      arguments: tema.idTema,
+                                    );
+                                  }
+                                  break;
                                 case 'EVALUACION':
                                   try {
                                     final response = await competenciaProvider
@@ -614,13 +818,12 @@ class _RoadSegmentState extends State<RoadSegment> {
                                                     ],
                                                   ),
                                                   child: Padding(
-                                                    padding:
-                                                        EdgeInsetsGeometry.only(
-                                                          top: imageHeight / 4,
-                                                          bottom: 15,
-                                                          right: 15,
-                                                          left: 15,
-                                                        ),
+                                                    padding: EdgeInsets.only(
+                                                      top: imageHeight / 4,
+                                                      bottom: 15,
+                                                      right: 15,
+                                                      left: 15,
+                                                    ),
                                                     child: Column(
                                                       mainAxisSize:
                                                           MainAxisSize.min,
@@ -843,7 +1046,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
-                              child: const Text("Salir"),
+                              child: const Text("Cerrar"),
                             ),
                           ),
                         ],

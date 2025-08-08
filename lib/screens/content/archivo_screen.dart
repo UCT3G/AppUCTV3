@@ -144,7 +144,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
                       ],
                     ),
                     child: Padding(
-                      padding: EdgeInsetsGeometry.only(
+                      padding: EdgeInsets.only(
                         top: imageHeight / 4,
                         bottom: 15,
                         right: 15,
@@ -387,7 +387,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
                                           ),
                                         ),
                                       ),
-                                      child: const Text("Salir"),
+                                      child: const Text("Cerrar"),
                                     ),
                                   ),
                                 ],
@@ -637,7 +637,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -750,7 +750,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -815,7 +815,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
                               ],
                             ),
                             child: Padding(
-                              padding: EdgeInsetsGeometry.only(
+                              padding: EdgeInsets.only(
                                 top: imageHeight / 4,
                                 bottom: 15,
                                 right: 15,
@@ -943,7 +943,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
                       ],
                     ),
                     child: Padding(
-                      padding: EdgeInsetsGeometry.only(
+                      padding: EdgeInsets.only(
                         top: imageHeight / 4,
                         bottom: 15,
                         right: 15,

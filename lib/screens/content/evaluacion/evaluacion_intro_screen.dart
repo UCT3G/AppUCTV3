@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -72,58 +74,80 @@ class _EvaluacionIntroScreenState extends State<EvaluacionIntroScreen> {
                   ),
                 ),
                 SizedBox(height: 10),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    'Estimado estudiante.',
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 20,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(height: 5),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    '¡Estás por iniciar una evaluación! La calificación mínima es de 80. Esto contará como ${tema.intentosConsumidos + 1} oportunidad(es) de las ${tema.intentosDisponibles} disponibles. , Al aceptar, estás indicando que has revisado y entendido los contenidos previos y que estás listo para contestar tu evaluación. (Abrir la evaluación para sólo ver las preguntas ES HACER TRAMPA , aún cuando no contestes nada cuenta como una oportunidad)',
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 15,
-                      color: Colors.black,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(height: 10),
-                SizedBox(
-                  width: 200,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.evaluacion,
-                        arguments: tema.idTema,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          'Estimado estudiante.',
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 20,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                      SizedBox(height: 5),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          tema.recursoBasicoTipo == 'EVALUACION'
+                              ? '¡Estás por iniciar una evaluación! La calificación mínima es de 80. Esto contará como ${tema.intentosConsumidos + 1} oportunidad(es) de las ${tema.intentosDisponibles} disponibles. , Al aceptar, estás indicando que has revisado y entendido los contenidos previos y que estás listo para contestar tu evaluación. (Abrir la evaluación para sólo ver las preguntas ES HACER TRAMPA , aún cuando no contestes nada cuenta como una oportunidad)'
+                              : tema.recursoBasicoTipo == 'ENCUESTA'
+                              ? '¡Estás por iniciar una encuesta! Aquí no hay calificación mínima. Estos no tienen cantidad limite de intentos. ¡Buena suerte!'
+                              : '',
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 15,
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Contestar Evaluacion',
-                      style: TextStyle(fontFamily: 'Montserrat', fontSize: 12),
-                    ),
+                      SizedBox(height: 10),
+                      SizedBox(
+                        width: 200,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (tema.recursoBasicoTipo == 'EVALUACION') {
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.evaluacion,
+                                arguments: tema.idTema,
+                              );
+                            } else if (tema.recursoBasicoTipo == 'ENCUESTA') {
+                              log('Holaa encuesta');
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: Text(
+                            tema.recursoBasicoTipo == 'EVALUACION'
+                                ? 'Contestar Evaluacion'
+                                : tema.recursoBasicoTipo == 'ENCUESTA'
+                                ? 'Contestar Encuesta'
+                                : '',
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

@@ -4,6 +4,7 @@ import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/breadcrumb_nav.dart';
+import 'package:app_uct/widgets/connection_error_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -20,16 +21,19 @@ class InteractiveScreen extends StatefulWidget {
 
 class _InteractiveScreenState extends State<InteractiveScreen> {
   WebViewController? _webViewController;
+  bool _hasConnectionError = false;
+  bool _temaMarcado = false;
+  bool _isMarking = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      cagarInteractivo();
+      cargarInteractivo();
     });
   }
 
-  Future<void> cagarInteractivo() async {
+  Future<void> cargarInteractivo() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
       listen: false,
@@ -37,122 +41,137 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final tema = competenciaProvider.getTemaById(widget.idTema)!;
 
-    try {
-      final response = await competenciaProvider.actualizarTemaUsuario(
-        tema.idCurso,
-        tema.idTema,
-      );
+    setState(() {
+      _hasConnectionError = false;
+    });
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.teal,
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              response['comentario'],
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontFamily: 'Montserrat',
-              ),
-            ),
-          ),
-        );
-      }
+    String url = '';
 
-      String url = '';
-
-      if (tema.recursoBasicoTipo == 'INTERACTIVO') {
-        url =
-            Uri.parse(
-                  'https://uct.tresguerras.com.mx:8000/static/interactive.html',
-                )
-                .replace(
-                  queryParameters: {
-                    'materia': tema.idCurso.toString(),
-                    'unidad': tema.idUnidad.toString(),
-                    'tema': tema.idTema.toString(),
-                    'ruta_recurso': tema.rutaRecurso,
-                  },
-                )
-                .toString();
-      } else if (tema.recursoBasicoTipo == 'TEMPLATE') {
-        final user = {
-          'areas': [],
-          'departamentos': [],
-          'isLoggedIn': true,
-          'modulo_activo': {
-            'id_modulo': 0,
-            'sistema': 'UCT COMPETENCIAS',
-            'sistemaClic': 'UCT COMPETENCIAS',
-          },
-          'notificaciones': [],
-          'oficinas': [],
-          'perfiles': [],
-          'permisos': {},
-          'puestos': [],
-          'token': authProvider.accessToken,
-          'tokenCreationTime': DateTime.now().toIso8601String(),
-          'userProfile': authProvider.currentUsuario,
-        };
-
-        final userJson = jsonEncode(user);
-        final userEncoded = Uri.encodeComponent(userJson);
-
-        url =
-            Uri.parse('https://uct.tresguerras.com.mx:8002/templateContainer')
-                .replace(
-                  queryParameters: {
-                    'user': userEncoded,
-                    'temaId': tema.idTema.toString(),
-                    'cursoId': tema.idCurso.toString(),
-                    'unidadId': tema.idUnidad.toString(),
-                  },
-                )
-                .toString();
-      }
-
-      _webViewController =
-          WebViewController()
-            ..setJavaScriptMode(JavaScriptMode.unrestricted)
-            ..setNavigationDelegate(
-              NavigationDelegate(
-                onProgress: (int progress) {
-                  debugPrint('Loading: $progress%');
+    if (tema.recursoBasicoTipo == 'INTERACTIVO') {
+      url =
+          Uri.parse(
+                'https://uct.tresguerras.com.mx:8000/static/interactive.html',
+              )
+              .replace(
+                queryParameters: {
+                  'materia': tema.idCurso.toString(),
+                  'unidad': tema.idUnidad.toString(),
+                  'tema': tema.idTema.toString(),
+                  'ruta_recurso': tema.rutaRecurso,
                 },
-                onWebResourceError: (WebResourceError error) {
-                  debugPrint('Error: ${error.description}');
+              )
+              .toString();
+    } else if (tema.recursoBasicoTipo == 'TEMPLATE') {
+      final user = {
+        'areas': [],
+        'departamentos': [],
+        'isLoggedIn': true,
+        'modulo_activo': {
+          'id_modulo': 0,
+          'sistema': 'UCT COMPETENCIAS',
+          'sistemaClic': 'UCT COMPETENCIAS',
+        },
+        'notificaciones': [],
+        'oficinas': [],
+        'perfiles': [],
+        'permisos': {},
+        'puestos': [],
+        'token': authProvider.accessToken,
+        'tokenCreationTime': DateTime.now().toIso8601String(),
+        'userProfile': authProvider.currentUsuario,
+      };
+
+      final userJson = jsonEncode(user);
+      final userEncoded = Uri.encodeComponent(userJson);
+
+      url =
+          Uri.parse('https://uct.tresguerras.com.mx:8002/templateContainer')
+              .replace(
+                queryParameters: {
+                  'user': userEncoded,
+                  'temaId': tema.idTema.toString(),
+                  'cursoId': tema.idCurso.toString(),
+                  'unidadId': tema.idUnidad.toString(),
                 },
-                onUrlChange: (UrlChange change) {
-                  debugPrint('URL changed to ${change.url}');
-                },
-              ),
-            )
-            ..setUserAgent("Flutter/1.0")
-            ..loadRequest(Uri.parse(url));
-    } catch (e) {
-      if (e.toString().contains('Sesión expirada.')) {
-        if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
-        return;
-      }
-      debugPrint('Error: $e');
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              'Error al cargar la imagen: $e',
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                color: Colors.white,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        );
-      }
+              )
+              .toString();
     }
+
+    _webViewController =
+        WebViewController()
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..setNavigationDelegate(
+            NavigationDelegate(
+              onProgress: (int progress) {
+                debugPrint('Loading: $progress%');
+              },
+              onWebResourceError: (WebResourceError error) {
+                setState(() {
+                  _hasConnectionError = true;
+                });
+                debugPrint('Error: ${error.description}');
+              },
+              onPageFinished: (String finishedUrl) async {
+                if (_temaMarcado || _isMarking) return;
+
+                _isMarking = true;
+                try {
+                  final response = await competenciaProvider
+                      .actualizarTemaUsuario(tema.idCurso, tema.idTema);
+                  _temaMarcado = true; // solo marcar si fue exitoso
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.teal,
+                        behavior: SnackBarBehavior.floating,
+                        content: Text(
+                          response['comentario'],
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontFamily: 'Montserrat',
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (e.toString().contains('Sesión expirada.')) {
+                    if (mounted) {
+                      Navigator.pushReplacementNamed(context, AppRoutes.login);
+                    }
+                    return;
+                  }
+                  debugPrint('Error al marcar tema: $e');
+                  setState(() {
+                    _hasConnectionError = true;
+                  });
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        content: Text(
+                          'Error al cargar el interactivo: $e',
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                } finally {
+                  _isMarking = false;
+                }
+              },
+              onUrlChange: (UrlChange change) {
+                debugPrint('URL changed to ${change.url}');
+              },
+            ),
+          )
+          ..setUserAgent("Flutter/1.0")
+          ..loadRequest(Uri.parse(url));
   }
 
   Future<void> atrasarAdelantarTema(
@@ -272,7 +291,7 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
                                           ),
                                         ),
                                       ),
-                                      child: const Text("Salir"),
+                                      child: const Text("Cerrar"),
                                     ),
                                   ),
                                 ],
@@ -522,7 +541,7 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -635,7 +654,7 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -675,7 +694,93 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
               }
               debugPrint('Error: $e');
               if (parentContext.mounted) {
-                Navigator.of(parentContext, rootNavigator: true).pop();
+                showDialog(
+                  context: parentContext,
+                  builder: (BuildContext dialogContext) {
+                    final imageHeight =
+                        MediaQuery.of(dialogContext).size.height * 0.30;
+
+                    return Center(
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(top: imageHeight / 2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                top: imageHeight / 4,
+                                bottom: 15,
+                                right: 15,
+                                left: 15,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Problemas de conexión",
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 22,
+                                      color: Colors.grey,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "No se pudieron validar los temas. Intenta de nuevo.",
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(dialogContext),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.grey.shade600,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                    child: const Text('Aceptar'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top:
+                                -(imageHeight /
+                                    4), // Hace que la imagen sobresalga
+                            child: SizedBox(
+                              height: imageHeight,
+                              child: Image.asset(
+                                'assets/images/YowiError.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
                 ScaffoldMessenger.of(parentContext).showSnackBar(
                   SnackBar(
                     behavior: SnackBarBehavior.floating,
@@ -705,7 +810,7 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.recurso,
-                arguments: tema.idTema,
+                arguments: nuevoTema.idTema,
               );
             }
             break;
@@ -718,7 +823,89 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
       }
       debugPrint('Error: $e');
       if (parentContext.mounted) {
-        Navigator.of(parentContext, rootNavigator: true).pop();
+        showDialog(
+          context: parentContext,
+          builder: (BuildContext dialogContext) {
+            final imageHeight = MediaQuery.of(dialogContext).size.height * 0.30;
+
+            return Center(
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.topCenter,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: imageHeight / 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        top: imageHeight / 4,
+                        bottom: 15,
+                        right: 15,
+                        left: 15,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Problemas de conexión",
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 22,
+                              color: Colors.grey,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "No se pudo navegar entre los temas. Intenta de nuevo.",
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 18,
+                              color: Colors.grey,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey.shade600,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: const Text('Aceptar'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: -(imageHeight / 4), // Hace que la imagen sobresalga
+                    child: SizedBox(
+                      height: imageHeight,
+                      child: Image.asset(
+                        'assets/images/YowiError.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
         ScaffoldMessenger.of(parentContext).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -756,6 +943,16 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
             width: size.width * 0.6,
             height: size.width * 0.6,
           ),
+        ),
+      );
+    }
+
+    if (_hasConnectionError) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: ConnectionErrorWidget(
+          onRetry: cargarInteractivo,
+          message: 'Error al cargar el recurso, intenta de nuevo.',
         ),
       );
     }

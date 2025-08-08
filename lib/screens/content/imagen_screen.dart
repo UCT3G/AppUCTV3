@@ -3,7 +3,9 @@
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/services/api_service.dart';
+import 'package:app_uct/utils/utils.dart';
 import 'package:app_uct/widgets/breadcrumb_nav.dart';
+import 'package:app_uct/widgets/connection_error_widget.dart';
 import 'package:app_uct/widgets/full_screen_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -20,6 +22,7 @@ class ImagenScreen extends StatefulWidget {
 
 class _ImagenScreenState extends State<ImagenScreen> {
   String? imagenUrl;
+  bool _hasConnectionError = false;
 
   Future<void> cargarImagen() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
@@ -28,7 +31,41 @@ class _ImagenScreenState extends State<ImagenScreen> {
     );
     final tema = competenciaProvider.getTemaById(widget.idTema)!;
 
+    setState(() {
+      _hasConnectionError = false;
+    });
+
     try {
+      final nombreArchivo = tema.rutaRecurso.split('/').last;
+      final rutaImagen =
+          '${ApiService.baseURL}/imagen_movil/${tema.idCurso}/${tema.idUnidad}/${tema.idTema}/$nombreArchivo';
+
+      final existe = await recursoDisponible(rutaImagen);
+
+      if (!existe) {
+        setState(() {
+          _hasConnectionError = true;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Error al cargar la imagen',
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          );
+        }
+        return;
+      }
+
+      imagenUrl = rutaImagen;
+
       final response = await competenciaProvider.actualizarTemaUsuario(
         tema.idCurso,
         tema.idTema,
@@ -50,18 +87,16 @@ class _ImagenScreenState extends State<ImagenScreen> {
           ),
         );
       }
-
-      final nombreArchivo = tema.rutaRecurso.split('/').last;
-      imagenUrl =
-          '${ApiService.baseURL}/imagen_movil/${tema.idCurso}/${tema.idUnidad}/${tema.idTema}/$nombreArchivo';
     } catch (e) {
       if (e.toString().contains('Sesión expirada.')) {
         if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
         return;
       }
+      setState(() {
+        _hasConnectionError = true;
+      });
       debugPrint('Error: $e');
       if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -207,7 +242,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
                                           ),
                                         ),
                                       ),
-                                      child: const Text("Salir"),
+                                      child: const Text("Cerrar"),
                                     ),
                                   ),
                                 ],
@@ -457,7 +492,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -570,7 +605,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
                                                     BorderRadius.circular(20),
                                               ),
                                             ),
-                                            child: const Text("Salir"),
+                                            child: const Text("Cerrar"),
                                           ),
                                         ),
                                       ],
@@ -610,7 +645,93 @@ class _ImagenScreenState extends State<ImagenScreen> {
               }
               debugPrint('Error: $e');
               if (parentContext.mounted) {
-                Navigator.of(parentContext, rootNavigator: true).pop();
+                showDialog(
+                  context: parentContext,
+                  builder: (BuildContext dialogContext) {
+                    final imageHeight =
+                        MediaQuery.of(dialogContext).size.height * 0.30;
+
+                    return Center(
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(top: imageHeight / 2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                top: imageHeight / 4,
+                                bottom: 15,
+                                right: 15,
+                                left: 15,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Problemas de conexión",
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 22,
+                                      color: Colors.grey,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "No se pudieron validar los temas. Intenta de nuevo.",
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(dialogContext),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.grey.shade600,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                    child: const Text('Aceptar'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top:
+                                -(imageHeight /
+                                    4), // Hace que la imagen sobresalga
+                            child: SizedBox(
+                              height: imageHeight,
+                              child: Image.asset(
+                                'assets/images/YowiError.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
                 ScaffoldMessenger.of(parentContext).showSnackBar(
                   SnackBar(
                     behavior: SnackBarBehavior.floating,
@@ -640,7 +761,7 @@ class _ImagenScreenState extends State<ImagenScreen> {
               Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.recurso,
-                arguments: tema.idTema,
+                arguments: nuevoTema.idTema,
               );
             }
             break;
@@ -653,7 +774,89 @@ class _ImagenScreenState extends State<ImagenScreen> {
       }
       debugPrint('Error: $e');
       if (parentContext.mounted) {
-        Navigator.of(parentContext, rootNavigator: true).pop();
+        showDialog(
+          context: parentContext,
+          builder: (BuildContext dialogContext) {
+            final imageHeight = MediaQuery.of(dialogContext).size.height * 0.30;
+
+            return Center(
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.topCenter,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: imageHeight / 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        top: imageHeight / 4,
+                        bottom: 15,
+                        right: 15,
+                        left: 15,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Problemas de conexión",
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 22,
+                              color: Colors.grey,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "No se pudo navegar entre los temas. Intenta de nuevo.",
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 18,
+                              color: Colors.grey,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey.shade600,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: const Text('Aceptar'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: -(imageHeight / 4), // Hace que la imagen sobresalga
+                    child: SizedBox(
+                      height: imageHeight,
+                      child: Image.asset(
+                        'assets/images/YowiError.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
         ScaffoldMessenger.of(parentContext).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -699,6 +902,16 @@ class _ImagenScreenState extends State<ImagenScreen> {
             width: size.width * 0.6,
             height: size.width * 0.6,
           ),
+        ),
+      );
+    }
+
+    if (_hasConnectionError) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: ConnectionErrorWidget(
+          onRetry: cargarImagen,
+          message: 'Error al cargar el recurso, intenta de nuevo.',
         ),
       );
     }
@@ -762,6 +975,13 @@ class _ImagenScreenState extends State<ImagenScreen> {
                                   imagenUrl!,
                                   fit: BoxFit.cover,
                                   width: double.infinity,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/sinImagen.png',
+                                      fit: BoxFit.contain,
+                                      height: 100,
+                                    );
+                                  },
                                 ),
                               ),
                             ),

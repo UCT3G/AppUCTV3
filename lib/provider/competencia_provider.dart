@@ -624,6 +624,60 @@ class CompetenciaProvider with ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> validarEncuesta(
+    int idTema,
+    int idEncuesta,
+  ) async {
+    _loadingDialog = true;
+    notifyListeners();
+
+    try {
+      final response = await CourseService.validarEncuesta(
+        idTema,
+        idEncuesta,
+        _authProvider.accessToken!,
+      );
+
+      _idEvaluacion = idEncuesta;
+      return response;
+    } catch (e) {
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await CourseService.validarEncuesta(
+                idTema,
+                idEncuesta,
+                _authProvider.accessToken!,
+              );
+
+              _idEvaluacion = idEncuesta;
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception('Error al validar la encuesta: ${e.toString()}');
+    } finally {
+      _loadingDialog = false;
+      notifyListeners();
+    }
+  }
+
   Future<Map<String, dynamic>> adelantarAtrasarTemas(
     int idCurso,
     int idUnidad,
