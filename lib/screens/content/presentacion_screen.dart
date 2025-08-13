@@ -1238,29 +1238,24 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                           itemBuilder: (context, index) {
                             return GestureDetector(
                               onTap: () => openFullScreen(index),
-                              child: InteractiveViewer(
-                                panEnabled: true,
-                                minScale: 1,
-                                maxScale: 4,
-                                child: CachedNetworkImage(
-                                  imageUrl: imageUrls[index],
-                                  fit: BoxFit.contain,
-                                  placeholder:
-                                      (context, url) => const Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                  errorWidget:
-                                      (context, error, stackTrace) =>
-                                          const Center(
-                                            child: Text(
-                                              'Error al cargar la imagen',
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                                fontFamily: 'Montserrat',
-                                              ),
+                              child: CachedNetworkImage(
+                                imageUrl: imageUrls[index],
+                                fit: BoxFit.contain,
+                                placeholder:
+                                    (context, url) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                errorWidget:
+                                    (context, error, stackTrace) =>
+                                        const Center(
+                                          child: Text(
+                                            'Error al cargar la imagen',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontFamily: 'Montserrat',
                                             ),
                                           ),
-                                ),
+                                        ),
                               ),
                             );
                           },
