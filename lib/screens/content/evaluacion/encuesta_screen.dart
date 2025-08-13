@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
@@ -224,6 +225,115 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
     return errores;
   }
 
+  Future<void> showResultadosEvaluacion(
+    BuildContext parentContext,
+    Map<String, dynamic> response,
+  ) async {
+    if (!parentContext.mounted) return;
+
+    return showDialog<void>(
+      context: parentContext,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        // final competenciaProvider = Provider.of<CompetenciaProvider>(
+        //   dialogContext,
+        // );
+        // final evaluacionProvider = Provider.of<EvaluacionProvider>(
+        //   dialogContext,
+        // );
+        // final tema = competenciaProvider.getTemaById(widget.idTema)!;
+        final imageHeight = MediaQuery.of(dialogContext).size.height * 0.15;
+
+        return Center(
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.topCenter,
+            children: [
+              Container(
+                margin: EdgeInsets.only(
+                  top: imageHeight / 2,
+                ), // Espacio para la imagen
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '¡Estimado usuario!',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(dialogContext).primaryColor,
+                          decoration: TextDecoration.none,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Queremos agradecerte por tomarte el tiempo para responder nuestra encuesta. Tus opiniones son muy valiosas para nosotros y nos ayudarán a mejorar nuestra plataforma y aplicación.',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                          decoration: TextDecoration.none,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      // Botones de acción
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(dialogContext);
+                              Navigator.pop(parentContext);
+                              Navigator.pop(context);
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey.shade600,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                            ),
+                            child: const Text('Salir'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Imagen que sobresale (posición absoluta)
+              Positioned(
+                top: -(imageHeight / 2), // Hace que la imagen sobresalga
+                child: SizedBox(
+                  height: imageHeight,
+                  child: Image.asset(
+                    'assets/images/YowMitad.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -400,244 +510,208 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (!verificarRespuestas()) {
-                        // final authProvider = Provider.of<AuthProvider>(
-                        //   context,
-                        //   listen: false,
-                        // );
-                        // final competenciaProvider =
-                        //     Provider.of<CompetenciaProvider>(
-                        //       context,
-                        //       listen: false,
-                        //     );
-                        // final tema = competenciaProvider.getTemaById(
-                        //   widget.idTema,
-                        // );
+                        final authProvider = Provider.of<AuthProvider>(
+                          context,
+                          listen: false,
+                        );
+                        final competenciaProvider =
+                            Provider.of<CompetenciaProvider>(
+                              context,
+                              listen: false,
+                            );
+                        final tema = competenciaProvider.getTemaById(
+                          widget.idTema,
+                        );
 
-                        // final jsonEvaluacion = {
-                        //   'id_user': authProvider.currentUsuario!.idUsuario,
-                        //   'idencuesta': formulario.idFormulario,
-                        //   'evaluacion': evaluacionProvider.respuestas,
-                        //   'NoReactivos': formulario.reactivos.length,
-                        //   'idcurso': tema!.idCurso,
-                        //   'ordenunidad': tema.ordenUnidad,
-                        //   'idMapaFuncional':
-                        //       competenciaProvider
-                        //           .competencia!
-                        //           .idMapaFuncionalFk,
-                        //   'saveRespuestas': {
-                        //     'id_formu': formulario.idFormulario,
-                        //     'id_sistema_fk': 0,
-                        //     'id_categoria_fk': formulario.idCategoria,
-                        //     'categoria_detalles': 0,
-                        //     'sistema_detalles': 0,
-                        //     'nombre': formulario.nombre,
-                        //     'titulo_formulario': formulario.tituloFormulario,
-                        //     'descripcion': formulario.descripcion,
-                        //     'auto_update': '',
-                        //     'estado': formulario.estado,
-                        //     'id_tema_fk': formulario.idTema,
-                        //     'registro_usuario': formulario.registroUsuario,
-                        //     'registro_fecha': formulario.registroFecha,
-                        //     'modificacion_usuario':
-                        //         formulario.modificacionUsuario,
-                        //     'modificacion_fecha': formulario.modificacionFecha,
-                        //     'id_area_encuesta_fk': formulario.idAreaEncuesta,
-                        //     'reactivos': evaluacionProvider.respuestas,
-                        //   },
-                        //   'datostema': {
-                        //     'id_tema': tema.idTema,
-                        //     'titulo': tema.titulo,
-                        //     'descripcion': tema.descripcion,
-                        //     'duracion': tema.duracion,
-                        //     'orden': tema.orden,
-                        //     'estado': tema.estado,
-                        //     'duracion_minutos': tema.duracionMinutos,
-                        //     'reactivos_mostrar': tema.reactivosMostrar,
-                        //     'id_unidad_fk': tema.idUnidad,
-                        //     'intentos_consumidos': tema.intentosConsumidos,
-                        //     'recurso_url': tema.recursoUrl,
-                        //     'ruta_recurso': tema.rutaRecurso,
-                        //     'slide_images': tema.slideImages,
-                        //     'recurso_basico_tipo': tema.recursoBasicoTipo,
-                        //     'id_tema_tipo_fk': tema.idTemaTipo,
-                        //     'registro_fecha': tema.registroFecha,
-                        //     'registro_usuario': tema.registroUsuario,
-                        //     'modificacion_fecha': tema.modificacionFecha,
-                        //     'modificacion_usuario': tema.modificacionUsuario,
-                        //     'id_curso_fk': tema.idCurso,
-                        //     'orden_unidad': tema.ordenUnidad,
-                        //     'intentos_disponibles': tema.intentosDisponibles,
-                        //     'resultado': tema.resultado,
-                        //     'observaciones': tema.observaciones,
-                        //   },
-                        // };
+                        final jsonEvaluacion = {
+                          'id_usuario': authProvider.currentUsuario!.idUsuario,
+                          'id_encuesta': formulario.idFormulario,
+                          'id_tema': tema!.idTema,
+                          'reactivos': {
+                            'id_formu': formulario.idFormulario,
+                            'id_sistema_fk': 0,
+                            'id_categoria_fk': formulario.idCategoria,
+                            'categoria_detalles': 0,
+                            'sistema_detalles': 0,
+                            'nombre': formulario.nombre,
+                            'titulo_formulario': formulario.tituloFormulario,
+                            'descripcion': formulario.descripcion,
+                            'auto_update': '',
+                            'estado': formulario.estado,
+                            'id_tema_fk': formulario.idTema,
+                            'registro_usuario': formulario.registroUsuario,
+                            'registro_fecha': formulario.registroFecha,
+                            'modificacion_usuario':
+                                formulario.modificacionUsuario,
+                            'modificacion_fecha': formulario.modificacionFecha,
+                            'id_area_encuesta_fk': formulario.idAreaEncuesta,
+                            'reactivos': evaluacionProvider.respuestas,
+                          },
+                        };
 
-                        // try {
-                        //   final response = await evaluacionProvider
-                        //       .guardarEvaluacion(jsonEvaluacion);
+                        try {
+                          final response = await evaluacionProvider
+                              .guardarEncuesta(jsonEvaluacion);
 
-                        //   if (context.mounted) {
-                        //     ScaffoldMessenger.of(context).showSnackBar(
-                        //       SnackBar(
-                        //         backgroundColor: Colors.teal,
-                        //         behavior: SnackBarBehavior.floating,
-                        //         content: Text(
-                        //           response['comentario'],
-                        //           style: TextStyle(
-                        //             color: Colors.white,
-                        //             fontSize: 14,
-                        //             fontFamily: 'Montserrat',
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     );
-                        //   }
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.teal,
+                                behavior: SnackBarBehavior.floating,
+                                content: Text(
+                                  response['comentario'],
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontFamily: 'Montserrat',
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
 
-                        //   _currentPage = 0;
-                        //   calificado = true;
+                          _currentPage = 0;
+                          calificado = true;
 
-                        //   if (context.mounted) {
-                        //     showResultadosEvaluacion(context, response);
-                        //   }
-                        //   competenciaProvider.actualizarEvaluacion(
-                        //     widget.idTema,
-                        //     response['calificacion_total'],
-                        //   );
-                        // } catch (e) {
-                        //   _currentPage = 0;
-                        //   if (e.toString().contains('Sesión expirada.')) {
-                        //     if (context.mounted) {
-                        //       Navigator.pushReplacementNamed(
-                        //         context,
-                        //         AppRoutes.login,
-                        //       );
-                        //     }
-                        //     return;
-                        //   }
-                        //   debugPrint('Error: $e');
-                        //   if (context.mounted) {
-                        //     showDialog(
-                        //       context: context,
-                        //       builder: (BuildContext dialogContext) {
-                        //         final imageHeight =
-                        //             MediaQuery.of(dialogContext).size.height *
-                        //             0.30;
+                          if (context.mounted) {
+                            showResultadosEvaluacion(context, response);
+                          }
+                          competenciaProvider.registrarIntento(widget.idTema);
+                        } catch (e) {
+                          _currentPage = 0;
+                          if (e.toString().contains('Sesión expirada.')) {
+                            if (context.mounted) {
+                              Navigator.pushReplacementNamed(
+                                context,
+                                AppRoutes.login,
+                              );
+                            }
+                            return;
+                          }
+                          debugPrint('Error: $e');
+                          if (context.mounted) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext dialogContext) {
+                                final imageHeight =
+                                    MediaQuery.of(dialogContext).size.height *
+                                    0.30;
 
-                        //         return Center(
-                        //           child: Stack(
-                        //             clipBehavior: Clip.none,
-                        //             alignment: Alignment.topCenter,
-                        //             children: [
-                        //               Container(
-                        //                 margin: EdgeInsets.only(
-                        //                   top: imageHeight / 2,
-                        //                 ),
-                        //                 decoration: BoxDecoration(
-                        //                   borderRadius: BorderRadius.circular(
-                        //                     20,
-                        //                   ),
-                        //                   color: Colors.white,
-                        //                   boxShadow: [
-                        //                     BoxShadow(
-                        //                       color: Colors.black.withValues(
-                        //                         alpha: 0.2,
-                        //                       ),
-                        //                       blurRadius: 10,
-                        //                       spreadRadius: 2,
-                        //                     ),
-                        //                   ],
-                        //                 ),
-                        //                 child: Padding(
-                        //                   padding: EdgeInsets.only(
-                        //                     top: imageHeight / 4,
-                        //                     bottom: 15,
-                        //                     right: 15,
-                        //                     left: 15,
-                        //                   ),
-                        //                   child: Column(
-                        //                     mainAxisSize: MainAxisSize.min,
-                        //                     children: [
-                        //                       Text(
-                        //                         "Problemas de conexión",
-                        //                         style: TextStyle(
-                        //                           fontFamily: 'Montserrat',
-                        //                           fontSize: 22,
-                        //                           color: Colors.grey,
-                        //                           decoration:
-                        //                               TextDecoration.none,
-                        //                         ),
-                        //                       ),
-                        //                       SizedBox(height: 10),
-                        //                       Text(
-                        //                         "No se pudo guardar la evaluación. Intenta de nuevo.",
-                        //                         style: TextStyle(
-                        //                           fontFamily: 'Montserrat',
-                        //                           fontSize: 18,
-                        //                           color: Colors.grey,
-                        //                           decoration:
-                        //                               TextDecoration.none,
-                        //                         ),
-                        //                       ),
-                        //                       SizedBox(height: 20),
-                        //                       TextButton(
-                        //                         onPressed:
-                        //                             () => Navigator.pop(
-                        //                               dialogContext,
-                        //                             ),
-                        //                         style: TextButton.styleFrom(
-                        //                           foregroundColor:
-                        //                               Colors.grey.shade600,
-                        //                           padding:
-                        //                               const EdgeInsets.symmetric(
-                        //                                 horizontal: 24,
-                        //                                 vertical: 12,
-                        //                               ),
-                        //                         ),
-                        //                         child: const Text('Aceptar'),
-                        //                       ),
-                        //                     ],
-                        //                   ),
-                        //                 ),
-                        //               ),
-                        //               Positioned(
-                        //                 top:
-                        //                     -(imageHeight /
-                        //                         4), // Hace que la imagen sobresalga
-                        //                 child: SizedBox(
-                        //                   height: imageHeight,
-                        //                   child: Image.asset(
-                        //                     'assets/images/YowiError.png',
-                        //                     fit: BoxFit.cover,
-                        //                   ),
-                        //                 ),
-                        //               ),
-                        //             ],
-                        //           ),
-                        //         );
-                        //       },
-                        //     );
-                        //     ScaffoldMessenger.of(context).showSnackBar(
-                        //       SnackBar(
-                        //         behavior: SnackBarBehavior.floating,
-                        //         content: Text(
-                        //           'Error al guardar la evaluación: $e',
-                        //           style: TextStyle(
-                        //             fontFamily: 'Montserrat',
-                        //             color: Colors.white,
-                        //             fontSize: 14,
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     );
-                        //   }
-                        // }
+                                return Center(
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    alignment: Alignment.topCenter,
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.only(
+                                          top: imageHeight / 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                              blurRadius: 10,
+                                              spreadRadius: 2,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            top: imageHeight / 4,
+                                            bottom: 15,
+                                            right: 15,
+                                            left: 15,
+                                          ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                "Problemas de conexión",
+                                                style: TextStyle(
+                                                  fontFamily: 'Montserrat',
+                                                  fontSize: 22,
+                                                  color: Colors.grey,
+                                                  decoration:
+                                                      TextDecoration.none,
+                                                ),
+                                              ),
+                                              SizedBox(height: 10),
+                                              Text(
+                                                "No se pudo guardar la encuesta. Intenta de nuevo.",
+                                                style: TextStyle(
+                                                  fontFamily: 'Montserrat',
+                                                  fontSize: 18,
+                                                  color: Colors.grey,
+                                                  decoration:
+                                                      TextDecoration.none,
+                                                ),
+                                              ),
+                                              SizedBox(height: 20),
+                                              TextButton(
+                                                onPressed:
+                                                    () => Navigator.pop(
+                                                      dialogContext,
+                                                    ),
+                                                style: TextButton.styleFrom(
+                                                  foregroundColor:
+                                                      Colors.grey.shade600,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 24,
+                                                        vertical: 12,
+                                                      ),
+                                                ),
+                                                child: const Text('Aceptar'),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top:
+                                            -(imageHeight /
+                                                4), // Hace que la imagen sobresalga
+                                        child: SizedBox(
+                                          height: imageHeight,
+                                          child: Image.asset(
+                                            'assets/images/YowiError.png',
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                content: Text(
+                                  'Error al guardar la encuesta: $e',
+                                  style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromRGBO(87, 84, 153, 1),
                     ),
                     child: Text(
-                      'Terminar evaluacion',
+                      'Terminar encuesta',
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Montserrat',

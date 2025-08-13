@@ -253,7 +253,7 @@ class EvaluacionProvider with ChangeNotifier {
                   response['formulario'] as Map<String, dynamic>;
 
               _formulario = Formulario.fromJson(formularioJson);
-              
+
               return response;
             } catch (e) {
               throw Exception(
@@ -269,6 +269,56 @@ class EvaluacionProvider with ChangeNotifier {
       throw Exception(
         'Error al cargar el formulario de la encuesta: ${e.toString()}',
       );
+    }
+  }
+
+  Future<Map<String, dynamic>> guardarEncuesta(
+    Map<String, dynamic> jsonFinal,
+  ) async {
+    _loading = true;
+
+    notifyListeners();
+
+    try {
+      final response = await EvaluacionService.enviarEncuesta(
+        jsonFinal,
+        _authProvider.accessToken!,
+      );
+
+      return response;
+    } catch (e) {
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await EvaluacionService.enviarEncuesta(
+                jsonFinal,
+                _authProvider.accessToken!,
+              );
+
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception('Error al guardar la encuesta: ${e.toString()}');
+    } finally {
+      _loading = false;
+      notifyListeners();
     }
   }
 

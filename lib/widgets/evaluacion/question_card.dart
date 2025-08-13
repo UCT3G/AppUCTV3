@@ -1,4 +1,4 @@
-import 'dart:developer';
+// import 'dart:developer';
 
 import 'package:app_uct/models/reactivo_model.dart';
 import 'package:app_uct/provider/competencia_provider.dart';

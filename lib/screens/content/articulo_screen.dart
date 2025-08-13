@@ -543,6 +543,262 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
               );
             }
             break;
+          case 'ENCUESTA':
+            try {
+              final response = await competenciaProvider.validarEncuesta(
+                nuevoTema.idTema,
+                int.parse(nuevoTema.rutaRecurso),
+              );
+
+              if (response['count'] > 0) {
+                if (parentContext.mounted) {
+                  showDialog(
+                    context: parentContext,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      final screenWidth = MediaQuery.of(context).size.width;
+                      final imageSize = screenWidth * 0.4;
+
+                      return Center(
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.centerLeft,
+                          children: [
+                            // Card contenedor
+                            Container(
+                              margin: EdgeInsets.only(left: imageSize / 2),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 10,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: imageSize / 2,
+                                  ), // Espacio para la imagen
+                                  Flexible(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Estimado Usuario",
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            decoration: TextDecoration.none,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'Ya contestaste esta encuesta. ¡Gracias!',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey.shade700,
+                                            decoration: TextDecoration.none,
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: ElevatedButton(
+                                            onPressed:
+                                                () => Navigator.pop(context),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  Theme.of(
+                                                    context,
+                                                  ).primaryColor,
+                                              foregroundColor: Colors.white,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 24,
+                                                    vertical: 12,
+                                                  ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                            ),
+                                            child: const Text("Cerrar"),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Imagen a la izquierda, sobrepuesta
+                            Positioned(
+                              left: 0,
+                              child: SizedBox(
+                                width: imageSize,
+                                child: Image.asset(
+                                  'assets/images/yowi_perfil.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.teal,
+                      behavior: SnackBarBehavior.floating,
+                      content: Text(
+                        response['comentario'],
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontFamily: 'Montserrat',
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return;
+              }
+            } catch (e) {
+              if (e.toString().contains('Sesión expirada.')) {
+                if (parentContext.mounted) {
+                  Navigator.pushReplacementNamed(
+                    parentContext,
+                    AppRoutes.login,
+                  );
+                  return;
+                }
+              }
+              debugPrint('Error: $e');
+              if (parentContext.mounted) {
+                showDialog(
+                  context: parentContext,
+                  builder: (BuildContext dialogContext) {
+                    final imageHeight =
+                        MediaQuery.of(dialogContext).size.height * 0.30;
+
+                    return Center(
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(top: imageHeight / 2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                top: imageHeight / 4,
+                                bottom: 15,
+                                right: 15,
+                                left: 15,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Problemas de conexión",
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 22,
+                                      color: Colors.grey,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "Error al validar la encuesta. Intenta de nuevo.",
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(dialogContext),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.grey.shade600,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                    child: const Text('Aceptar'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top:
+                                -(imageHeight /
+                                    4), // Hace que la imagen sobresalga
+                            child: SizedBox(
+                              height: imageHeight,
+                              child: Image.asset(
+                                'assets/images/YowiError.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    content: Text(
+                      'Error: $e',
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return;
+            }
+            if (parentContext.mounted) {
+              Navigator.pushNamed(
+                parentContext,
+                AppRoutes.evaluacionIntro,
+                arguments: nuevoTema.idTema,
+              );
+            }
+            break;
           case 'EVALUACION':
             try {
               final response = await competenciaProvider.validarTemasUnidad(
