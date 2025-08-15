@@ -106,10 +106,20 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
                 debugPrint('Loading: $progress%');
               },
               onWebResourceError: (WebResourceError error) {
-                setState(() {
-                  _hasConnectionError = true;
-                });
-                debugPrint('Error: ${error.description}');
+                debugPrint(
+                  '❌ Error WebView: ${error.errorType} - ${error.description}',
+                );
+
+                // Solo marcar error si es un problema real de conexión o carga crítica
+                if (error.errorType == WebResourceErrorType.hostLookup ||
+                    error.errorType ==
+                        WebResourceErrorType.failedSslHandshake ||
+                    error.errorType == WebResourceErrorType.connect ||
+                    error.errorType == WebResourceErrorType.timeout) {
+                  setState(() {
+                    _hasConnectionError = true;
+                  });
+                }
               },
               onPageFinished: (String finishedUrl) async {
                 if (_temaMarcado || _isMarking) return;

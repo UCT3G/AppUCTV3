@@ -1198,7 +1198,7 @@ class _RoadSegmentState extends State<RoadSegment> {
             ),
             child: CircleAvatar(
               radius: 30,
-              backgroundColor: _predefinedColors[currentUnidadIndex],
+              backgroundColor: _predefinedColors[currentUnidadIndex % 4],
               child: Icon(
                 _resourceIcons[tema.recursoBasicoTipo] ?? Icons.note_rounded,
                 color: Colors.white,
