@@ -103,27 +103,41 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'App UCT',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      navigatorKey: AppNavigator.navigatorKey,
-      initialRoute: AppRoutes.loading,
-      onGenerateRoute: (settings) {
-        final routeBuilder = AppRoutes.routes[settings.name];
-        if (routeBuilder != null) {
-          return MaterialPageRoute(builder: routeBuilder, settings: settings);
-        }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(
+              MediaQuery.of(context).textScaler.scale(1.0).clamp(0.85, 1.4),
+            ),
+          ),
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'App UCT',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            ),
+            navigatorKey: AppNavigator.navigatorKey,
+            initialRoute: AppRoutes.loading,
+            onGenerateRoute: (settings) {
+              final routeBuilder = AppRoutes.routes[settings.name];
+              if (routeBuilder != null) {
+                return MaterialPageRoute(
+                  builder: routeBuilder,
+                  settings: settings,
+                );
+              }
 
-        return MaterialPageRoute(
-          builder:
-              (context) => Scaffold(
-                body: Center(
-                  child: Text('Ruta no encontrada: ${settings.name}'),
-                ),
-              ),
+              return MaterialPageRoute(
+                builder:
+                    (context) => Scaffold(
+                      body: Center(
+                        child: Text('Ruta no encontrada: ${settings.name}'),
+                      ),
+                    ),
+              );
+            },
+          ),
         );
       },
     );
