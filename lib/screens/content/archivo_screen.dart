@@ -6,6 +6,8 @@ import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/services/api_service.dart';
 import 'package:app_uct/widgets/breadcrumb_nav.dart';
 import 'package:app_uct/widgets/connection_error_widget.dart';
+import 'package:app_uct/widgets/dialogs/dialog_error_connection.dart';
+import 'package:app_uct/widgets/dialogs/dialog_navegacion_temas.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -35,7 +37,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
         status = await Permission.manageExternalStorage.request();
       }
       if (!status.isGranted) {
-        openAppSettings(); // opción para guiar al usuario si no concede el permiso
+        openAppSettings();
         throw Exception('Permiso de almacenamiento completo denegado.');
       }
 
@@ -105,101 +107,36 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
 
       await OpenFilex.open(savePath);
     } catch (e) {
-      debugPrint('Error al descargar: $e');
+      // debugPrint('Error al descargar: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              'Error: ${e.toString()}',
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                color: Colors.white,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        );
         showDialog(
           context: context,
           builder: (BuildContext dialogContext) {
-            final imageHeight = MediaQuery.of(dialogContext).size.height * 0.30;
-
-            return Center(
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.topCenter,
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(top: imageHeight / 2),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: imageHeight / 4,
-                        bottom: 15,
-                        right: 15,
-                        left: 15,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "Problemas de conexión",
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 22,
-                              color: Colors.grey,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            "No se pudo realizar la descarga del archivo. Intenta de nuevo.",
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 18,
-                              color: Colors.grey,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          TextButton(
-                            onPressed: () => Navigator.pop(dialogContext),
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.grey.shade600,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                            ),
-                            child: const Text('Aceptar'),
-                          ),
-                        ],
-                      ),
+            return DialogErrorConnection(
+              title: "Problemas de conexión",
+              message:
+                  "No se pudo realizar la descarga del archivo, intenta de nuevo.",
+              imagePath: 'assets/images/YowiError.png',
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey.shade600,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
                     ),
                   ),
-                  Positioned(
-                    top: -(imageHeight / 4), // Hace que la imagen sobresalga
-                    child: SizedBox(
-                      height: imageHeight,
-                      child: Image.asset(
-                        'assets/images/YowiError.png',
-                        fit: BoxFit.cover,
-                      ),
+                  child: Text(
+                    'Cerrar',
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      color: Color(0xFF574293),
+                      decoration: TextDecoration.none,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           },
         );
@@ -248,25 +185,10 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
         if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);
         return;
       }
-      debugPrint('Error: $e');
+      // debugPrint('Error: $e');
       setState(() {
         _hasConnectionError = true;
       });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              'Error al cargar el tema: $e',
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                color: Colors.white,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        );
-      }
     }
   }
 
@@ -292,123 +214,57 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
         accion,
       );
       if (response['tema_usuario'] == 0) {
-        if (parentContext.mounted) {
-          ScaffoldMessenger.of(parentContext).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.redAccent,
-              behavior: SnackBarBehavior.floating,
-              content: Text(
-                response['comentario'],
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontFamily: 'Montserrat',
-                ),
-              ),
-            ),
-          );
-        }
         if (response['comentario'].contains('Ya no hay mas temas')) {
           if (parentContext.mounted) {
-            await showDialog(
+            ScaffoldMessenger.of(parentContext).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.redAccent,
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  response['comentario'],
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontFamily: 'Montserrat',
+                  ),
+                ),
+              ),
+            );
+            showDialog(
               context: parentContext,
               barrierDismissible: false,
-              builder: (BuildContext context) {
-                final screenWidth = MediaQuery.of(context).size.width;
-                final imageSize = screenWidth * 0.4;
-
-                return Center(
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.centerLeft,
-                    children: [
-                      // Card contenedor
-                      Container(
-                        margin: EdgeInsets.only(left: imageSize / 2),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              blurRadius: 10,
-                              spreadRadius: 2,
-                            ),
-                          ],
+              builder: (BuildContext dialogContext) {
+                return DialogNavegacionTemas(
+                  title: "Estimado usuario",
+                  message: "No hay más temas para seguir explorando",
+                  imagePath: 'assets/images/yowi_perfil.png',
+                  actions: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF574293),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              width: imageSize / 2,
-                            ), // Espacio para la imagen
-                            Flexible(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Estimado Usuario",
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context).primaryColor,
-                                      decoration: TextDecoration.none,
-                                    ),
-                                    textAlign: TextAlign.right,
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    'Ya no hay más temas para ver.',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey.shade700,
-                                      decoration: TextDecoration.none,
-                                    ),
-                                    textAlign: TextAlign.right,
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: ElevatedButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            Theme.of(context).primaryColor,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 24,
-                                          vertical: 12,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                      ),
-                                      child: const Text("Cerrar"),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Imagen a la izquierda, sobrepuesta
-                      Positioned(
-                        left: 0,
-                        child: SizedBox(
-                          width: imageSize,
-                          child: Image.asset(
-                            'assets/images/yowi_perfil.png',
-                            fit: BoxFit.cover,
+                        child: Text(
+                          "Cerrar",
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            color: Color(0xFF574293),
+                            decoration: TextDecoration.none,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 );
               },
             );
@@ -538,107 +394,39 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
                   showDialog(
                     context: parentContext,
                     barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      final screenWidth = MediaQuery.of(context).size.width;
-                      final imageSize = screenWidth * 0.4;
-
-                      return Center(
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          alignment: Alignment.centerLeft,
-                          children: [
-                            // Card contenedor
-                            Container(
-                              margin: EdgeInsets.only(left: imageSize / 2),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.2),
-                                    blurRadius: 10,
-                                    spreadRadius: 2,
-                                  ),
-                                ],
+                    builder: (BuildContext dialogContext) {
+                      return DialogNavegacionTemas(
+                        title: "Estimado Usuario",
+                        message:
+                            "Ya respondió la encuesta, ¡gracias por su aportación!",
+                        imagePath: 'assets/images/yowi_perfil.png',
+                        actions: [
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.pop(dialogContext),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF574293),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(
-                                    width: imageSize / 2,
-                                  ), // Espacio para la imagen
-                                  Flexible(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Estimado Usuario",
-                                          style: TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            decoration: TextDecoration.none,
-                                          ),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          'Ya contestaste esta encuesta. ¡Gracias!',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.grey.shade700,
-                                            decoration: TextDecoration.none,
-                                          ),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                        const SizedBox(height: 20),
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child: ElevatedButton(
-                                            onPressed:
-                                                () => Navigator.pop(context),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  Theme.of(
-                                                    context,
-                                                  ).primaryColor,
-                                              foregroundColor: Colors.white,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 24,
-                                                    vertical: 12,
-                                                  ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                            ),
-                                            child: const Text("Cerrar"),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Imagen a la izquierda, sobrepuesta
-                            Positioned(
-                              left: 0,
-                              child: SizedBox(
-                                width: imageSize,
-                                child: Image.asset(
-                                  'assets/images/yowi_perfil.png',
-                                  fit: BoxFit.cover,
+                              child: Text(
+                                "Cerrar",
+                                style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  color: Color(0xFF574293),
+                                  decoration: TextDecoration.none,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       );
                     },
                   );
@@ -669,107 +457,38 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
                   return;
                 }
               }
-              debugPrint('Error: $e');
+              // debugPrint('Error: $e');
               if (parentContext.mounted) {
                 showDialog(
                   context: parentContext,
                   builder: (BuildContext dialogContext) {
-                    final imageHeight =
-                        MediaQuery.of(dialogContext).size.height * 0.30;
-
-                    return Center(
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.topCenter,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: imageHeight / 2),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  blurRadius: 10,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                top: imageHeight / 4,
-                                bottom: 15,
-                                right: 15,
-                                left: 15,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Problemas de conexión",
-                                    style: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 22,
-                                      color: Colors.grey,
-                                      decoration: TextDecoration.none,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    "Error al validar la encuesta. Intenta de nuevo.",
-                                    style: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 18,
-                                      color: Colors.grey,
-                                      decoration: TextDecoration.none,
-                                    ),
-                                  ),
-                                  SizedBox(height: 20),
-                                  TextButton(
-                                    onPressed:
-                                        () => Navigator.pop(dialogContext),
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Colors.grey.shade600,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 24,
-                                        vertical: 12,
-                                      ),
-                                    ),
-                                    child: const Text('Aceptar'),
-                                  ),
-                                ],
-                              ),
+                    return DialogErrorConnection(
+                      title: "Problemas de conexión",
+                      message:
+                          "Error al validar la encuesta, intenta de nuevo.",
+                      imagePath: 'assets/images/YowiError.png',
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(dialogContext),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.grey.shade600,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
                             ),
                           ),
-                          Positioned(
-                            top:
-                                -(imageHeight /
-                                    4), // Hace que la imagen sobresalga
-                            child: SizedBox(
-                              height: imageHeight,
-                              child: Image.asset(
-                                'assets/images/YowiError.png',
-                                fit: BoxFit.cover,
-                              ),
+                          child: Text(
+                            'Aceptar',
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              color: Color(0xFF574293),
+                              decoration: TextDecoration.none,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
-                );
-                ScaffoldMessenger.of(parentContext).showSnackBar(
-                  SnackBar(
-                    behavior: SnackBarBehavior.floating,
-                    content: Text(
-                      'Error: $e',
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
                 );
               }
               return;
