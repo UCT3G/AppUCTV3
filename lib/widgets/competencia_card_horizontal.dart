@@ -62,6 +62,7 @@ class _CompetenciaCardHorizontalState extends State<CompetenciaCardHorizontal> {
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
@@ -128,7 +129,6 @@ class _CompetenciaCardHorizontalState extends State<CompetenciaCardHorizontal> {
                     ),
                   ),
                 ),
-                Spacer(),
                 Container(
                   padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(

@@ -31,7 +31,7 @@ class BiometricService {
   Future<bool> authenticateWithBiometrics() async {
     try {
       return await _localAuthentication.authenticate(
-        localizedReason: 'Usa tu huella o rostro para ingresar',
+        localizedReason: 'Usa tus datos biométricos para ingresar',
         options: const AuthenticationOptions(
           biometricOnly: true,
           stickyAuth: true,

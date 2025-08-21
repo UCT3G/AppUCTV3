@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen>
   AuthProvider get authProvider =>
       Provider.of<AuthProvider>(context, listen: false);
 
-  // METODO PARA INICIAR SESION CON CREDENCIALES
+  // METODO PARA INICIAR SESION POR PRIMERA VEZ
   void login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen>
           backgroundColor: Colors.white,
           behavior: SnackBarBehavior.floating,
           content: Text(
-            'Por favor, ingrese usuario y contraseña',
+            'Por favor, ingrese usuario y contraseña.',
             style: TextStyle(
               fontFamily: 'Montserrat',
               color: Colors.redAccent,
@@ -247,6 +247,7 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
+  //METODO PARA INICIAR SESION CON EL BLOQUEO DE PANTALLA (PATRON, PIN, ECT.)
   Future<void> loginWithDeviceLock() async {
     setState(() {
       _isLoadingBiometrics = true;
@@ -291,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen>
               backgroundColor: Colors.white,
               behavior: SnackBarBehavior.floating,
               content: Text(
-                'Autenticación fallida',
+                'Autenticación fallida.',
                 style: TextStyle(
                   fontFamily: 'Montserrat',
                   color: Colors.redAccent,
@@ -327,6 +328,7 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
+  // METODO PARA INICIAR SESION SIN BLOQUEO DE PANTALLA
   Future<void> loginWithCredentials() async {
     setState(() {
       _isLoadingCredentials = true;
@@ -371,7 +373,7 @@ class _LoginScreenState extends State<LoginScreen>
               backgroundColor: Colors.white,
               behavior: SnackBarBehavior.floating,
               content: Text(
-                'Autenticación fallida',
+                'Autenticación fallida.',
                 style: TextStyle(
                   fontFamily: 'Montserrat',
                   color: Colors.redAccent,
@@ -475,14 +477,17 @@ class _LoginScreenState extends State<LoginScreen>
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        child: const Text('Aceptar'),
+                        child: Text(
+                          'Aceptar',
+                          style: TextStyle(fontFamily: 'Montserrat'),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
               Positioned(
-                top: -(imageHeight / 2), // Hace que la imagen sobresalga
+                top: -(imageHeight / 2),
                 child: SizedBox(
                   height: imageHeight,
                   child: Image.asset(
@@ -498,6 +503,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  // METODO PARA VERIFICAR EL TIPO DE BLOQUEO DE PANTALLA HABILITADO
   Future<void> checkAvailability() async {
     final biometricsAvailable = await authProvider.isBiometricAvailable();
     final lockAvailable = await authProvider.isLockScreen();
@@ -761,13 +767,17 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                     ),
                   ] else if (_passwordIncorrect) ...[
-                    Text(
-                      'BIENVENIDA/O DE NUEVO:',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Montserrat',
-                        fontSize: 20,
+                    SizedBox(
+                      width: double.infinity, // ocupa todo el ancho
+                      child: Text(
+                        'BIENVENIDA/O DE NUEVO:',
+                        textAlign: TextAlign.center, // ahora sí se centra bien
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
+                          fontSize: 20,
+                        ),
                       ),
                     ),
                     Text(
@@ -853,13 +863,17 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                     ),
                   ] else ...[
-                    Text(
-                      'BIENVENIDA/O DE NUEVO:',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Montserrat',
-                        fontSize: 20,
+                    SizedBox(
+                      width: double.infinity, // ocupa todo el ancho
+                      child: Text(
+                        'BIENVENIDA/O DE NUEVO:',
+                        textAlign: TextAlign.center, // ahora sí se centra bien
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
+                          fontSize: 20,
+                        ),
                       ),
                     ),
                     Text(
@@ -904,10 +918,10 @@ class _LoginScreenState extends State<LoginScreen>
                                         SizedBox(height: 5),
                                         Text(
                                           _biometricType == BiometricType.face
-                                              ? 'Reconocimiento facial'
+                                              ? 'Face ID'
                                               : _biometricType ==
                                                   BiometricType.iris
-                                              ? 'Reconocimiento de iris'
+                                              ? 'Iris'
                                               : 'Huella dactilar',
                                           style: TextStyle(
                                             color: Colors.black,

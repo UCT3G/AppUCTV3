@@ -6,6 +6,7 @@ import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/competencia_card.dart';
 import 'package:app_uct/widgets/competencia_card_horizontal.dart';
 import 'package:app_uct/widgets/connection_error_widget.dart';
+import 'package:app_uct/widgets/dialogs/dialog_error_connection.dart';
 import 'package:app_uct/widgets/painter_home.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -129,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
       listen: false,
     );
     final TextEditingController controller = TextEditingController();
-    final imageHeight = MediaQuery.of(context).size.height * 0.15;
+    final imageHeight = MediaQuery.of(context).size.width * 0.3;
     final mensajes = [
       "¡Hola de nuevo! ¿Qué te gustaría buscar hoy?",
       "Dime qué necesitas... ¡Estoy listo!",
@@ -313,107 +314,35 @@ class _HomeScreenState extends State<HomeScreen> {
                                   await showDialog(
                                     context: context,
                                     builder: (BuildContext dialogContext) {
-                                      final imageHeight =
-                                          MediaQuery.of(
-                                            dialogContext,
-                                          ).size.height *
-                                          0.30;
-
-                                      return Center(
-                                        child: Stack(
-                                          clipBehavior: Clip.none,
-                                          alignment: Alignment.topCenter,
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(
-                                                top: imageHeight / 2,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                color: Colors.white,
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withValues(alpha: 0.2),
-                                                    blurRadius: 10,
-                                                    spreadRadius: 2,
+                                      return DialogErrorConnection(
+                                        title: 'Problemas de conexión',
+                                        message:
+                                            'No se pudo realizar la búsqueda. Intenta de nuevo',
+                                        imagePath:
+                                            'assets/images/YowiError.png',
+                                        actions: [
+                                          TextButton(
+                                            onPressed:
+                                                () => Navigator.pop(
+                                                  dialogContext,
+                                                ),
+                                            style: TextButton.styleFrom(
+                                              foregroundColor:
+                                                  Colors.grey.shade600,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 24,
+                                                    vertical: 12,
                                                   ),
-                                                ],
-                                              ),
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                  top: imageHeight / 4,
-                                                  bottom: 15,
-                                                  right: 15,
-                                                  left: 15,
-                                                ),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Text(
-                                                      "Problemas de conexión",
-                                                      style: TextStyle(
-                                                        fontFamily:
-                                                            'Montserrat',
-                                                        fontSize: 22,
-                                                        color: Colors.grey,
-                                                        decoration:
-                                                            TextDecoration.none,
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 10),
-                                                    Text(
-                                                      "No se pudo realizar la búsqueda. Intenta de nuevo.",
-                                                      style: TextStyle(
-                                                        fontFamily:
-                                                            'Montserrat',
-                                                        fontSize: 18,
-                                                        color: Colors.grey,
-                                                        decoration:
-                                                            TextDecoration.none,
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 20),
-                                                    TextButton(
-                                                      onPressed:
-                                                          () => Navigator.pop(
-                                                            dialogContext,
-                                                          ),
-                                                      style: TextButton.styleFrom(
-                                                        foregroundColor:
-                                                            Colors
-                                                                .grey
-                                                                .shade600,
-                                                        padding:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 24,
-                                                              vertical: 12,
-                                                            ),
-                                                      ),
-                                                      child: const Text(
-                                                        'Aceptar',
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
+                                            ),
+                                            child: Text(
+                                              'Aceptar',
+                                              style: TextStyle(
+                                                fontFamily: 'Montserrat',
                                               ),
                                             ),
-                                            Positioned(
-                                              top:
-                                                  -(imageHeight /
-                                                      4), // Hace que la imagen sobresalga
-                                              child: SizedBox(
-                                                height: imageHeight,
-                                                child: Image.asset(
-                                                  'assets/images/YowiError.png',
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       );
                                     },
                                   );
@@ -715,7 +644,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             _showFiltrado
                                 ? 'No se encontraron competencias.'
                                 : 'No hay competencias disponibles.',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontFamily: 'Montserrat',
+                            ),
                           ),
                         )
                         : SingleChildScrollView(
@@ -723,20 +656,33 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.all(12),
                           child: Column(
                             children: [
-                              SizedBox(
-                                height: 200,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: listCompetenciasRecientes.length,
-                                  itemBuilder: (context, index) {
-                                    final competencia =
-                                        listCompetenciasRecientes[index];
-                                    return CompetenciaCardHorizontal(
-                                      idCompetencia: competencia.idCurso ?? 0,
-                                    );
-                                  },
-                                ),
-                              ),
+                              listCompetenciasRecientes.isEmpty
+                                  ? Text(
+                                    'No hay competencias recientes disponibles.',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                  )
+                                  : SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: IntrinsicHeight(
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children:
+                                            listCompetenciasRecientes.map((
+                                              competencia,
+                                            ) {
+                                              return CompetenciaCardHorizontal(
+                                                idCompetencia:
+                                                    competencia.idCurso ?? 0,
+                                              );
+                                            }).toList(),
+                                      ),
+                                    ),
+                                  ),
                               ListView.builder(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),

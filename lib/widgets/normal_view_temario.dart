@@ -7,8 +7,8 @@ Widget buildNormalView(Size screenSize, String titulo) {
       Image.asset(
         "assets/images/Yowi2.png",
         width: screenSize.width * 0.3,
-        height: screenSize.width * 0.3,
-        alignment: Alignment.centerLeft,
+        height: screenSize.height * 0.3,
+        alignment: Alignment.bottomLeft,
       ),
       SizedBox(width: 10),
       Expanded(

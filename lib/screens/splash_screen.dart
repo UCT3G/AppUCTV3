@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> {
           "assets/animations/3g-tracto.json",
           fit: BoxFit.cover,
           width: screenSize.width * 0.6,
-          height: screenSize.width * 0.6,
+          height: screenSize.height * 0.6,
         ),
       ),
     );

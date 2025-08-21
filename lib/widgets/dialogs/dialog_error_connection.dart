@@ -47,24 +47,33 @@ class DialogErrorConnection extends StatelessWidget {
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 22,
-                      color: Colors.grey,
-                      decoration: TextDecoration.none,
+                  SizedBox(
+                    width: double.infinity, // ocupa todo el ancho
+                    child: Text(
+                      title,
+                      textAlign: TextAlign.center, // ahora sí se centra bien
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 22,
+                        color: Colors.grey,
+                        decoration: TextDecoration.none,
+                      ),
                     ),
                   ),
                   SizedBox(height: 10),
-                  Text(
-                    message,
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 18,
-                      color: Colors.grey,
-                      decoration: TextDecoration.none,
+                  SizedBox(
+                    width: double.infinity, // ocupa todo el ancho
+                    child: Text(
+                      message,
+                      textAlign: TextAlign.center, // ahora sí se centra bien
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 18,
+                        color: Colors.grey,
+                        decoration: TextDecoration.none,
+                      ),
                     ),
                   ),
                   SizedBox(height: 20),

@@ -49,7 +49,7 @@ class AuthService {
   Future<Map<String, dynamic>> loginWithBiometrics() async {
     try {
       if (!await TokenService.hasCredentials()) {
-        throw Exception('No se encontraron credenciales guardadas');
+        throw Exception('No se encontraron credenciales guardadas.');
       }
 
       bool isAuthenticated =
@@ -62,10 +62,10 @@ class AuthService {
         if (username != null && password != null) {
           return await login(username, password);
         } else {
-          throw Exception('No se encontraron credenciales guardadas');
+          throw Exception('No se encontraron credenciales guardadas.');
         }
       } else {
-        throw Exception('Autenticación biométrica fallida');
+        throw Exception('Autenticación biométrica fallida.');
       }
     } catch (e) {
       throw Exception('Error en la autenticación biométrica: $e');
@@ -76,7 +76,7 @@ class AuthService {
   Future<Map<String, dynamic>> loginWithLockScreen() async {
     try {
       if (!await TokenService.hasCredentials()) {
-        throw Exception('No se encontraron credenciales guardadas');
+        throw Exception('No se encontraron credenciales guardadas.');
       }
 
       bool isAuthenticated =
@@ -89,10 +89,10 @@ class AuthService {
         if (username != null && password != null) {
           return await login(username, password);
         } else {
-          throw Exception('No se encontraron credenciales guardadas');
+          throw Exception('No se encontraron credenciales guardadas.');
         }
       } else {
-        throw Exception('Autenticación fallida');
+        throw Exception('Autenticación fallida.');
       }
     } catch (e) {
       throw Exception('Error en la autenticación with lock screen: $e');
@@ -102,7 +102,7 @@ class AuthService {
   Future<Map<String, dynamic>> loginWithCredentials() async {
     try {
       if (!await TokenService.hasCredentials()) {
-        throw Exception('No se encontraron credenciales guardadas');
+        throw Exception('No se encontraron credenciales guardadas.');
       }
 
       final username = await _storage.read(key: 'username');
@@ -111,7 +111,7 @@ class AuthService {
       if (username != null && password != null) {
         return await login(username, password);
       } else {
-        throw Exception('No se encontraron credenciales guardadas');
+        throw Exception('No se encontraron credenciales guardadas.');
       }
     } catch (e) {
       throw Exception('Error en la autenticación: $e');

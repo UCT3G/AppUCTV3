@@ -111,11 +111,12 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
                 );
 
                 // Solo marcar error si es un problema real de conexión o carga crítica
-                if (error.errorType == WebResourceErrorType.hostLookup ||
-                    error.errorType ==
-                        WebResourceErrorType.failedSslHandshake ||
-                    error.errorType == WebResourceErrorType.connect ||
-                    error.errorType == WebResourceErrorType.timeout) {
+                if ((error.isForMainFrame ?? false) &&
+                    (error.errorType == WebResourceErrorType.hostLookup ||
+                        error.errorType ==
+                            WebResourceErrorType.failedSslHandshake ||
+                        error.errorType == WebResourceErrorType.connect ||
+                        error.errorType == WebResourceErrorType.timeout)) {
                   setState(() {
                     _hasConnectionError = true;
                   });
@@ -174,6 +175,10 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
                 } finally {
                   _isMarking = false;
                 }
+
+                await _webViewController!.runJavaScript(
+                  'document.querySelector("audio")?.play();',
+                );
               },
               onUrlChange: (UrlChange change) {
                 debugPrint('URL changed to ${change.url}');

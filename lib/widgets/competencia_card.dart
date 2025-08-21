@@ -30,7 +30,7 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
 
   @override
   Widget build(BuildContext context) {
-    // final screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery.of(context).size;
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
       listen: false,
@@ -51,8 +51,8 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
               },
               child: FractionallySizedBox(
                 widthFactor: 0.75,
-                child: SizedBox(
-                  height: 150,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: 150),
                   child: Card(
                     elevation: 5,
                     shape: RoundedRectangleBorder(
@@ -65,6 +65,7 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
                       padding: EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Padding(
                             padding: EdgeInsets.only(left: 25),
@@ -105,7 +106,6 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
                               ),
                             ),
                           ),
-                          Spacer(),
                           Container(
                             padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
@@ -186,7 +186,7 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
         ),
         Positioned(
           top: 25,
-          left: 20,
+          left: (screenSize.width * 0.75) * 0.08,
           child: CircleAvatar(
             radius: 30,
             backgroundColor: Colors.deepPurple,
