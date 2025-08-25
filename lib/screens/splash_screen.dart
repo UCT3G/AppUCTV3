@@ -64,6 +64,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final isLandscape = screenSize.width > screenSize.height;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -71,8 +72,8 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Lottie.asset(
           "assets/animations/3g-tracto.json",
           fit: BoxFit.cover,
-          width: screenSize.width * 0.6,
-          height: screenSize.height * 0.6,
+          width: isLandscape ? screenSize.width * 0.3 : screenSize.width * 0.6,
+          height: isLandscape ? screenSize.width * 0.3 : screenSize.width * 0.6,
         ),
       ),
     );

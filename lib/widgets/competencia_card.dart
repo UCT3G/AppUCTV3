@@ -31,6 +31,7 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final isLandscape = screenSize.width > screenSize.height;
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
       listen: false,
@@ -186,7 +187,10 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
         ),
         Positioned(
           top: 25,
-          left: (screenSize.width * 0.75) * 0.08,
+          left:
+              isLandscape
+                  ? (screenSize.width * 0.9) * 0.08
+                  : (screenSize.width * 0.75) * 0.08,
           child: CircleAvatar(
             radius: 30,
             backgroundColor: Colors.deepPurple,

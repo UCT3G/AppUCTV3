@@ -596,6 +596,7 @@ class _LoginScreenState extends State<LoginScreen>
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final isLandscape = screenWidth > screenHeight;
 
     return Scaffold(
       body: Stack(
@@ -645,7 +646,7 @@ class _LoginScreenState extends State<LoginScreen>
                 children: [
                   SvgPicture.asset(
                     "assets/images/UCT.svg",
-                    width: screenWidth * 0.3,
+                    width: isLandscape ? screenWidth * 0.15 : screenWidth * 0.3,
                     colorFilter: ColorFilter.mode(
                       Colors.white,
                       BlendMode.srcIn,
