@@ -18,7 +18,12 @@ class DialogErrorConnection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageHeight = MediaQuery.of(context).size.height * heightFactor;
+    final screenSize = MediaQuery.of(context).size;
+    final isLandscape = screenSize.width > screenSize.height;
+    final imageHeight =
+        isLandscape
+            ? screenSize.width * heightFactor
+            : screenSize.height * heightFactor;
 
     return Center(
       child: Stack(

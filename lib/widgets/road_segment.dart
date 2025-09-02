@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/screens/temario_screen.dart';
+import 'package:app_uct/widgets/dialogs/dialog_error_connection.dart';
+import 'package:app_uct/widgets/dialogs/dialog_navegacion_temas.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -79,7 +81,10 @@ class _RoadSegmentState extends State<RoadSegment> {
         final unidad = competenciaProvider.unidades.firstWhere(
           (u) => u.idUnidad == tema.idUnidad,
         );
-        final imageHeight = MediaQuery.of(dialogContext).size.height * 0.15;
+        final screenSize = MediaQuery.of(parentContext).size;
+        final isLandscape = screenSize.width > screenSize.height;
+        final imageHeight =
+            isLandscape ? screenSize.width * 0.15 : screenSize.height * 0.15;
 
         if (competenciaProvider.loadingDialog) {
           return const Center(child: CircularProgressIndicator());
@@ -185,7 +190,10 @@ class _RoadSegmentState extends State<RoadSegment> {
                                 vertical: 12,
                               ),
                             ),
-                            child: const Text('Cerrar'),
+                            child: Text(
+                              'Cerrar',
+                              style: TextStyle(fontFamily: 'Montserrat'),
+                            ),
                           ),
                           ElevatedButton(
                             onPressed: () async {
@@ -207,9 +215,9 @@ class _RoadSegmentState extends State<RoadSegment> {
                                       Navigator.pop(dialogContext);
                                     }
                                     if (parentContext.mounted) {
-                                      showAlertDialog(
+                                      showAlertDialogTemas(
                                         parentContext,
-                                        '¡Tienes que pasar las unidades anteriores para ver este recurso!',
+                                        '¡Tienes que pasar las unidades anteriores para ver este curso!',
                                       );
                                     }
                                     return;
@@ -253,111 +261,38 @@ class _RoadSegmentState extends State<RoadSegment> {
                                     showDialog(
                                       context: parentContext,
                                       builder: (BuildContext dialogContext) {
-                                        final imageHeight =
-                                            MediaQuery.of(
-                                              dialogContext,
-                                            ).size.height *
-                                            0.30;
-
-                                        return Center(
-                                          child: Stack(
-                                            clipBehavior: Clip.none,
-                                            alignment: Alignment.topCenter,
-                                            children: [
-                                              Container(
-                                                margin: EdgeInsets.only(
-                                                  top: imageHeight / 2,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  color: Colors.white,
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black
-                                                          .withValues(
-                                                            alpha: 0.2,
-                                                          ),
-                                                      blurRadius: 10,
-                                                      spreadRadius: 2,
+                                        return DialogErrorConnection(
+                                          title: "Problemas de conexión",
+                                          message:
+                                              "Error al validar las unidades. Intenta de nuevo.",
+                                          imagePath:
+                                              'assets/images/YowiError.png',
+                                          actions: [
+                                            TextButton(
+                                              onPressed:
+                                                  () => Navigator.pop(
+                                                    dialogContext,
+                                                  ),
+                                              style: TextButton.styleFrom(
+                                                foregroundColor:
+                                                    Colors.grey.shade600,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 24,
+                                                      vertical: 12,
                                                     ),
-                                                  ],
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.only(
-                                                    top: imageHeight / 4,
-                                                    bottom: 15,
-                                                    right: 15,
-                                                    left: 15,
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Text(
-                                                        "Problemas de conexión",
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                          fontSize: 22,
-                                                          color: Colors.grey,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .none,
-                                                        ),
-                                                      ),
-                                                      SizedBox(height: 10),
-                                                      Text(
-                                                        "Error al validar las unidades. Intenta de nuevo.",
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                          fontSize: 18,
-                                                          color: Colors.grey,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .none,
-                                                        ),
-                                                      ),
-                                                      SizedBox(height: 20),
-                                                      TextButton(
-                                                        onPressed:
-                                                            () => Navigator.pop(
-                                                              dialogContext,
-                                                            ),
-                                                        style: TextButton.styleFrom(
-                                                          foregroundColor:
-                                                              Colors
-                                                                  .grey
-                                                                  .shade600,
-                                                          padding:
-                                                              const EdgeInsets.symmetric(
-                                                                horizontal: 24,
-                                                                vertical: 12,
-                                                              ),
-                                                        ),
-                                                        child: const Text(
-                                                          'Aceptar',
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
+                                              ),
+                                              child: Text(
+                                                'Cerrar',
+                                                style: TextStyle(
+                                                  fontFamily: 'Montserrat',
+                                                  color: Color(0xFF574293),
+                                                  decoration:
+                                                      TextDecoration.none,
                                                 ),
                                               ),
-                                              Positioned(
-                                                top:
-                                                    -(imageHeight /
-                                                        4), // Hace que la imagen sobresalga
-                                                child: SizedBox(
-                                                  height: imageHeight,
-                                                  child: Image.asset(
-                                                    'assets/images/YowiError.png',
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         );
                                       },
                                     );
@@ -517,7 +452,7 @@ class _RoadSegmentState extends State<RoadSegment> {
 
                                     if (response['count'] > 0) {
                                       if (parentContext.mounted) {
-                                        showAlertDialog(
+                                        showAlertDialogTemas(
                                           parentContext,
                                           'Ya contestaste esta encuesta. ¡Gracias!',
                                         );
@@ -560,114 +495,38 @@ class _RoadSegmentState extends State<RoadSegment> {
                                       showDialog(
                                         context: parentContext,
                                         builder: (BuildContext dialogContext) {
-                                          final imageHeight =
-                                              MediaQuery.of(
-                                                dialogContext,
-                                              ).size.height *
-                                              0.30;
-
-                                          return Center(
-                                            child: Stack(
-                                              clipBehavior: Clip.none,
-                                              alignment: Alignment.topCenter,
-                                              children: [
-                                                Container(
-                                                  margin: EdgeInsets.only(
-                                                    top: imageHeight / 2,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
-                                                    color: Colors.white,
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withValues(
-                                                              alpha: 0.2,
-                                                            ),
-                                                        blurRadius: 10,
-                                                        spreadRadius: 2,
+                                          return DialogErrorConnection(
+                                            title: "Problemas de conexión",
+                                            message:
+                                                "Error al validar la encuesta. Intenta de nuevo.",
+                                            imagePath:
+                                                'assets/images/YowiError.png',
+                                            actions: [
+                                              TextButton(
+                                                onPressed:
+                                                    () => Navigator.pop(
+                                                      dialogContext,
+                                                    ),
+                                                style: TextButton.styleFrom(
+                                                  foregroundColor:
+                                                      Colors.grey.shade600,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 24,
+                                                        vertical: 12,
                                                       ),
-                                                    ],
-                                                  ),
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(
-                                                      top: imageHeight / 4,
-                                                      bottom: 15,
-                                                      right: 15,
-                                                      left: 15,
-                                                    ),
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Text(
-                                                          "Problemas de conexión",
-                                                          style: TextStyle(
-                                                            fontFamily:
-                                                                'Montserrat',
-                                                            fontSize: 22,
-                                                            color: Colors.grey,
-                                                            decoration:
-                                                                TextDecoration
-                                                                    .none,
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 10),
-                                                        Text(
-                                                          "Error al validar la encuesta. Intenta de nuevo.",
-                                                          style: TextStyle(
-                                                            fontFamily:
-                                                                'Montserrat',
-                                                            fontSize: 18,
-                                                            color: Colors.grey,
-                                                            decoration:
-                                                                TextDecoration
-                                                                    .none,
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 20),
-                                                        TextButton(
-                                                          onPressed:
-                                                              () => Navigator.pop(
-                                                                dialogContext,
-                                                              ),
-                                                          style: TextButton.styleFrom(
-                                                            foregroundColor:
-                                                                Colors
-                                                                    .grey
-                                                                    .shade600,
-                                                            padding:
-                                                                const EdgeInsets.symmetric(
-                                                                  horizontal:
-                                                                      24,
-                                                                  vertical: 12,
-                                                                ),
-                                                          ),
-                                                          child: const Text(
-                                                            'Aceptar',
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
+                                                ),
+                                                child: Text(
+                                                  'Cerrar',
+                                                  style: TextStyle(
+                                                    fontFamily: 'Montserrat',
+                                                    color: Color(0xFF574293),
+                                                    decoration:
+                                                        TextDecoration.none,
                                                   ),
                                                 ),
-                                                Positioned(
-                                                  top:
-                                                      -(imageHeight /
-                                                          4), // Hace que la imagen sobresalga
-                                                  child: SizedBox(
-                                                    height: imageHeight,
-                                                    child: Image.asset(
-                                                      'assets/images/YowiError.png',
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           );
                                         },
                                       );
@@ -737,7 +596,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                                       'No tienes mas intentos',
                                     )) {
                                       if (parentContext.mounted) {
-                                        showAlertDialog(
+                                        showAlertDialogTemas(
                                           parentContext,
                                           'Lo siento no puedes contestar esta evaluación, ya consumiste todos los intentos',
                                         );
@@ -747,7 +606,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                                       'No puede contestar esta encuesta',
                                     )) {
                                       if (parentContext.mounted) {
-                                        showAlertDialog(
+                                        showAlertDialogTemas(
                                           parentContext,
                                           'Lo siento no puedes contestar esta evaluación, no has visto todos los temas.',
                                         );
@@ -774,114 +633,38 @@ class _RoadSegmentState extends State<RoadSegment> {
                                       showDialog(
                                         context: parentContext,
                                         builder: (BuildContext dialogContext) {
-                                          final imageHeight =
-                                              MediaQuery.of(
-                                                dialogContext,
-                                              ).size.height *
-                                              0.30;
-
-                                          return Center(
-                                            child: Stack(
-                                              clipBehavior: Clip.none,
-                                              alignment: Alignment.topCenter,
-                                              children: [
-                                                Container(
-                                                  margin: EdgeInsets.only(
-                                                    top: imageHeight / 2,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
-                                                    color: Colors.white,
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withValues(
-                                                              alpha: 0.2,
-                                                            ),
-                                                        blurRadius: 10,
-                                                        spreadRadius: 2,
+                                          return DialogErrorConnection(
+                                            title: "Problemas de conexión",
+                                            message:
+                                                "Error al validar los temas. Intenta de nuevo.",
+                                            imagePath:
+                                                'assets/images/YowiError.png',
+                                            actions: [
+                                              TextButton(
+                                                onPressed:
+                                                    () => Navigator.pop(
+                                                      dialogContext,
+                                                    ),
+                                                style: TextButton.styleFrom(
+                                                  foregroundColor:
+                                                      Colors.grey.shade600,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 24,
+                                                        vertical: 12,
                                                       ),
-                                                    ],
-                                                  ),
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(
-                                                      top: imageHeight / 4,
-                                                      bottom: 15,
-                                                      right: 15,
-                                                      left: 15,
-                                                    ),
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Text(
-                                                          "Problemas de conexión",
-                                                          style: TextStyle(
-                                                            fontFamily:
-                                                                'Montserrat',
-                                                            fontSize: 22,
-                                                            color: Colors.grey,
-                                                            decoration:
-                                                                TextDecoration
-                                                                    .none,
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 10),
-                                                        Text(
-                                                          "Error al validar los temas. Intenta de nuevo.",
-                                                          style: TextStyle(
-                                                            fontFamily:
-                                                                'Montserrat',
-                                                            fontSize: 18,
-                                                            color: Colors.grey,
-                                                            decoration:
-                                                                TextDecoration
-                                                                    .none,
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 20),
-                                                        TextButton(
-                                                          onPressed:
-                                                              () => Navigator.pop(
-                                                                dialogContext,
-                                                              ),
-                                                          style: TextButton.styleFrom(
-                                                            foregroundColor:
-                                                                Colors
-                                                                    .grey
-                                                                    .shade600,
-                                                            padding:
-                                                                const EdgeInsets.symmetric(
-                                                                  horizontal:
-                                                                      24,
-                                                                  vertical: 12,
-                                                                ),
-                                                          ),
-                                                          child: const Text(
-                                                            'Aceptar',
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
+                                                ),
+                                                child: Text(
+                                                  'Cerrar',
+                                                  style: TextStyle(
+                                                    fontFamily: 'Montserrat',
+                                                    color: Color(0xFF574293),
+                                                    decoration:
+                                                        TextDecoration.none,
                                                   ),
                                                 ),
-                                                Positioned(
-                                                  top:
-                                                      -(imageHeight /
-                                                          4), // Hace que la imagen sobresalga
-                                                  child: SizedBox(
-                                                    height: imageHeight,
-                                                    child: Image.asset(
-                                                      'assets/images/YowiError.png',
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           );
                                         },
                                       );
@@ -934,7 +717,10 @@ class _RoadSegmentState extends State<RoadSegment> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),
-                            child: const Text('Ver tema'),
+                            child: Text(
+                              'Ver tema',
+                              style: TextStyle(fontFamily: 'Montserrat'),
+                            ),
                           ),
                         ],
                       ),
@@ -960,103 +746,44 @@ class _RoadSegmentState extends State<RoadSegment> {
     );
   }
 
-  Future<void> showAlertDialog(
+  Future<void> showAlertDialogTemas(
     BuildContext parentContext,
     String message,
   ) async {
-    return await showDialog(
+    return showDialog(
       context: parentContext,
-      barrierDismissible: false,
       builder: (BuildContext dialogContext) {
-        final screenWidth = MediaQuery.of(dialogContext).size.width;
-        final imageSize = screenWidth * 0.4;
+        final screenSize = MediaQuery.of(parentContext).size;
+        final isLandscape = screenSize.width > screenSize.height;
 
-        return Center(
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.centerLeft,
-            children: [
-              // Card contenedor
-              Container(
-                margin: EdgeInsets.only(left: imageSize / 2),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 10,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(width: imageSize / 2), // Espacio para la imagen
-                    Flexible(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Estimado Usuario ¡Lo sentimos!",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(dialogContext).primaryColor,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            message,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey.shade700,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                          const SizedBox(height: 20),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: ElevatedButton(
-                              onPressed: () => Navigator.pop(dialogContext),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(dialogContext).primaryColor,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                              ),
-                              child: const Text("Cerrar"),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Imagen a la izquierda, sobrepuesta
-              Positioned(
-                left: 0,
-                child: SizedBox(
-                  width: imageSize,
-                  child: Image.asset(
-                    'assets/images/yowi_perfil.png',
-                    fit: BoxFit.cover,
+        return DialogNavegacionTemas(
+          title: '¡Estimado usuario!',
+          message: message,
+          imagePath: 'assets/images/yowi_perfil.png',
+          heightFactor: isLandscape ? 0.2 : 0.4,
+          actions: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(dialogContext).primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
+                child: Text(
+                  "Cerrar",
+                  style: TextStyle(fontFamily: 'Montserrat'),
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
@@ -1092,6 +819,8 @@ class _RoadSegmentState extends State<RoadSegment> {
             );
 
     final screenSize = MediaQuery.of(context).size;
+    final isLandscape = screenSize.width > screenSize.height;
+
     bool isCardOnRight;
     bool isCircleOnLeft;
 
@@ -1130,16 +859,16 @@ class _RoadSegmentState extends State<RoadSegment> {
       children: [
         Image.asset(_assetPath, fit: BoxFit.cover, width: double.infinity),
         Positioned(
-          top: screenSize.height * 0.02,
-          left: isCardOnRight ? null : 50,
-          right: isCardOnRight ? 50 : null,
+          top: screenSize.height * (isLandscape ? 0.2 : 0.02),
+          left: isCardOnRight ? null : (isLandscape ? 300 : 50),
+          right: isCardOnRight ? (isLandscape ? 300 : 50) : null,
           child: GestureDetector(
             onTap: () async {
               await showTemarioDialog(context);
             },
             child: SizedBox(
-              width: screenSize.width * 0.7,
-              height: screenSize.height * 0.13,
+              width: screenSize.width * (isLandscape ? 0.5 : 0.7),
+              height: screenSize.height * (isLandscape ? 0.33 : 0.13),
               child: Card(
                 color:
                     (tema!.recursoBasicoTipo == 'EVALUACION' &&
@@ -1176,7 +905,16 @@ class _RoadSegmentState extends State<RoadSegment> {
                                   : Colors.grey[600],
                         ),
                         textAlign: TextAlign.center,
-                        maxLines: 4,
+                        maxLines:
+                            (() {
+                              final scale = MediaQuery.of(
+                                context,
+                              ).textScaler.scale(1.0).clamp(0.85, 1.4);
+                              if (scale <= 1.0) return 4;
+                              if (scale <= 1.15) return 3;
+                              if (scale <= 1.25) return 2;
+                              return 1;
+                            })(),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -1187,9 +925,9 @@ class _RoadSegmentState extends State<RoadSegment> {
           ),
         ),
         Positioned(
-          top: screenSize.height * 0.05,
-          left: isCircleOnLeft ? 40 : null,
-          right: isCircleOnLeft ? null : 40,
+          top: screenSize.height * (isLandscape ? 0.25 : 0.05),
+          left: isCircleOnLeft ? (isLandscape ? 50 : 40) : null,
+          right: isCircleOnLeft ? null : (isLandscape ? 50 : 40),
           child: Container(
             padding: const EdgeInsets.all(2), // Grosor del borde blanco
             decoration: const BoxDecoration(
@@ -1197,11 +935,12 @@ class _RoadSegmentState extends State<RoadSegment> {
               color: Colors.white, // Color del borde
             ),
             child: CircleAvatar(
-              radius: 30,
+              radius: isLandscape ? 40 : 30,
               backgroundColor: _predefinedColors[currentUnidadIndex % 4],
               child: Icon(
                 _resourceIcons[tema.recursoBasicoTipo] ?? Icons.note_rounded,
                 color: Colors.white,
+                size: isLandscape ? 35 : 25,
               ),
             ),
           ),
@@ -1214,7 +953,7 @@ class _RoadSegmentState extends State<RoadSegment> {
             right: isCardOnRight ? 0 : null,
             child: Image.asset(
               _extraImagePath!,
-              width: screenSize.width * 0.18,
+              width: screenSize.width * (isLandscape ? 0.28 : 0.18),
               fit: BoxFit.contain,
             ),
           ),

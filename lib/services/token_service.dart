@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app_uct/models/usuario_model.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,5 +67,16 @@ class TokenService {
     final username = await _storage.read(key: 'username');
     final password = await _storage.read(key: 'password');
     return username != null && password != null;
+  }
+
+  static Future<void> clearAll() async {
+    try {
+      await _storage.deleteAll();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      debugPrint("Storage y preferencias limpiados");
+    } catch (e) {
+      debugPrint("Error al limpiar storage: $e");
+    }
   }
 }

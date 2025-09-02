@@ -132,7 +132,9 @@ class _TemarioScreenState extends State<TemarioScreen> {
               (u) => u.idUnidad == siguienteTema.idUnidad,
             );
     final screenSize = MediaQuery.of(context).size;
-    final gradientHeight = screenSize.height * 0.25;
+    final isLandscape = screenSize.width > screenSize.height;
+    final gradientHeight =
+        isLandscape ? screenSize.height * 0.35 : screenSize.height * 0.25;
 
     log(competencia.toString());
 
@@ -231,25 +233,6 @@ class _TemarioScreenState extends State<TemarioScreen> {
                           child: CustomPaint(painter: PainterTemario()),
                         ),
                       ),
-                      Positioned(
-                        left: 10,
-                        top: MediaQuery.of(context).padding.top,
-                        child: IconButton(
-                          onPressed: () {
-                            competenciaProvider.clear();
-                            if (widget.fromHome) {
-                              Navigator.pop(context);
-                            } else {
-                              Navigator.pushNamedAndRemoveUntil(
-                                context,
-                                AppRoutes.home,
-                                (route) => false,
-                              );
-                            }
-                          },
-                          icon: Icon(Icons.arrow_back, color: Colors.white),
-                        ),
-                      ),
                       // Positioned(
                       //   right: 0,
                       //   top: MediaQuery.of(context).padding.top,
@@ -300,6 +283,25 @@ class _TemarioScreenState extends State<TemarioScreen> {
                                       ),
                             ),
                           ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 10,
+                        top: MediaQuery.of(context).padding.top,
+                        child: IconButton(
+                          onPressed: () {
+                            competenciaProvider.clear();
+                            if (widget.fromHome) {
+                              Navigator.pop(context);
+                            } else {
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                AppRoutes.home,
+                                (route) => false,
+                              );
+                            }
+                          },
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
                         ),
                       ),
                     ],

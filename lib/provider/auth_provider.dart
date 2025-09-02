@@ -24,11 +24,22 @@ class AuthProvider extends ChangeNotifier {
 
   // METODO QUE CARGA LOS TOKENS AL INICIAR LA APP
   Future<void> loadTokens() async {
-    _accessToken = await TokenService.getAccessToken();
-    _refreshToken = await TokenService.getRefreshToken();
-    _currentUsuario = await TokenService.getUserData();
-    _username = await TokenService.getUsername();
-    _password = await TokenService.getPassword();
+    try {
+      _accessToken = await TokenService.getAccessToken();
+      _refreshToken = await TokenService.getRefreshToken();
+      _currentUsuario = await TokenService.getUserData();
+      _username = await TokenService.getUsername();
+      _password = await TokenService.getPassword();
+    } catch (e) {
+      debugPrint("Error al cargar tokens: $e");
+      await TokenService.clearAll();
+      _accessToken = null;
+      _refreshToken = null;
+      _currentUsuario = null;
+      _username = null;
+      _password = null;
+    }
+
     notifyListeners();
   }
 
