@@ -77,7 +77,9 @@ class _CompetenciaCardState extends State<CompetenciaCard> {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontFamily: 'Montserrat',
-                                fontSize: 14,
+                                fontSize:
+                                    screenSize.width *
+                                    (isLandscape ? 0.03 : 0.045),
                                 fontWeight: FontWeight.bold,
                                 foreground:
                                     competencia.esObligatoria == '1'

@@ -276,10 +276,11 @@ class _TemarioScreenState extends State<TemarioScreen> {
                                   _showFullText
                                       ? buildFullText(
                                         competencia?.titulo ?? 'Titulo curso',
+                                        context,
                                       )
                                       : buildNormalView(
-                                        screenSize,
                                         competencia?.titulo ?? 'Titulo curso',
+                                        context,
                                       ),
                             ),
                           ),

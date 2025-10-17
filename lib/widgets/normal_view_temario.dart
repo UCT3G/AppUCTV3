@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-Widget buildNormalView(Size screenSize, String titulo) {
+Widget buildNormalView(String titulo, BuildContext context) {
+  final screenSize = MediaQuery.of(context).size;
+  final isLandscape = screenSize.width > screenSize.height;
+
   return Row(
     crossAxisAlignment: CrossAxisAlignment.end,
     children: [
@@ -14,16 +17,24 @@ Widget buildNormalView(Size screenSize, String titulo) {
       Expanded(
         child: Padding(
           padding: EdgeInsets.only(bottom: 10),
-          child: Text(
-            titulo.toUpperCase(),
-            textAlign: TextAlign.center,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Montserrat',
+          child: SizedBox(
+            height:
+                isLandscape
+                    ? screenSize.height * 0.30
+                    : screenSize.height * 0.20,
+            child: SingleChildScrollView(
+              child: Text(
+                titulo.toUpperCase(),
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: screenSize.width * (isLandscape ? 0.04 : 0.065),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Montserrat',
+                ),
+              ),
             ),
           ),
         ),
