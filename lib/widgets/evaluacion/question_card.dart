@@ -60,6 +60,7 @@ class _QuestionCardState extends State<QuestionCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
+                            width: double.infinity,
                             decoration: BoxDecoration(
                               shape: BoxShape.rectangle,
                               borderRadius: BorderRadius.circular(25),
