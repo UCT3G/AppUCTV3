@@ -5,6 +5,7 @@ import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:app_uct/routes/app_navigator.dart';
 import 'package:app_uct/routes/app_routes.dart';
+import 'package:app_uct/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late SharedPreferences _preferences;
   bool _wasPaused = false;
+  bool? _hasSeenOnboarding;
 
   @override
   void initState() {
@@ -57,6 +59,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future<void> initPreferences() async {
     _preferences = await SharedPreferences.getInstance();
+    final hasSeenOnboarding =
+        _preferences.getBool('onboarding_completed') ?? false;
+    setState(() {
+      _hasSeenOnboarding = hasSeenOnboarding;
+    });
   }
 
   @override
@@ -103,6 +110,23 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    if (_hasSeenOnboarding == null) {
+      return const MaterialApp(
+        home: Scaffold(body: Center(child: CircularProgressIndicator())),
+      );
+    }
+
+    if (!_hasSeenOnboarding!) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'App UCT',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        ),
+        home: OnboardingScreen(),
+      );
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return MediaQuery(
