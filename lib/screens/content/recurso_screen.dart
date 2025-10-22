@@ -71,41 +71,46 @@ class RecursoScreen extends StatelessWidget {
                     elevation: 50,
                     shadowColor: Colors.black,
                     color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: SizedBox(
                       width: 300,
-                      height: 700,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset('assets/images/YowiError.png', height: size.height * 0.3,),
-                          SizedBox(height: 20),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              'Estimado usuario.',
-                              style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontSize: 20,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/images/YowiError.png',
+                                height: size.height * 0.3,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              'Por el momento, este tipo de recurso no está disponible en la aplicación móvil. Puedes consultarlo desde nuestra versión web. Estamos trabajando para incorporar todos los recursos en la app próximamente. Agradecemos tu comprensión.',
-                              style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontSize: 15,
-                                color: Colors.black,
+                              const SizedBox(height: 20),
+                              Text(
+                                'Estimado usuario.',
+                                style: const TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 20,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
+                              const SizedBox(height: 10),
+                              Text(
+                                'Por el momento, este tipo de recurso no está disponible en la aplicación móvil. Puedes consultarlo desde nuestra versión web. Estamos trabajando para incorporar todos los recursos en la app próximamente. Agradecemos tu comprensión.',
+                                style: const TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

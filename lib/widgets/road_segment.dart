@@ -118,7 +118,8 @@ class _RoadSegmentState extends State<RoadSegment> {
                       Text(
                         tema.titulo ?? 'Titulo',
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize:
+                              screenSize.width * (isLandscape ? 0.035 : 0.055),
                           fontWeight: FontWeight.bold,
                           color: Theme.of(dialogContext).primaryColor,
                         ),
@@ -148,7 +149,9 @@ class _RoadSegmentState extends State<RoadSegment> {
                                 Text(
                                   '${tema.intentosConsumidos} visualizaciones',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize:
+                                        screenSize.width *
+                                        (isLandscape ? 0.02 : 0.035),
                                     color: Colors.grey.shade700,
                                   ),
                                 ),
@@ -896,6 +899,8 @@ class _RoadSegmentState extends State<RoadSegment> {
                       Text(
                         tema.titulo ?? 'Titulo',
                         style: TextStyle(
+                          fontSize:
+                              screenSize.width * (isLandscape ? 0.03 : 0.046),
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
                           color:

@@ -5,6 +5,8 @@ import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/connection_error_widget.dart';
+import 'package:app_uct/widgets/dialogs/dialog_error_connection.dart';
+import 'package:app_uct/widgets/dialogs/dialog_navegacion_temas.dart';
 import 'package:app_uct/widgets/evaluacion/question_card.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -128,96 +130,38 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext dialogContext) {
-          final screenWidth = MediaQuery.of(dialogContext).size.width;
-          final imageSize = screenWidth * 0.4;
+          final screenSize = MediaQuery.of(dialogContext).size;
+          final isLandscape = screenSize.width > screenSize.height;
 
-          return Center(
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.centerLeft,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(left: imageSize / 2),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(width: imageSize / 2), // Espacio para la imagen
-                      Flexible(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Estimado Usuario",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(dialogContext).primaryColor,
-                                decoration: TextDecoration.none,
-                              ),
-                              textAlign: TextAlign.right,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Hay preguntas sin responder, por favor verifique que todas las preguntas esten respondidas e intente de nuevo',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey.shade700,
-                                decoration: TextDecoration.none,
-                              ),
-                              textAlign: TextAlign.right,
-                            ),
-                            const SizedBox(height: 20),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: ElevatedButton(
-                                onPressed: () => Navigator.pop(dialogContext),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(dialogContext).primaryColor,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                                child: const Text("Cerrar"),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Imagen a la izquierda, sobrepuesta
-                Positioned(
-                  left: 0,
-                  child: SizedBox(
-                    width: imageSize,
-                    child: Image.asset(
-                      'assets/images/yowi_perfil.png',
-                      fit: BoxFit.cover,
+          return DialogNavegacionTemas(
+            title: "Estimado usuario",
+            message:
+                'Hay preguntas sin responder, por favor verifique que todas las preguntas esten respondidas e intente de nuevo',
+            imagePath: 'assets/images/yowi_perfil.png',
+            heightFactor: isLandscape ? 0.2 : 0.4,
+            actions: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(dialogContext).primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
+                  child: Text(
+                    "Cerrar",
+                    style: TextStyle(fontFamily: 'Montserrat'),
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       );
@@ -235,13 +179,6 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
       context: parentContext,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
-        // final competenciaProvider = Provider.of<CompetenciaProvider>(
-        //   dialogContext,
-        // );
-        // final evaluacionProvider = Provider.of<EvaluacionProvider>(
-        //   dialogContext,
-        // );
-        // final tema = competenciaProvider.getTemaById(widget.idTema)!;
         final imageHeight = MediaQuery.of(dialogContext).size.height * 0.15;
 
         return Center(
@@ -297,9 +234,10 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
                         children: [
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(dialogContext);
-                              Navigator.pop(parentContext);
-                              Navigator.pop(context);
+                              Navigator.pushNamed(
+                                parentContext,
+                                AppRoutes.temario,
+                              );
                             },
                             style: TextButton.styleFrom(
                               foregroundColor: Colors.grey.shade600,
@@ -593,100 +531,32 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
                             showDialog(
                               context: context,
                               builder: (BuildContext dialogContext) {
-                                final imageHeight =
-                                    MediaQuery.of(dialogContext).size.height *
-                                    0.30;
-
-                                return Center(
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    alignment: Alignment.topCenter,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                          top: imageHeight / 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                          color: Colors.white,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.2,
-                                              ),
-                                              blurRadius: 10,
-                                              spreadRadius: 2,
-                                            ),
-                                          ],
-                                        ),
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                            top: imageHeight / 4,
-                                            bottom: 15,
-                                            right: 15,
-                                            left: 15,
-                                          ),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                "Problemas de conexión",
-                                                style: TextStyle(
-                                                  fontFamily: 'Montserrat',
-                                                  fontSize: 22,
-                                                  color: Colors.grey,
-                                                  decoration:
-                                                      TextDecoration.none,
-                                                ),
-                                              ),
-                                              SizedBox(height: 10),
-                                              Text(
-                                                "No se pudo guardar la encuesta. Intenta de nuevo.",
-                                                style: TextStyle(
-                                                  fontFamily: 'Montserrat',
-                                                  fontSize: 18,
-                                                  color: Colors.grey,
-                                                  decoration:
-                                                      TextDecoration.none,
-                                                ),
-                                              ),
-                                              SizedBox(height: 20),
-                                              TextButton(
-                                                onPressed:
-                                                    () => Navigator.pop(
-                                                      dialogContext,
-                                                    ),
-                                                style: TextButton.styleFrom(
-                                                  foregroundColor:
-                                                      Colors.grey.shade600,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 24,
-                                                        vertical: 12,
-                                                      ),
-                                                ),
-                                                child: const Text('Aceptar'),
-                                              ),
-                                            ],
-                                          ),
+                                return DialogErrorConnection(
+                                  title: "Problemas de conexión",
+                                  message:
+                                      "No se pudo guardar la encuesta. Intenta de nuevo.",
+                                  imagePath: 'assets/images/YowiError.png',
+                                  actions: [
+                                    TextButton(
+                                      onPressed:
+                                          () => Navigator.pop(dialogContext),
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: Colors.grey.shade600,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 12,
                                         ),
                                       ),
-                                      Positioned(
-                                        top:
-                                            -(imageHeight /
-                                                4), // Hace que la imagen sobresalga
-                                        child: SizedBox(
-                                          height: imageHeight,
-                                          child: Image.asset(
-                                            'assets/images/YowiError.png',
-                                            fit: BoxFit.cover,
-                                          ),
+                                      child: Text(
+                                        'Cerrar',
+                                        style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          color: Color(0xFF574293),
+                                          decoration: TextDecoration.none,
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 );
                               },
                             );
@@ -710,12 +580,15 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromRGBO(87, 84, 153, 1),
                     ),
-                    child: Text(
-                      'Terminar encuesta',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Montserrat',
-                        color: Colors.white,
+                    child: Center(
+                      child: Text(
+                        'Terminar encuesta',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Montserrat',
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),

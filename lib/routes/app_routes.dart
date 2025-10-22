@@ -13,6 +13,7 @@ import 'package:app_uct/screens/content/recurso_screen.dart';
 import 'package:app_uct/screens/content/video_screen.dart';
 import 'package:app_uct/screens/home_screen.dart';
 import 'package:app_uct/screens/login_screen.dart';
+import 'package:app_uct/screens/onboarding_screen.dart';
 import 'package:app_uct/screens/splash_screen.dart';
 import 'package:app_uct/screens/temario_screen.dart';
 import 'package:app_uct/screens/welcome_screen.dart';
@@ -37,6 +38,7 @@ class AppRoutes {
   static const String evaluacion = '/evaluacion';
   static const String recurso = '/recurso';
   static const String encuesta = '/encuesta';
+  static const String onboarding = '/onboarding';
 
   static final routes = {
     login: (context) => LoginScreen(),
@@ -104,5 +106,6 @@ class AppRoutes {
       final idTema = ModalRoute.of(context)!.settings.arguments as int;
       return EncuestaScreen(idTema: idTema);
     },
+    onboarding: (context) => OnboardingScreen(),
   };
 }

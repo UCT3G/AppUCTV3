@@ -36,6 +36,8 @@ class _CompetenciaCardHorizontalState extends State<CompetenciaCardHorizontal> {
     final competencia = competenciaProvider.getCompetenciaById(
       widget.idCompetencia,
     );
+    final screenSize = MediaQuery.of(context).size;
+    final isLandscape = screenSize.width > screenSize.height;
 
     return Stack(
       clipBehavior: Clip.none,
@@ -109,7 +111,7 @@ class _CompetenciaCardHorizontalState extends State<CompetenciaCardHorizontal> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontFamily: 'Montserrat',
-                      fontSize: 18,
+                      fontSize: screenSize.width * (isLandscape ? 0.025 : 0.05),
                       fontWeight: FontWeight.bold,
                       foreground:
                           competencia.esObligatoria == '1'
