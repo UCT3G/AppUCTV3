@@ -161,16 +161,12 @@ class _PageTwoState extends State<PageTwo> with TickerProviderStateMixin {
                       ),
                     ),
                     Positioned(
-                      top:
-                          isLandscape
-                              ? -screenWidth * 0.2
-                              : -screenHeight *
-                                  0.2, // súbelo un poco fuera del área
+                      top: 0, // súbelo un poco fuera del área
                       child: Lottie.asset(
                         'assets/images/onboarding/yowi_idea.json',
                         fit: BoxFit.contain,
                         width:
-                            isLandscape ? screenWidth * 0.6 : screenWidth * 0.9,
+                            isLandscape ? screenWidth * 0.5 : screenWidth * 0.7,
                       ),
                     ),
                   ],

@@ -63,7 +63,7 @@ class PageThree extends StatelessWidget {
                           'Liderazgo',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            fontSize: screenWidth * 0.07,
+                            fontSize: screenWidth * 0.06,
                             fontWeight: FontWeight.w900,
                             fontStyle: FontStyle.italic,
                           ),
@@ -111,7 +111,7 @@ class PageThree extends StatelessWidget {
                           'Calidad',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            fontSize: screenWidth * 0.07,
+                            fontSize: screenWidth * 0.06,
                             fontWeight: FontWeight.w900,
                             fontStyle: FontStyle.italic,
                           ),
@@ -159,7 +159,7 @@ class PageThree extends StatelessWidget {
                           'Comercial',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            fontSize: screenWidth * 0.07,
+                            fontSize: screenWidth * 0.06,
                             fontWeight: FontWeight.w900,
                             fontStyle: FontStyle.italic,
                           ),
@@ -207,7 +207,7 @@ class PageThree extends StatelessWidget {
                           'Tractocamión',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            fontSize: screenWidth * 0.07,
+                            fontSize: screenWidth * 0.06,
                             fontWeight: FontWeight.w900,
                             fontStyle: FontStyle.italic,
                           ),
@@ -255,7 +255,7 @@ class PageThree extends StatelessWidget {
                           'Talento humano',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            fontSize: screenWidth * 0.07,
+                            fontSize: screenWidth * 0.06,
                             fontWeight: FontWeight.w900,
                             fontStyle: FontStyle.italic,
                           ),
@@ -303,7 +303,7 @@ class PageThree extends StatelessWidget {
                           'Montacargas',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            fontSize: screenWidth * 0.07,
+                            fontSize: screenWidth * 0.06,
                             fontWeight: FontWeight.w900,
                             fontStyle: FontStyle.italic,
                           ),
@@ -351,7 +351,7 @@ class PageThree extends StatelessWidget {
                           'Chofer de camioneta',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            fontSize: screenWidth * 0.07,
+                            fontSize: screenWidth * 0.06,
                             fontWeight: FontWeight.w900,
                             fontStyle: FontStyle.italic,
                           ),

@@ -31,9 +31,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_completed', true);
 
-    AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
-      AppRoutes.login,
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
+        AppRoutes.login,
+      );
+    });
   }
 
   void nextPage() {
