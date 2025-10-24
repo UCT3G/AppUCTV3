@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 
-class PageOne extends StatefulWidget {
-  const PageOne({super.key});
+class PageFour extends StatefulWidget {
+  const PageFour({super.key});
 
   @override
-  State<PageOne> createState() => _PageOneState();
+  State<PageFour> createState() => _PageFourState();
 }
 
-class _PageOneState extends State<PageOne> with TickerProviderStateMixin {
+class _PageFourState extends State<PageFour> with TickerProviderStateMixin {
   late AnimationController _controller1;
   late Animation<double> _animation1;
-  late AnimationController _controller2;
-  late Animation<double> _animation2;
 
   @override
   void initState() {
@@ -27,22 +25,11 @@ class _PageOneState extends State<PageOne> with TickerProviderStateMixin {
         setState(() {});
       });
     _controller1.repeat();
-
-    _controller2 = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: 60),
-    );
-    _animation2 = Tween<double>(begin: -100, end: 500).animate(_controller2)
-      ..addListener(() {
-        setState(() {});
-      });
-    _controller2.repeat();
   }
 
   @override
   void dispose() {
     _controller1.dispose();
-    _controller2.dispose();
     super.dispose();
   }
 
@@ -72,30 +59,18 @@ class _PageOneState extends State<PageOne> with TickerProviderStateMixin {
                         child: SizedBox(
                           width: 360,
                           height: 640,
-                          child: CustomPaint(painter: PageOneCustomPainter()),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: isLandscape ? screenWidth * 0.2 : screenHeight * 0.1,
-                      left:
-                          isLandscape ? screenWidth * 0.1 : screenWidth * 0.15,
-                      child: SvgPicture.asset(
-                        'assets/images/onboarding/estrella3.svg',
-                        width: screenWidth * 0.08,
-                        colorFilter: ColorFilter.mode(
-                          const Color.fromARGB(255, 124, 173, 188),
-                          BlendMode.srcIn,
+                          child: CustomPaint(painter: PageFourCustomPainter()),
                         ),
                       ),
                     ),
                     Positioned(
                       top:
                           isLandscape ? screenWidth * 0.15 : screenHeight * 0.1,
-                      right: screenWidth * 0.1,
+                      left:
+                          isLandscape ? screenWidth * 0.1 : screenWidth * 0.05,
                       child: SvgPicture.asset(
                         'assets/images/onboarding/estrella3.svg',
-                        width: screenWidth * 0.05,
+                        width: screenWidth * 0.08,
                         colorFilter: ColorFilter.mode(
                           const Color.fromRGBO(124, 173, 188, 1),
                           BlendMode.srcIn,
@@ -103,14 +78,17 @@ class _PageOneState extends State<PageOne> with TickerProviderStateMixin {
                       ),
                     ),
                     Positioned(
-                      top: isLandscape ? screenWidth * 0.5 : screenHeight * 0.3,
-                      right:
-                          isLandscape ? screenWidth * 0.3 : screenWidth * 0.2,
+                      top:
+                          isLandscape
+                              ? screenWidth * 0.25
+                              : screenHeight * 0.15,
+                      left:
+                          isLandscape ? screenWidth * 0.05 : screenWidth * 0.05,
                       child: SvgPicture.asset(
                         'assets/images/onboarding/estrella3.svg',
-                        width: screenWidth * 0.1,
+                        width: screenWidth * 0.15,
                         colorFilter: ColorFilter.mode(
-                          Colors.white,
+                          const Color.fromRGBO(124, 173, 188, 1),
                           BlendMode.srcIn,
                         ),
                       ),
@@ -119,11 +97,11 @@ class _PageOneState extends State<PageOne> with TickerProviderStateMixin {
                       top:
                           isLandscape
                               ? screenWidth * 0.035
-                              : screenHeight * 0.025,
+                              : screenHeight * 0.03,
                       left: _animation1.value,
                       child: SvgPicture.asset(
                         'assets/images/onboarding/nube.svg',
-                        width: screenWidth * 0.2,
+                        width: screenWidth * 0.3,
                         colorFilter: ColorFilter.mode(
                           const Color.fromARGB(255, 190, 216, 236),
                           BlendMode.srcIn,
@@ -133,29 +111,14 @@ class _PageOneState extends State<PageOne> with TickerProviderStateMixin {
                     Positioned(
                       top:
                           isLandscape
-                              ? screenWidth * 0.45
-                              : screenHeight * 0.25,
-                      right: _animation2.value,
-                      child: SvgPicture.asset(
-                        'assets/images/onboarding/nube.svg',
-                        width: screenWidth * 0.2,
-                        colorFilter: ColorFilter.mode(
-                          const Color.fromARGB(255, 190, 216, 236),
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top:
-                          isLandscape
-                              ? -screenWidth * 0.2
+                              ? -screenWidth * 0.5
                               : -screenHeight *
                                   0.2, // súbelo un poco fuera del área
                       child: Lottie.asset(
-                        'assets/images/onboarding/yowi_hablando.json',
+                        'assets/images/onboarding/trailer_final.json',
                         fit: BoxFit.contain,
                         width:
-                            isLandscape ? screenWidth * 0.6 : screenWidth * 0.9,
+                            isLandscape ? screenWidth * 0.8 : screenWidth * 0.9,
                       ),
                     ),
                   ],
@@ -163,10 +126,10 @@ class _PageOneState extends State<PageOne> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 24),
               Text(
-                'Bienvenido',
+                'En cualquier lugar, en todo momento',
                 style: TextStyle(
                   color: Color(0xFF574293),
-                  fontSize: screenWidth * 0.12,
+                  fontSize: screenWidth * 0.09,
                   fontStyle: FontStyle.italic,
                   fontWeight: FontWeight.w900,
                   height: 1.0,
@@ -176,7 +139,7 @@ class _PageOneState extends State<PageOne> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 24),
               Text(
-                '¿Listo para comenzar tu viaje de conocimientos?',
+                'Avanza en tu camino de aprendizaje.',
                 style: TextStyle(
                   color: Color(0xFF4D4D4D),
                   fontSize: screenWidth * 0.06,
@@ -194,7 +157,7 @@ class _PageOneState extends State<PageOne> with TickerProviderStateMixin {
   }
 }
 
-class PageOneCustomPainter extends CustomPainter {
+class PageFourCustomPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Layer 1
@@ -208,46 +171,38 @@ class PageOneCustomPainter extends CustomPainter {
           ..strokeJoin = StrokeJoin.miter;
 
     Path path_0 = Path();
-    path_0.moveTo(size.width * 0.4536111, size.height * 0.1657656);
+    path_0.moveTo(size.width * 0.0666111, size.height * 0.2899687);
     path_0.cubicTo(
-      size.width * 0.7784722,
-      size.height * 0.0550469,
-      size.width * 1.0502500,
-      size.height * 0.2117188,
-      size.width * 0.9361389,
-      size.height * 0.2808750,
+      size.width * -0.0055000,
+      size.height * 0.1724375,
+      size.width * 0.3891667,
+      size.height * 0.1667969,
+      size.width * 0.5820000,
+      size.height * 0.2017188,
     );
     path_0.cubicTo(
-      size.width * 0.8121667,
-      size.height * 0.3586250,
-      size.width * 0.7138889,
-      size.height * 0.3653750,
-      size.width * 0.8032222,
-      size.height * 0.4716406,
+      size.width * 1.4444722,
+      size.height * 0.3780938,
+      size.width * 1.3478889,
+      size.height * 0.7012656,
+      size.width * 1.0064444,
+      size.height * 0.8051562,
     );
     path_0.cubicTo(
-      size.width * 0.8956944,
-      size.height * 0.5454531,
-      size.width * 1.2233056,
-      size.height * 0.6723281,
-      size.width * 0.7437778,
-      size.height * 0.8185938,
+      size.width * -0.0263333,
+      size.height * 1.0418750,
+      size.width * -0.2997778,
+      size.height * 0.7605469,
+      size.width * -0.0384444,
+      size.height * 0.6187187,
     );
     path_0.cubicTo(
-      size.width * 0.3830556,
-      size.height * 0.8886250,
-      size.width * 0.1993611,
-      size.height * 0.8283750,
-      size.width * 0.0315833,
-      size.height * 0.6070937,
-    );
-    path_0.cubicTo(
-      size.width * -0.0640278,
-      size.height * 0.4435469,
-      size.width * 0.1659167,
-      size.height * 0.2835781,
-      size.width * 0.4536111,
-      size.height * 0.1657656,
+      size.width * 0.0990000,
+      size.height * 0.5465781,
+      size.width * 0.2148333,
+      size.height * 0.4877031,
+      size.width * 0.0666111,
+      size.height * 0.2899687,
     );
     path_0.close();
 
@@ -264,38 +219,38 @@ class PageOneCustomPainter extends CustomPainter {
           ..strokeJoin = StrokeJoin.miter;
 
     Path path_1 = Path();
-    path_1.moveTo(size.width * 0.0439167, size.height * 0.7767031);
+    path_1.moveTo(size.width * 0.8436944, size.height * 0.1754063);
     path_1.cubicTo(
-      size.width * 0.0640556,
-      size.height * 0.7638750,
-      size.width * 0.1199722,
-      size.height * 0.7573125,
-      size.width * 0.1860556,
-      size.height * 0.7900625,
+      size.width * 0.8708889,
+      size.height * 0.1754063,
+      size.width * 0.9116944,
+      size.height * 0.1861250,
+      size.width * 0.9116944,
+      size.height * 0.2136719,
     );
     path_1.cubicTo(
-      size.width * 0.2226667,
-      size.height * 0.8082344,
-      size.width * 0.2625556,
-      size.height * 0.8451562,
-      size.width * 0.2273056,
-      size.height * 0.8676719,
+      size.width * 0.9116944,
+      size.height * 0.2289844,
+      size.width * 0.8913056,
+      size.height * 0.2519375,
+      size.width * 0.8436944,
+      size.height * 0.2519375,
     );
     path_1.cubicTo(
-      size.width * 0.2071111,
-      size.height * 0.8805625,
-      size.width * 0.1493889,
-      size.height * 0.8862344,
-      size.width * 0.0852500,
-      size.height * 0.8543594,
+      size.width * 0.8164722,
+      size.height * 0.2519375,
+      size.width * 0.7756667,
+      size.height * 0.2404531,
+      size.width * 0.7756667,
+      size.height * 0.2136719,
     );
     path_1.cubicTo(
-      size.width * 0.0485278,
-      size.height * 0.8361719,
-      size.width * 0.0085556,
-      size.height * 0.7992031,
-      size.width * 0.0439167,
-      size.height * 0.7767031,
+      size.width * 0.7756667,
+      size.height * 0.1983750,
+      size.width * 0.7960833,
+      size.height * 0.1754063,
+      size.width * 0.8436944,
+      size.height * 0.1754063,
     );
     path_1.close();
 

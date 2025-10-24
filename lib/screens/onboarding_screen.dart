@@ -1,6 +1,10 @@
 import 'package:app_uct/routes/app_navigator.dart';
 import 'package:app_uct/routes/app_routes.dart';
+import 'package:app_uct/screens/onboarding/page_five.dart';
+import 'package:app_uct/screens/onboarding/page_four.dart';
 import 'package:app_uct/screens/onboarding/page_one.dart';
+import 'package:app_uct/screens/onboarding/page_three.dart';
+import 'package:app_uct/screens/onboarding/page_two.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,8 +18,14 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentIndex = 0;
-
-  final List<Widget> _pages = [PageOne()];
+  //
+  final List<Widget> _pages = [
+    PageOne(),
+    PageTwo(),
+    PageThree(),
+    PageFour(),
+    PageFive(),
+  ];
 
   Future<void> finishOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
@@ -77,8 +87,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: PageView(
                   controller: _controller,
                   physics: const ClampingScrollPhysics(),
-                  onPageChanged: (value) => setState(() => _currentIndex = value),
-                  children: _pages,),
+                  onPageChanged:
+                      (value) => setState(() => _currentIndex = value),
+                  children: _pages,
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
