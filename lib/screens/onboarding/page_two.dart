@@ -161,7 +161,8 @@ class _PageTwoState extends State<PageTwo> with TickerProviderStateMixin {
                       ),
                     ),
                     Positioned(
-                      top: 0, // súbelo un poco fuera del área
+                      top:
+                          -screenHeight * 0.05, // súbelo un poco fuera del área
                       child: Lottie.asset(
                         'assets/images/onboarding/yowi_idea.json',
                         fit: BoxFit.contain,

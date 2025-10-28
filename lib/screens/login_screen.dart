@@ -638,6 +638,16 @@ class _LoginScreenState extends State<LoginScreen>
               width: screenWidth * 0.4,
             ),
           ),
+          Positioned(
+            top: screenHeight * 0.05,
+            left: 0,
+            child: IconButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
+              },
+              icon: Icon(Icons.home, color: Colors.white, size: 30),
+            ),
+          ),
           Center(
             child: SingleChildScrollView(
               padding: EdgeInsets.all(20),

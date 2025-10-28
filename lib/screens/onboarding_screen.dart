@@ -1,4 +1,4 @@
-import 'package:app_uct/routes/app_navigator.dart';
+// import 'package:app_uct/routes/app_navigator.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/screens/onboarding/page_five.dart';
 import 'package:app_uct/screens/onboarding/page_four.dart';
@@ -28,14 +28,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   Future<void> finishOnboarding() async {
+    Navigator.pushReplacementNamed(context, AppRoutes.login);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_completed', true);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      AppNavigator.navigatorKey.currentState?.pushReplacementNamed(
-        AppRoutes.login,
-      );
-    });
   }
 
   void nextPage() {

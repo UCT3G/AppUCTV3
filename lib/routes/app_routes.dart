@@ -20,9 +20,10 @@ import 'package:app_uct/screens/welcome_screen.dart';
 import 'package:flutter/widgets.dart';
 
 class AppRoutes {
+  static const String root = '/';
   static const String login = '/login';
   static const String home = '/home';
-  static const String loading = '/';
+  static const String loading = '/loading';
   static const String welcome = '/welcome';
   static const String interactive = '/interactive-content';
   static const String video = '/video-content';
@@ -41,6 +42,7 @@ class AppRoutes {
   static const String onboarding = '/onboarding';
 
   static final routes = {
+    root: (context) => SplashScreen(isInitialLoad: false),
     login: (context) => LoginScreen(),
     home: (context) => HomeScreen(),
     loading: (context) {

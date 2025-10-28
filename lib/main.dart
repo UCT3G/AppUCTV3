@@ -5,7 +5,6 @@ import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:app_uct/routes/app_navigator.dart';
 import 'package:app_uct/routes/app_routes.dart';
-import 'package:app_uct/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -116,17 +115,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       );
     }
 
-    if (!_hasSeenOnboarding!) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'App UCT',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        ),
-        home: OnboardingScreen(),
-      );
-    }
-
     return LayoutBuilder(
       builder: (context, constraints) {
         return MediaQuery(
@@ -142,7 +130,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             ),
             navigatorKey: AppNavigator.navigatorKey,
-            initialRoute: AppRoutes.loading,
+            initialRoute:
+                _hasSeenOnboarding! ? AppRoutes.loading : AppRoutes.onboarding,
             onGenerateRoute: (settings) {
               final routeBuilder = AppRoutes.routes[settings.name];
               if (routeBuilder != null) {
