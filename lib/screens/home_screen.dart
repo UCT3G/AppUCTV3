@@ -21,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _showScrollButton = false;
   bool _showObligatorias = false;
   bool _showFiltrado = false;
@@ -399,6 +400,171 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> modalAdministrador(BuildContext context) {
+    final TextEditingController controller = TextEditingController();
+    final imageHeight = MediaQuery.of(context).size.width * 0.3;
+
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: imageHeight / 2),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                top: 10, // espacio arriba para el contenido
+                left: 8,
+                right: 8,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white, // Fondo del modal
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromRGBO(162, 157, 205, 1),
+                    Color.fromRGBO(165, 210, 241, 1),
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(8.0),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromRGBO(162, 157, 205, 1),
+                        Color.fromRGBO(165, 210, 241, 1),
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'INICIAR SESIÓN ADMINISTRADOR',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Montserrat',
+                          color: Color.fromRGBO(86, 66, 148, 1),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        margin: EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: controller,
+                          style: TextStyle(fontFamily: 'Montserrat'),
+                          decoration: InputDecoration(
+                            hintText: 'Usuario',
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(fontFamily: 'Montserrat'),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        margin: EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: controller,
+                          style: TextStyle(fontFamily: 'Montserrat'),
+                          decoration: InputDecoration(
+                            hintText: 'Contraseña',
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(fontFamily: 'Montserrat'),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 150,
+                        child: ElevatedButton(
+                          onPressed: () async {},
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 14,
+                              horizontal: 5,
+                            ),
+                            backgroundColor: Color.fromRGBO(86, 66, 148, 1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.search, color: Colors.white),
+                              SizedBox(width: 5),
+                              Text(
+                                'Iniciar sesión',
+                                style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: -(imageHeight / 2),
+              right: 0,
+              child: SizedBox(
+                height: imageHeight,
+                child: Image.asset(
+                  'assets/images/YowMitad.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> loadData() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
@@ -494,6 +660,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final listCompetenciasRecientes = competenciaProvider.competenciasRecientes;
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -537,21 +704,118 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: Icon(Icons.account_circle_rounded, color: Colors.white),
         actions: [
           IconButton(
-            onPressed: () async {
-              final authProvider = Provider.of<AuthProvider>(
-                context,
-                listen: false,
-              );
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.login,
-                (route) => false,
-              );
-              await authProvider.logout();
+            onPressed: () {
+              _scaffoldKey.currentState?.openEndDrawer();
             },
-            icon: Icon(Icons.logout, color: Colors.white),
+            icon: Icon(Icons.menu_rounded, color: Colors.white),
           ),
         ],
+      ),
+      endDrawer: Drawer(
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromRGBO(86, 66, 148, 1),
+                      Color.fromRGBO(120, 130, 170, 1),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.account_circle_rounded,
+                      color: Colors.white,
+                      size: 48,
+                    ),
+                    SizedBox(width: 12),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            authProvider.currentUsuario?.nombreCompleto ??
+                                'Usuario',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Montserrat',
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            authProvider.currentUsuario?.nombrePuesto ??
+                                'Puesto',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              fontSize: 12,
+                              fontFamily: 'Montserrat',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    ListTile(
+                      leading: Icon(Icons.settings, color: Color(0xFF4d4d4d)),
+                      title: Text(
+                        'Administrador',
+                        style: TextStyle(
+                          color: Color(0xFF4d4d4d),
+                          fontFamily: 'Montserrat',
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        modalAdministrador(context);
+                      },
+                    ),
+                    Divider(color: Colors.black38),
+                    ListTile(
+                      leading: Icon(Icons.logout, color: Color(0xFF4d4d4d)),
+                      title: Text(
+                        'Cerrar Sesión',
+                        style: TextStyle(
+                          color: Color(0xFF4d4d4d),
+                          fontFamily: 'Montserrat',
+                        ),
+                      ),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        await authProvider.logout();
+                        if (context.mounted) {
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            AppRoutes.login,
+                            (route) => false,
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: Stack(
         children: [
