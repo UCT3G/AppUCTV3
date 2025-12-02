@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -80,7 +81,10 @@ class _LoginScreenState extends State<LoginScreen>
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (response['success'] == true && response['access_token'] != null) {
-        await showSaveCredentialsDialog();
+        final prefs = await SharedPreferences.getInstance();
+        if (prefs.getBool('administrador') == false) {
+          await showSaveCredentialsDialog();
+        }
 
         if (mounted) {
           Navigator.pushReplacementNamed(context, AppRoutes.welcome);

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
+import 'package:app_uct/screens/splash_screen.dart';
 import 'package:app_uct/widgets/competencia_card.dart';
 import 'package:app_uct/widgets/competencia_card_horizontal.dart';
 import 'package:app_uct/widgets/connection_error_widget.dart';
@@ -11,6 +12,7 @@ import 'package:app_uct/widgets/painter_home.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _showObligatorias = false;
   bool _showFiltrado = false;
   bool _hasConnectionError = false;
+  bool _isAdministrador = false;
 
   Future<void> loadCompetencias() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
@@ -401,7 +404,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> modalAdministrador(BuildContext context) {
-    final TextEditingController controller = TextEditingController();
+    final TextEditingController usuario = TextEditingController();
+    final TextEditingController password = TextEditingController();
     final imageHeight = MediaQuery.of(context).size.width * 0.3;
 
     return showModalBottomSheet(
@@ -453,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         'INICIAR SESIÓN ADMINISTRADOR',
                         style: TextStyle(
                           fontSize: 20,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w800,
                           fontFamily: 'Montserrat',
                           color: Color.fromRGBO(86, 66, 148, 1),
                         ),
@@ -476,7 +480,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         child: TextField(
-                          controller: controller,
+                          controller: usuario,
                           style: TextStyle(fontFamily: 'Montserrat'),
                           decoration: InputDecoration(
                             hintText: 'Usuario',
@@ -503,19 +507,23 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         child: TextField(
-                          controller: controller,
+                          controller: password,
                           style: TextStyle(fontFamily: 'Montserrat'),
                           decoration: InputDecoration(
                             hintText: 'Contraseña',
                             border: InputBorder.none,
                             hintStyle: TextStyle(fontFamily: 'Montserrat'),
                           ),
+                          obscureText: true,
                         ),
                       ),
                       SizedBox(
                         width: 150,
                         child: ElevatedButton(
-                          onPressed: () async {},
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            loginAdministrador(usuario.text, password.text);
+                          },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
                               vertical: 14,
@@ -529,7 +537,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.search, color: Colors.white),
+                              Icon(Icons.login, color: Colors.white),
                               SizedBox(width: 5),
                               Text(
                                 'Iniciar sesión',
@@ -565,6 +573,101 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void loginAdministrador(String username, String password) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.white,
+          behavior: SnackBarBehavior.floating,
+          content: Text(
+            'Por favor, ingrese usuario y contraseña del administrador.',
+            style: TextStyle(
+              fontFamily: 'Montserrat',
+              color: Colors.redAccent,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder:
+          (context) => PopScope(
+            canPop: false,
+            child: SplashScreen(isInitialLoad: false),
+          ),
+    );
+
+    try {
+      final response = await authProvider.loginAdministrador(
+        username,
+        password,
+      );
+
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+
+      if (response['success'] == true) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.teal,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                response['message'],
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          );
+          await _loadAdminFlag();
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.white,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                response['message'],
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  color: Colors.redAccent,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Error: $e',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> loadData() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
       context,
@@ -594,7 +697,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      loadData();
+      await _loadAdminFlag();
+      await loadData();
     });
 
     _scrollController.addListener(() {
@@ -608,6 +712,48 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     });
+  }
+
+  Future<void> _loadAdminFlag() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isAdmin = prefs.getBool('administrador') ?? false;
+      if (mounted) {
+        setState(() {
+          _isAdministrador = isAdmin;
+        });
+      }
+    } catch (e) {
+      // ignore errors reading prefs
+    }
+  }
+
+  Future<void> _deactivateAdmin() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('administrador', false);
+      if (mounted) {
+        setState(() {
+          _isAdministrador = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.teal,
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+              'Modo administrador desactivado',
+              style: TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al desactivar administrador: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -774,20 +920,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
-                    ListTile(
-                      leading: Icon(Icons.settings, color: Color(0xFF4d4d4d)),
-                      title: Text(
-                        'Administrador',
-                        style: TextStyle(
-                          color: Color(0xFF4d4d4d),
-                          fontFamily: 'Montserrat',
+                    if (!_isAdministrador) ...[
+                      ListTile(
+                        leading: Icon(Icons.settings, color: Color(0xFF4d4d4d)),
+                        title: Text(
+                          'Administrador',
+                          style: TextStyle(
+                            color: Color(0xFF4d4d4d),
+                            fontFamily: 'Montserrat',
+                          ),
                         ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          modalAdministrador(context);
+                        },
                       ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        modalAdministrador(context);
-                      },
-                    ),
+                    ] else ...[
+                      ListTile(
+                        leading: Icon(Icons.settings, color: Color(0xFF4d4d4d)),
+                        title: Text(
+                          'Desactivar administrador',
+                          style: TextStyle(
+                            color: Color(0xFF4d4d4d),
+                            fontFamily: 'Montserrat',
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          await _deactivateAdmin();
+                        },
+                      ),
+                    ],
                     Divider(color: Colors.black38),
                     ListTile(
                       leading: Icon(Icons.logout, color: Color(0xFF4d4d4d)),

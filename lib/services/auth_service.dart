@@ -18,6 +18,7 @@ class AuthService {
     String username,
     String password,
   ) async {
+    final prefs = await SharedPreferences.getInstance();
     try {
       final response = await http.post(
         Uri.parse('${ApiService.baseURL}/USUARIO/LoginApp'),
@@ -25,6 +26,7 @@ class AuthService {
         body: json.encode({
           'username': encodeBase64(username),
           'password': encodeBase64(password),
+          'administrador': prefs.getBool('administrador') ?? false,
         }),
       );
 
@@ -159,6 +161,38 @@ class AuthService {
       return response.statusCode == 200;
     } catch (e) {
       return false;
+    }
+  }
+
+  static Future<Map<String, dynamic>> loginAdministrador(
+    String username,
+    String password,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiService.baseURL}/USUARIO/LoginAppAdministrador'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'username': encodeBase64(username),
+          'password': encodeBase64(password),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': json.decode(response.body)};
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        return {
+          'success': false,
+          'message': json.decode(response.body)['message'],
+          'tipo': json.decode(response.body)['tipo'],
+        };
+      } else {
+        throw Exception(
+          'Error en el login administrador: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Error en el login administrador: $e');
     }
   }
 }

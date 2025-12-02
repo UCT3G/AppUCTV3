@@ -6,6 +6,7 @@ import 'package:app_uct/services/biometric_service.dart';
 import 'package:app_uct/services/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -151,10 +152,15 @@ class AuthProvider extends ChangeNotifier {
 
   //METODO PARA CERRAR SESION
   Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
     await AuthService.logout();
     _accessToken = null;
     _refreshToken = null;
     _currentUsuario = null;
+    if (prefs.getBool('administrador') == true) {
+      _username = null;
+      _password = null;
+    }
     notifyListeners();
   }
 
@@ -187,5 +193,22 @@ class AuthProvider extends ChangeNotifier {
     return _accessToken != null &&
         _accessToken!.isNotEmpty &&
         _currentUsuario != null;
+  }
+
+  Future<Map<String, dynamic>> loginAdministrador(
+    String username,
+    String password,
+  ) async {
+    final response = await AuthService.loginAdministrador(username, password);
+    if (!response['success']) {
+      return {
+        'success': false,
+        'message': response['message'],
+        'tipo': response['tipo'],
+      };
+    }
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('administrador', true);
+    return {'success': true, 'message': 'Login administrador exitoso'};
   }
 }
