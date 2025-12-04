@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:app_uct/services/api_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EvaluacionService {
   static Future<Map<String, dynamic>> getFormularioEvaluacion(
@@ -14,8 +16,29 @@ class EvaluacionService {
     final url = Uri.parse(
       '${ApiService.baseURL}/CURSOS_MOVIL/cargarEvaluacion',
     );
-
+    final prefs = await SharedPreferences.getInstance();
     try {
+      final lastRequest = prefs.getString('last-request') ?? '';
+      if (lastRequest.isNotEmpty) {
+        try {
+          final lastDate = DateTime.parse(lastRequest);
+          final now = DateTime.now();
+          final difference = now.difference(lastDate);
+
+          if (difference >= Duration(hours: 2)) {
+            await http.post(
+              Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
+              headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $accessToken',
+              },
+              body: json.encode({'motivo': 'timeout', 'fuente': 'recolector'}),
+            );
+          }
+        } catch (e) {
+          log('No se pudo parsear last-request: $lastRequest -> $e');
+        }
+      }
       final response = await http.post(
         url,
         headers: {
@@ -31,6 +54,7 @@ class EvaluacionService {
       );
 
       if (response.statusCode == 200) {
+        prefs.setString('last-request', DateTime.now().toIso8601String());
         final data = json.decode(response.body);
         return data;
       } else if (response.statusCode == 401) {
@@ -48,8 +72,29 @@ class EvaluacionService {
     String accessToken,
   ) async {
     final url = Uri.parse('${ApiService.baseURL}/CURSOS_MOVIL/saveEvaluacion');
-
+    final prefs = await SharedPreferences.getInstance();
     try {
+      final lastRequest = prefs.getString('last-request') ?? '';
+      if (lastRequest.isNotEmpty) {
+        try {
+          final lastDate = DateTime.parse(lastRequest);
+          final now = DateTime.now();
+          final difference = now.difference(lastDate);
+
+          if (difference >= Duration(hours: 2)) {
+            await http.post(
+              Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
+              headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $accessToken',
+              },
+              body: json.encode({'motivo': 'timeout', 'fuente': 'recolector'}),
+            );
+          }
+        } catch (e) {
+          log('No se pudo parsear last-request: $lastRequest -> $e');
+        }
+      }
       final response = await http.post(
         url,
         headers: {
@@ -60,6 +105,7 @@ class EvaluacionService {
       );
 
       if (response.statusCode == 200) {
+        prefs.setString('last-request', DateTime.now().toIso8601String());
         final data = json.decode(response.body);
         return data;
       } else if (response.statusCode == 401) {
@@ -80,8 +126,29 @@ class EvaluacionService {
     final url = Uri.parse(
       '${ApiService.baseURL}/CURSOS_MOVIL/loadFormEncuesta',
     );
-
+    final prefs = await SharedPreferences.getInstance();
     try {
+      final lastRequest = prefs.getString('last-request') ?? '';
+      if (lastRequest.isNotEmpty) {
+        try {
+          final lastDate = DateTime.parse(lastRequest);
+          final now = DateTime.now();
+          final difference = now.difference(lastDate);
+
+          if (difference >= Duration(hours: 2)) {
+            await http.post(
+              Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
+              headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $accessToken',
+              },
+              body: json.encode({'motivo': 'timeout', 'fuente': 'recolector'}),
+            );
+          }
+        } catch (e) {
+          log('No se pudo parsear last-request: $lastRequest -> $e');
+        }
+      }
       final response = await http.post(
         url,
         headers: {
@@ -92,6 +159,7 @@ class EvaluacionService {
       );
 
       if (response.statusCode == 200) {
+        prefs.setString('last-request', DateTime.now().toIso8601String());
         final data = json.decode(response.body);
         return data;
       } else if (response.statusCode == 401) {
@@ -109,8 +177,29 @@ class EvaluacionService {
     String accessToken,
   ) async {
     final url = Uri.parse('${ApiService.baseURL}/CURSOS_MOVIL/saveEncuesta');
-
+    final prefs = await SharedPreferences.getInstance();
     try {
+      final lastRequest = prefs.getString('last-request') ?? '';
+      if (lastRequest.isNotEmpty) {
+        try {
+          final lastDate = DateTime.parse(lastRequest);
+          final now = DateTime.now();
+          final difference = now.difference(lastDate);
+
+          if (difference >= Duration(hours: 2)) {
+            await http.post(
+              Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
+              headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $accessToken',
+              },
+              body: json.encode({'motivo': 'timeout', 'fuente': 'recolector'}),
+            );
+          }
+        } catch (e) {
+          log('No se pudo parsear last-request: $lastRequest -> $e');
+        }
+      }
       final response = await http.post(
         url,
         headers: {
@@ -121,6 +210,7 @@ class EvaluacionService {
       );
 
       if (response.statusCode == 200) {
+        prefs.setString('last-request', DateTime.now().toIso8601String());
         final data = json.decode(response.body);
         return data;
       } else if (response.statusCode == 401) {

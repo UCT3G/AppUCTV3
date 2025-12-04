@@ -52,7 +52,6 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
         2,
       );
 
-      log(response.toString());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

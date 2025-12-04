@@ -67,7 +67,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    log('Cambio de estado: $state');
     final currentRoute = ModalRoute.of(context)?.settings.name;
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (state == AppLifecycleState.paused) {

@@ -103,7 +103,6 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
         _opciones[_seleccionActual[0]],
         _opciones[_seleccionActual[1]],
       ];
-      log(grupo.toString());
 
       setState(() {
         _grupoRespuesta.add(grupo);
@@ -123,7 +122,6 @@ class _InputAgruparWidgetState extends State<InputAgruparWidget> {
         );
 
         reactivoSeleccionado['opciones'] = _opciones;
-        log(reactivoSeleccionado.toString());
         evaluacionProvider.setRespuesta(reactivoSeleccionado);
       }
     }

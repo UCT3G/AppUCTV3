@@ -81,7 +81,6 @@ class InputCheckboxWidget extends StatelessWidget {
                               respuesta: respuesta,
                             );
 
-                            log(reactivoSeleccionado.toString());
                             evaluacionProvider.setRespuesta(
                               reactivoSeleccionado,
                             );

@@ -45,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (lastPausedString != null) {
       final lastPaused = DateTime.parse(lastPausedString);
       final difference = DateTime.now().difference(lastPaused);
-      if (difference.inMinutes >= 1) {
+      if (difference.inMinutes >= 5) {
         if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.welcome);
       } else {
         if (mounted) {
@@ -54,7 +54,6 @@ class _SplashScreenState extends State<SplashScreen> {
             lastScreenString ?? AppRoutes.welcome,
           );
         }
-        log('$lastScreenString');
       }
     } else {
       if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.login);

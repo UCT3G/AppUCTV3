@@ -65,11 +65,7 @@ class CompetenciaProvider with ChangeNotifier {
       final index = unidad.temas.indexWhere((t) => t.idTema == idTema);
       if (index != -1) {
         final tema = unidad.temas[index];
-        final tiposNoCalificables = [
-          'PRACTICA',
-          'EVALUACION',
-          'PRESENCIAL',
-        ];
+        final tiposNoCalificables = ['PRACTICA', 'EVALUACION', 'PRESENCIAL'];
 
         final actualizarTema = tema.copyWith(
           intentosConsumidos: tema.intentosConsumidos + 1,
@@ -131,9 +127,7 @@ class CompetenciaProvider with ChangeNotifier {
         _authProvider.accessToken!,
       );
       final unidadesJson = response['unidades'] as List;
-      log('${response['unidades']}');
       _unidades = unidadesJson.map((json) => Unidad.fromJson(json)).toList();
-      log('$_unidades');
       return response;
     } catch (e) {
       if (e.toString().contains('Token expirado o inválido')) {

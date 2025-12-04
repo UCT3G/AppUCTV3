@@ -105,9 +105,7 @@ class EvaluacionProvider with ChangeNotifier {
 
               final formularioJson =
                   response['formulario'] as Map<String, dynamic>;
-              log('${response['formulario']}');
               _formulario = Formulario.fromJson(formularioJson);
-              log('$_formulario');
               return response;
             } catch (e) {
               throw Exception(

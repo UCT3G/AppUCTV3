@@ -55,7 +55,6 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
         1,
       );
 
-      log(response.toString());
       await actualizarTemaVisto();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -188,7 +187,6 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
               errores = true;
             }
           } else if (reactivo.idInput == 6) {
-            log("VALIDANDO opciones: ${respuesta['respuesta']['opciones']}");
             if (respuesta['respuesta']['opciones'] == null ||
                 respuesta['respuesta']['opciones'].isEmpty) {
               evaluacionProvider.marcarError(reactivo.idReactivo, true);

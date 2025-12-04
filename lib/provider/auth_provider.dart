@@ -153,7 +153,7 @@ class AuthProvider extends ChangeNotifier {
   //METODO PARA CERRAR SESION
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await AuthService.logout();
+    await AuthService.logout(_accessToken!);
     _accessToken = null;
     _refreshToken = null;
     _currentUsuario = null;
@@ -199,7 +199,11 @@ class AuthProvider extends ChangeNotifier {
     String username,
     String password,
   ) async {
-    final response = await AuthService.loginAdministrador(username, password);
+    final response = await AuthService.loginAdministrador(
+      username,
+      password,
+      _accessToken!,
+    );
     if (!response['success']) {
       return {
         'success': false,

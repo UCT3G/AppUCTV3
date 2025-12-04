@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:app_uct/services/biometric_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -18,8 +21,8 @@ class AuthService {
     String username,
     String password,
   ) async {
-    final prefs = await SharedPreferences.getInstance();
     try {
+      final prefs = await SharedPreferences.getInstance();
       final response = await http.post(
         Uri.parse('${ApiService.baseURL}/USUARIO/LoginApp'),
         headers: {'Content-Type': 'application/json'},
@@ -31,6 +34,7 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
+        await prefs.setString('last-request', DateTime.now().toIso8601String());
         return {'success': true, 'data': json.decode(response.body)};
       }
       if (response.statusCode == 401) {
@@ -121,12 +125,31 @@ class AuthService {
   }
 
   // METODO PARA CERRAR SESION
-  static Future<void> logout() async {
-    await _storage.delete(key: 'access_token');
-    await _storage.delete(key: 'refresh_token');
-
+  static Future<void> logout(String accessToken) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('userData');
+    try {
+      await http.post(
+        Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: json.encode({'motivo': 'logout', 'fuente': 'manual'}),
+      );
+
+      await _storage.delete(key: 'access_token');
+      await _storage.delete(key: 'refresh_token');
+
+      await prefs.remove('userData');
+      await prefs.remove('last-request');
+
+      if (prefs.getBool('administrador') == true) {
+        await _storage.delete(key: 'username');
+        await _storage.delete(key: 'password');
+      }
+    } catch (e) {
+      log('No se pudo hacer el logout $e');
+    }
   }
 
   // METODO PARA RENOVAR EL ACCESS TOKEN
@@ -167,8 +190,31 @@ class AuthService {
   static Future<Map<String, dynamic>> loginAdministrador(
     String username,
     String password,
+    String accessToken,
   ) async {
+    final prefs = await SharedPreferences.getInstance();
     try {
+      final lastRequest = prefs.getString('last-request') ?? '';
+      if (lastRequest.isNotEmpty) {
+        try {
+          final lastDate = DateTime.parse(lastRequest);
+          final now = DateTime.now();
+          final difference = now.difference(lastDate);
+
+          if (difference >= Duration(hours: 2)) {
+            await http.post(
+              Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
+              headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $accessToken',
+              },
+              body: json.encode({'motivo': 'timeout', 'fuente': 'recolector'}),
+            );
+          }
+        } catch (e) {
+          log('No se pudo parsear last-request: $lastRequest -> $e');
+        }
+      }
       final response = await http.post(
         Uri.parse('${ApiService.baseURL}/USUARIO/LoginAppAdministrador'),
         headers: {'Content-Type': 'application/json'},
@@ -179,6 +225,7 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
+        await prefs.setString('last-request', DateTime.now().toIso8601String());
         return {'success': true, 'data': json.decode(response.body)};
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         return {

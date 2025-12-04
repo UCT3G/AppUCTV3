@@ -136,8 +136,6 @@ class _TemarioScreenState extends State<TemarioScreen> {
     final gradientHeight =
         isLandscape ? screenSize.height * 0.35 : screenSize.height * 0.25;
 
-    log(competencia.toString());
-
     if (competenciaProvider.loading) {
       return Scaffold(
         backgroundColor: Colors.white,

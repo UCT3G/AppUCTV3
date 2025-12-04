@@ -156,7 +156,6 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
                 respuesta: respuesta,
               );
 
-              log(reactivoSeleccionado.toString());
               evaluacionProvider.setRespuesta(reactivoSeleccionado);
             });
           },
