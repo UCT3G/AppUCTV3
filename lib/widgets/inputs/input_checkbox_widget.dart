@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:app_uct/provider/evaluacion_provider.dart';
 import 'package:app_uct/services/api_service.dart';
 import 'package:flutter/material.dart';

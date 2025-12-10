@@ -1,5 +1,4 @@
 // import 'dart:developer';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_uct/models/competencia_model.dart';

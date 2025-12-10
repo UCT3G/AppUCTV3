@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:app_uct/models/formulario_model.dart';
 import 'package:app_uct/models/reactivo_model.dart';
 import 'package:app_uct/provider/auth_provider.dart';
