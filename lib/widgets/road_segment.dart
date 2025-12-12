@@ -915,7 +915,6 @@ class _RoadSegmentState extends State<RoadSegment> {
                               final scale = MediaQuery.of(
                                 context,
                               ).textScaler.scale(1.0).clamp(0.85, 1.4);
-                              if (scale <= 1.0) return 4;
                               if (scale <= 1.15) return 3;
                               if (scale <= 1.25) return 2;
                               return 1;

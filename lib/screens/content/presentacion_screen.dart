@@ -258,15 +258,31 @@ class _PresentacionScreenState extends State<PresentacionScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      SmoothPageIndicator(
-                        controller: _pageController,
-                        count: imageUrls.length,
-                        effect: WormEffect(
-                          dotHeight: isSmall ? 8 : 10,
-                          dotWidth: isSmall ? 8 : 10,
-                          activeDotColor: Theme.of(context).primaryColor,
+                      if (imageUrls.length <= 15)
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: SmoothPageIndicator(
+                            controller: _pageController,
+                            count: imageUrls.length,
+                            effect: WormEffect(
+                              dotHeight: isSmall ? 8 : 10,
+                              dotWidth: isSmall ? 8 : 10,
+                              activeDotColor: Theme.of(context).primaryColor,
+                            ),
+                          ),
                         ),
-                      ),
+                      if (imageUrls.length > 15)
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: LinearProgressIndicator(
+                            value: (_currentPage + 1) / imageUrls.length,
+                            minHeight: 8,
+                            backgroundColor: Colors.grey.shade300,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color.fromRGBO(87, 84, 153, 1),
+                            ),
+                          ),
+                        ),
                       const SizedBox(height: 12),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: padding),

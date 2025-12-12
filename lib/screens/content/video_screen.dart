@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/services/api_service.dart';
@@ -7,6 +9,7 @@ import 'package:app_uct/widgets/breadcrumb_nav.dart';
 import 'package:app_uct/widgets/connection_error_widget.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -43,6 +46,28 @@ class _VideoScreenState extends State<VideoScreen> {
           '${ApiService.baseURL}/video_movil/${tema.idCurso}/${tema.idUnidad}/${tema.idTema}';
 
       final existe = await recursoDisponible(rutaVideo);
+
+      // Diagnostic: fetch headers and a small range to inspect server behavior
+      try {
+        final headRes = await http.head(Uri.parse(rutaVideo));
+        log('Video HEAD status: ${headRes.statusCode}');
+        log('Video HEAD headers: ${headRes.headers}');
+      } catch (e, st) {
+        log('HEAD request failed: $e');
+        log('$st');
+      }
+
+      try {
+        final probe = await http.get(
+          Uri.parse(rutaVideo),
+          headers: {'Range': 'bytes=0-0'},
+        );
+        log('Range GET status: ${probe.statusCode}');
+        log('Range GET headers: ${probe.headers}');
+      } catch (e, st) {
+        log('Range GET failed: $e');
+        log('$st');
+      }
 
       if (!existe) {
         setState(() {
@@ -90,7 +115,14 @@ class _VideoScreenState extends State<VideoScreen> {
 
       _controller = VideoPlayerController.networkUrl(Uri.parse(rutaVideo));
 
-      await _controller.initialize();
+      try {
+        await _controller.initialize();
+      } catch (e, st) {
+        // Log detailed stack trace and rethrow to be handled below
+        log('Video initialize exception: $e');
+        log('$st');
+        rethrow;
+      }
 
       _chewieController = ChewieController(
         videoPlayerController: _controller,
@@ -124,6 +156,7 @@ class _VideoScreenState extends State<VideoScreen> {
             ),
           ),
         );
+        log('Error al cargar el video: $e');
       }
     } finally {
       _videoLoading = false;

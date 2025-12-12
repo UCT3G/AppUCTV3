@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/utils/session_helper.dart';
@@ -251,35 +250,35 @@ class _TemarioScreenState extends State<TemarioScreen> {
                       //     ),
                       //   ),
                       // ),
-                      Positioned(
-                        left: 0,
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onDoubleTap: () {
-                            setState(() {
-                              _showFullText = !_showFullText;
-                            });
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 25),
-                            child: AnimatedSwitcher(
-                              duration: Duration(milliseconds: 300),
-                              transitionBuilder:
-                                  (child, animation) => FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  ),
-                              child:
-                                  _showFullText
-                                      ? buildFullText(
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: GestureDetector(
+                            onDoubleTap: () {
+                              setState(() {
+                                _showFullText = !_showFullText;
+                              });
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 25),
+                              child: AnimatedSwitcher(
+                                duration: Duration(milliseconds: 300),
+                                transitionBuilder:
+                                    (child, animation) => FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        ),
+                                child: _showFullText
+                                    ? buildFullText(
                                         competencia?.titulo ?? 'Titulo curso',
                                         context,
                                       )
-                                      : buildNormalView(
+                                    : buildNormalView(
                                         competencia?.titulo ?? 'Titulo curso',
                                         context,
                                       ),
+                              ),
                             ),
                           ),
                         ),
