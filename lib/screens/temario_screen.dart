@@ -192,19 +192,28 @@ class _TemarioScreenState extends State<TemarioScreen> {
       child: Scaffold(
         body: Stack(
           children: [
-            // Parte scrollable (carretera y contenido)
-            SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  SizedBox(height: gradientHeight + 20),
-                  Image.asset(
-                    'assets/images/Lineainicio.png',
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                  ),
-                  ...buildRoadSegments(competenciaProvider),
-                ],
+            // Parte scrollable (carretera y contenido) — proteger solo el contenido
+            SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom + 16,
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: gradientHeight + 20),
+                    Image.asset(
+                      'assets/images/Lineainicio.png',
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
+                    ...buildRoadSegments(competenciaProvider),
+                    SizedBox(
+                      height: MediaQuery.of(context).padding.bottom + 16,
+                    ),
+                  ],
+                ),
               ),
             ),
             // Contenedor con gradiente Y Yowi
@@ -266,18 +275,19 @@ class _TemarioScreenState extends State<TemarioScreen> {
                                 duration: Duration(milliseconds: 300),
                                 transitionBuilder:
                                     (child, animation) => FadeTransition(
-                                          opacity: animation,
-                                          child: child,
+                                      opacity: animation,
+                                      child: child,
+                                    ),
+                                child:
+                                    _showFullText
+                                        ? buildFullText(
+                                          competencia?.titulo ?? 'Titulo curso',
+                                          context,
+                                        )
+                                        : buildNormalView(
+                                          competencia?.titulo ?? 'Titulo curso',
+                                          context,
                                         ),
-                                child: _showFullText
-                                    ? buildFullText(
-                                        competencia?.titulo ?? 'Titulo curso',
-                                        context,
-                                      )
-                                    : buildNormalView(
-                                        competencia?.titulo ?? 'Titulo curso',
-                                        context,
-                                      ),
                               ),
                             ),
                           ),

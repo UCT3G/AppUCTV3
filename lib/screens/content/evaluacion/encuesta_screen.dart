@@ -363,234 +363,238 @@ class _EncuestaScreenState extends State<EncuestaScreen> {
               ),
             ),
           ),
-          Column(
-            children: [
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: formulario.reactivos.length,
-                  onPageChanged:
-                      (index) => setState(() => _currentPage = index),
-                  itemBuilder: (context, index) {
-                    final reactivo = formulario.reactivos[index];
-                    return QuestionCard(
-                      idReactivo: reactivo.idReactivo,
-                      index: index,
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 10),
-              if (formulario.reactivos.length <= 10)
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: SmoothPageIndicator(
+          SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView.builder(
                     controller: _pageController,
-                    count: formulario.reactivos.length,
-                    effect: JumpingDotEffect(
-                      dotHeight: 10,
-                      dotWidth: 10,
-                      dotColor: Color.fromRGBO(87, 84, 153, 1),
-                      activeDotColor: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                ),
-              if (formulario.reactivos.length > 10)
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: LinearProgressIndicator(
-                    value: (_currentPage + 1) / formulario.reactivos.length,
-                    minHeight: 8,
-                    backgroundColor: Colors.grey.shade300,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Color.fromRGBO(87, 84, 153, 1),
-                    ),
-                  ),
-                ),
-              SizedBox(height: 5),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed:
-                          _currentPage > 0
-                              ? () => _pageController.previousPage(
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.ease,
-                              )
-                              : null,
-                      icon: Icon(Icons.arrow_back),
-                    ),
-                    Text(
-                      'Pregunta ${_currentPage + 1} de ${formulario.reactivos.length}',
-                    ),
-                    IconButton(
-                      onPressed:
-                          _currentPage < formulario.reactivos.length - 1
-                              ? () => _pageController.nextPage(
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.ease,
-                              )
-                              : null,
-                      icon: Icon(Icons.arrow_forward),
-                    ),
-                  ],
-                ),
-              ),
-              if (!calificado)
-                SizedBox(
-                  width: 250,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (!verificarRespuestas()) {
-                        final authProvider = Provider.of<AuthProvider>(
-                          context,
-                          listen: false,
-                        );
-                        final competenciaProvider =
-                            Provider.of<CompetenciaProvider>(
-                              context,
-                              listen: false,
-                            );
-                        final tema = competenciaProvider.getTemaById(
-                          widget.idTema,
-                        );
-
-                        final jsonEvaluacion = {
-                          'id_usuario': authProvider.currentUsuario!.idUsuario,
-                          'id_encuesta': formulario.idFormulario,
-                          'id_tema': tema!.idTema,
-                          'reactivos': {
-                            'id_formu': formulario.idFormulario,
-                            'id_sistema_fk': 0,
-                            'id_categoria_fk': formulario.idCategoria,
-                            'categoria_detalles': 0,
-                            'sistema_detalles': 0,
-                            'nombre': formulario.nombre,
-                            'titulo_formulario': formulario.tituloFormulario,
-                            'descripcion': formulario.descripcion,
-                            'auto_update': '',
-                            'estado': formulario.estado,
-                            'id_tema_fk': formulario.idTema,
-                            'registro_usuario': formulario.registroUsuario,
-                            'registro_fecha': formulario.registroFecha,
-                            'modificacion_usuario':
-                                formulario.modificacionUsuario,
-                            'modificacion_fecha': formulario.modificacionFecha,
-                            'id_area_encuesta_fk': formulario.idAreaEncuesta,
-                            'reactivos': evaluacionProvider.respuestas,
-                          },
-                        };
-
-                        try {
-                          final response = await evaluacionProvider
-                              .guardarEncuesta(jsonEvaluacion);
-
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor: Colors.teal,
-                                behavior: SnackBarBehavior.floating,
-                                content: Text(
-                                  response['comentario'],
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontFamily: 'Montserrat',
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-
-                          _currentPage = 0;
-                          calificado = true;
-
-                          if (context.mounted) {
-                            showResultadosEvaluacion(context, response);
-                          }
-                          competenciaProvider.registrarIntento(widget.idTema);
-                        } catch (e) {
-                          _currentPage = 0;
-                          if (e.toString().contains('Sesión expirada.')) {
-                            if (context.mounted) {
-                              Navigator.pushReplacementNamed(
-                                context,
-                                AppRoutes.login,
-                              );
-                            }
-                            return;
-                          }
-                          debugPrint('Error: $e');
-                          if (context.mounted) {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext dialogContext) {
-                                return DialogErrorConnection(
-                                  title: "Problemas de conexión",
-                                  message:
-                                      "No se pudo guardar la encuesta. Intenta de nuevo.",
-                                  imagePath: 'assets/images/YowiError.png',
-                                  actions: [
-                                    TextButton(
-                                      onPressed:
-                                          () => Navigator.pop(dialogContext),
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: Colors.grey.shade600,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 24,
-                                          vertical: 12,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'Cerrar',
-                                        style: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          color: Color(0xFF574293),
-                                          decoration: TextDecoration.none,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                content: Text(
-                                  'Error al guardar la encuesta: $e',
-                                  style: TextStyle(
-                                    fontFamily: 'Montserrat',
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                        }
-                      }
+                    itemCount: formulario.reactivos.length,
+                    onPageChanged:
+                        (index) => setState(() => _currentPage = index),
+                    itemBuilder: (context, index) {
+                      final reactivo = formulario.reactivos[index];
+                      return QuestionCard(
+                        idReactivo: reactivo.idReactivo,
+                        index: index,
+                      );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromRGBO(87, 84, 153, 1),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Terminar encuesta',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Montserrat',
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(height: 10),
+                if (formulario.reactivos.length <= 10)
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: SmoothPageIndicator(
+                      controller: _pageController,
+                      count: formulario.reactivos.length,
+                      effect: JumpingDotEffect(
+                        dotHeight: 10,
+                        dotWidth: 10,
+                        dotColor: Color.fromRGBO(87, 84, 153, 1),
+                        activeDotColor: Theme.of(context).primaryColor,
                       ),
                     ),
                   ),
+                if (formulario.reactivos.length > 10)
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: LinearProgressIndicator(
+                      value: (_currentPage + 1) / formulario.reactivos.length,
+                      minHeight: 8,
+                      backgroundColor: Colors.grey.shade300,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color.fromRGBO(87, 84, 153, 1),
+                      ),
+                    ),
+                  ),
+                SizedBox(height: 5),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed:
+                            _currentPage > 0
+                                ? () => _pageController.previousPage(
+                                  duration: Duration(milliseconds: 300),
+                                  curve: Curves.ease,
+                                )
+                                : null,
+                        icon: Icon(Icons.arrow_back),
+                      ),
+                      Text(
+                        'Pregunta ${_currentPage + 1} de ${formulario.reactivos.length}',
+                      ),
+                      IconButton(
+                        onPressed:
+                            _currentPage < formulario.reactivos.length - 1
+                                ? () => _pageController.nextPage(
+                                  duration: Duration(milliseconds: 300),
+                                  curve: Curves.ease,
+                                )
+                                : null,
+                        icon: Icon(Icons.arrow_forward),
+                      ),
+                    ],
+                  ),
                 ),
-            ],
+                if (!calificado)
+                  SizedBox(
+                    width: 250,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (!verificarRespuestas()) {
+                          final authProvider = Provider.of<AuthProvider>(
+                            context,
+                            listen: false,
+                          );
+                          final competenciaProvider =
+                              Provider.of<CompetenciaProvider>(
+                                context,
+                                listen: false,
+                              );
+                          final tema = competenciaProvider.getTemaById(
+                            widget.idTema,
+                          );
+
+                          final jsonEvaluacion = {
+                            'id_usuario':
+                                authProvider.currentUsuario!.idUsuario,
+                            'id_encuesta': formulario.idFormulario,
+                            'id_tema': tema!.idTema,
+                            'reactivos': {
+                              'id_formu': formulario.idFormulario,
+                              'id_sistema_fk': 0,
+                              'id_categoria_fk': formulario.idCategoria,
+                              'categoria_detalles': 0,
+                              'sistema_detalles': 0,
+                              'nombre': formulario.nombre,
+                              'titulo_formulario': formulario.tituloFormulario,
+                              'descripcion': formulario.descripcion,
+                              'auto_update': '',
+                              'estado': formulario.estado,
+                              'id_tema_fk': formulario.idTema,
+                              'registro_usuario': formulario.registroUsuario,
+                              'registro_fecha': formulario.registroFecha,
+                              'modificacion_usuario':
+                                  formulario.modificacionUsuario,
+                              'modificacion_fecha':
+                                  formulario.modificacionFecha,
+                              'id_area_encuesta_fk': formulario.idAreaEncuesta,
+                              'reactivos': evaluacionProvider.respuestas,
+                            },
+                          };
+
+                          try {
+                            final response = await evaluacionProvider
+                                .guardarEncuesta(jsonEvaluacion);
+
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Colors.teal,
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text(
+                                    response['comentario'],
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            _currentPage = 0;
+                            calificado = true;
+
+                            if (context.mounted) {
+                              showResultadosEvaluacion(context, response);
+                            }
+                            competenciaProvider.registrarIntento(widget.idTema);
+                          } catch (e) {
+                            _currentPage = 0;
+                            if (e.toString().contains('Sesión expirada.')) {
+                              if (context.mounted) {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  AppRoutes.login,
+                                );
+                              }
+                              return;
+                            }
+                            debugPrint('Error: $e');
+                            if (context.mounted) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext dialogContext) {
+                                  return DialogErrorConnection(
+                                    title: "Problemas de conexión",
+                                    message:
+                                        "No se pudo guardar la encuesta. Intenta de nuevo.",
+                                    imagePath: 'assets/images/YowiError.png',
+                                    actions: [
+                                      TextButton(
+                                        onPressed:
+                                            () => Navigator.pop(dialogContext),
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: Colors.grey.shade600,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 24,
+                                            vertical: 12,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Cerrar',
+                                          style: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            color: Color(0xFF574293),
+                                            decoration: TextDecoration.none,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text(
+                                    'Error al guardar la encuesta: $e',
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromRGBO(87, 84, 153, 1),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Terminar encuesta',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Montserrat',
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),

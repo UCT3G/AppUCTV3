@@ -262,95 +262,103 @@ class _VideoScreenState extends State<VideoScreen> {
               ),
             ),
           ),
-          Column(
-            children: [
-              BreadcrumbNav(
-                paths: [
-                  competenciaProvider.competencia!.titulo ?? 'Competencia',
-                  currentUnidad.titulo,
-                  tema.titulo ?? 'Titulo',
-                ],
-              ),
-              Expanded(
-                child: Center(
-                  child:
-                      _videoLoading
-                          ? const CircularProgressIndicator()
-                          : _controllerInicializado
-                          ? Chewie(controller: _chewieController)
-                          : const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text(
-                              'No se pudo cargar el video.',
-                              style: TextStyle(
-                                color: Colors.redAccent,
-                                fontFamily: 'Montserrat',
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: 150),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          NavegacionTemas.atrasarAdelantarTema(
-                            context,
-                            0,
-                            tema.idTema,
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.arrow_back_ios_new_rounded),
-                            Text(
-                              'Atras',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 5),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: 150),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          NavegacionTemas.atrasarAdelantarTema(
-                            context,
-                            1,
-                            tema.idTema,
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Adelante',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                            Icon(Icons.arrow_forward_ios_rounded),
-                          ],
-                        ),
-                      ),
-                    ),
+          SafeArea(
+            top: false,
+            child: Column(
+              children: [
+                BreadcrumbNav(
+                  paths: [
+                    competenciaProvider.competencia!.titulo ?? 'Competencia',
+                    currentUnidad.titulo,
+                    tema.titulo ?? 'Titulo',
                   ],
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Center(
+                    child:
+                        _videoLoading
+                            ? const CircularProgressIndicator()
+                            : _controllerInicializado
+                            ? Chewie(controller: _chewieController)
+                            : const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Text(
+                                'No se pudo cargar el video.',
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontFamily: 'Montserrat',
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    bottom:
+                        isSmall
+                            ? MediaQuery.of(context).padding.bottom + 8
+                            : MediaQuery.of(context).padding.bottom + 16,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ConstrainedBox(
+                        constraints: BoxConstraints(minWidth: 150),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            NavegacionTemas.atrasarAdelantarTema(
+                              context,
+                              0,
+                              tema.idTema,
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_back_ios_new_rounded),
+                              Text(
+                                'Atras',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(minWidth: 150),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            NavegacionTemas.atrasarAdelantarTema(
+                              context,
+                              1,
+                              tema.idTema,
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Adelante',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                              Icon(Icons.arrow_forward_ios_rounded),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

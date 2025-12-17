@@ -289,148 +289,145 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
       ),
       body: Stack(
         children: [
-          Center(
-            child: Stack(
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/background_recursos.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Column(
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                        'assets/images/background_recursos.png',
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                BreadcrumbNav(
+                  paths: [
+                    competenciaProvider.competencia!.titulo ?? 'Competencia',
+                    currentUnidad.titulo,
+                    tema.titulo ?? 'Titulo',
+                  ],
                 ),
-                Column(
-                  children: [
-                    BreadcrumbNav(
-                      paths: [
-                        competenciaProvider.competencia!.titulo ??
-                            'Competencia',
-                        currentUnidad.titulo,
-                        tema.titulo ?? 'Titulo',
-                      ],
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: SingleChildScrollView(
-                          child: GestureDetector(
-                            onTap: descargarArchivo,
-                            child: Image.asset(
-                              'assets/images/Archivo.png',
-                              fit: BoxFit.contain,
-                              width: size.width * 0.9,
-                            ),
-                          ),
+
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: descargarArchivo,
+                        child: Image.asset(
+                          'assets/images/Archivo.png',
+                          fit: BoxFit.contain,
+                          width: size.width * 0.9,
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ConstrainedBox(
-                            constraints: BoxConstraints(minWidth: 150),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                NavegacionTemas.atrasarAdelantarTema(
-                                  context,
-                                  0,
-                                  tema.idTema,
-                                );
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.arrow_back_ios_new_rounded),
-                                  Text(
-                                    'Atras',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontFamily: 'Montserrat',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 5),
-                          ConstrainedBox(
-                            constraints: BoxConstraints(minWidth: 150),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                NavegacionTemas.atrasarAdelantarTema(
-                                  context,
-                                  1,
-                                  tema.idTema,
-                                );
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Adelante',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontFamily: 'Montserrat',
-                                    ),
-                                  ),
-                                  Icon(Icons.arrow_forward_ios_rounded),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                if (_descargando)
-                  Center(
-                    child: Container(
-                      width: 250,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          LinearProgressIndicator(
-                            value: _progreso,
-                            minHeight: 8,
-                            backgroundColor: Colors.grey[300],
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color.fromRGBO(165, 209, 241, 1),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            '${(_progreso * 100).toStringAsFixed(0)}%',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
-                              fontFamily: 'Montserrat',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ConstrainedBox(
+                        constraints: BoxConstraints(minWidth: 150),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            NavegacionTemas.atrasarAdelantarTema(
+                              context,
+                              0,
+                              tema.idTema,
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_back_ios_new_rounded),
+                              Text(
+                                'Atras',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(minWidth: 150),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            NavegacionTemas.atrasarAdelantarTema(
+                              context,
+                              1,
+                              tema.idTema,
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Adelante',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                              Icon(Icons.arrow_forward_ios_rounded),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
+          if (_descargando)
+            SafeArea(
+              child: Center(
+                child: Container(
+                  width: 250,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      LinearProgressIndicator(
+                        value: _progreso,
+                        minHeight: 8,
+                        backgroundColor: Colors.grey[300],
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color.fromRGBO(165, 209, 241, 1),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        '${(_progreso * 100).toStringAsFixed(0)}%',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                          fontFamily: 'Montserrat',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

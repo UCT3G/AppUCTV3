@@ -26,14 +26,21 @@ class EvaluacionService {
           final difference = now.difference(lastDate);
 
           if (difference >= Duration(hours: 2)) {
-            await http.post(
+            final response = await http.post(
               Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
               headers: {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Authorization': 'Bearer $accessToken',
               },
-              body: json.encode({'motivo': 'timeout', 'fuente': 'recolector'}),
+              body: json.encode({
+                'motivo': 'timeout',
+                'fuente': 'recolector',
+                'administrador': prefs.getBool('administrador'),
+                'id_login': prefs.getInt('id_login'),
+              }),
             );
+            final responseData = json.decode(response.body);
+            prefs.setInt('id_login', responseData['id_login']);
           }
         } catch (e) {
           log('No se pudo parsear last-request: $lastRequest -> $e');
@@ -82,14 +89,21 @@ class EvaluacionService {
           final difference = now.difference(lastDate);
 
           if (difference >= Duration(hours: 2)) {
-            await http.post(
+            final response = await http.post(
               Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
               headers: {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Authorization': 'Bearer $accessToken',
               },
-              body: json.encode({'motivo': 'timeout', 'fuente': 'recolector'}),
+              body: json.encode({
+                'motivo': 'timeout',
+                'fuente': 'recolector',
+                'administrador': prefs.getBool('administrador'),
+                'id_login': prefs.getInt('id_login'),
+              }),
             );
+            final responseData = json.decode(response.body);
+            prefs.setInt('id_login', responseData['id_login']);
           }
         } catch (e) {
           log('No se pudo parsear last-request: $lastRequest -> $e');
@@ -136,14 +150,21 @@ class EvaluacionService {
           final difference = now.difference(lastDate);
 
           if (difference >= Duration(hours: 2)) {
-            await http.post(
+            final response = await http.post(
               Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
               headers: {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Authorization': 'Bearer $accessToken',
               },
-              body: json.encode({'motivo': 'timeout', 'fuente': 'recolector'}),
+              body: json.encode({
+                'motivo': 'timeout',
+                'fuente': 'recolector',
+                'administrador': prefs.getBool('administrador'),
+                'id_login': prefs.getInt('id_login'),
+              }),
             );
+            final responseData = json.decode(response.body);
+            prefs.setInt('id_login', responseData['id_login']);
           }
         } catch (e) {
           log('No se pudo parsear last-request: $lastRequest -> $e');
@@ -187,14 +208,21 @@ class EvaluacionService {
           final difference = now.difference(lastDate);
 
           if (difference >= Duration(hours: 2)) {
-            await http.post(
+            final response = await http.post(
               Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
               headers: {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Authorization': 'Bearer $accessToken',
               },
-              body: json.encode({'motivo': 'timeout', 'fuente': 'recolector'}),
+              body: json.encode({
+                'motivo': 'timeout',
+                'fuente': 'recolector',
+                'administrador': prefs.getBool('administrador'),
+                'id_login': prefs.getInt('id_login'),
+              }),
             );
+            final responseData = json.decode(response.body);
+            prefs.setInt('id_login', responseData['id_login']);
           }
         } catch (e) {
           log('No se pudo parsear last-request: $lastRequest -> $e');

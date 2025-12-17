@@ -511,402 +511,439 @@ class _PracticaScreenState extends State<PracticaScreen> {
               ),
             ),
           ),
-          Column(
-            children: [
-              BreadcrumbNav(
-                paths: [
-                  competenciaProvider.competencia!.titulo ?? 'Competencia',
-                  currentUnidad.titulo,
-                  tema.titulo ?? 'Titulo',
-                ],
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+          SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: size.height - kToolbarHeight,
+                ),
+                child: IntrinsicHeight(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        'assets/images/Practica.png',
-                        fit: BoxFit.contain,
-                        width: size.width * 0.9,
+                      BreadcrumbNav(
+                        paths: [
+                          competenciaProvider.competencia!.titulo ??
+                              'Competencia',
+                          currentUnidad.titulo,
+                          tema.titulo ?? 'Titulo',
+                        ],
                       ),
-                      SizedBox(height: 10),
-                      Text(
-                        "Archivo de la práctica:",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontFamily: 'Montserrat',
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Card(
-                        elevation: 3,
-                        clipBehavior: Clip.antiAlias,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            gradient: LinearGradient(
-                              colors: [
-                                Color.fromRGBO(86, 66, 148, 1),
-                                Color.fromRGBO(165, 209, 241, 1),
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                          ),
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.insert_drive_file,
-                              color: Colors.white,
-                            ),
-                            title: const Text(
-                              "Ver practica",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                            trailing: ElevatedButton.icon(
-                              onPressed: () => descargarPractica(),
-                              icon: Icon(Icons.download),
-                              label: Text(
-                                'Descargar',
-                                style: TextStyle(fontFamily: 'Montserrat'),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      if (_descargandoPractica)
-                        Container(
-                          width: 250,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                          ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
                           child: Column(
-                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              LinearProgressIndicator(
-                                value: _progresoPractica,
-                                minHeight: 8,
-                                backgroundColor: Colors.grey[300],
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color.fromRGBO(165, 209, 241, 1),
-                                ),
+                              Image.asset(
+                                'assets/images/Practica.png',
+                                fit: BoxFit.contain,
+                                width: size.width * 0.9,
                               ),
-                              const SizedBox(height: 5),
+                              SizedBox(height: 10),
                               Text(
-                                '${(_progresoPractica * 100).toStringAsFixed(0)}%',
+                                "Archivo de la práctica:",
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black87,
+                                  fontSize: 15,
                                   fontFamily: 'Montserrat',
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      SizedBox(height: 24),
-                      Text(
-                        'Tu entrega',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontFamily: 'Montserrat',
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      tema.intentosConsumidos > 0
-                          ? Card(
-                            elevation: 3,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromRGBO(86, 66, 148, 1),
-                                    Color.fromRGBO(165, 209, 241, 1),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: Icon(
-                                        Icons.file_present,
+                              const SizedBox(height: 8),
+                              Card(
+                                elevation: 3,
+                                clipBehavior: Clip.antiAlias,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Color.fromRGBO(86, 66, 148, 1),
+                                        Color.fromRGBO(165, 209, 241, 1),
+                                      ],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
+                                  ),
+                                  child: ListTile(
+                                    leading: const Icon(
+                                      Icons.insert_drive_file,
+                                      color: Colors.white,
+                                    ),
+                                    title: const Text(
+                                      "Ver practica",
+                                      style: TextStyle(
                                         color: Colors.white,
+                                        fontSize: 16,
+                                        fontFamily: 'Montserrat',
                                       ),
-                                      title: Text(
-                                        'Archivo subido',
+                                    ),
+                                    trailing: ElevatedButton.icon(
+                                      onPressed: () => descargarPractica(),
+                                      icon: Icon(Icons.download),
+                                      label: Text(
+                                        'Descargar',
                                         style: TextStyle(
                                           fontFamily: 'Montserrat',
-                                          color: Colors.white,
-                                          fontSize: 16,
                                         ),
                                       ),
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Flexible(
-                                          child: ElevatedButton.icon(
-                                            onPressed: descargarPracticaSubida,
-                                            icon: const Icon(
-                                              Icons.file_download,
-                                            ),
-                                            label: const Text(
-                                              "Evidencia",
-                                              style: TextStyle(
-                                                fontFamily: 'Montserrat',
-                                              ),
-                                            ),
-                                          ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              if (_descargandoPractica)
+                                Container(
+                                  width: 250,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.1,
                                         ),
-                                        const SizedBox(width: 8),
-                                        Flexible(
-                                          child: ElevatedButton.icon(
-                                            onPressed: subirPractica,
-                                            icon: const Icon(Icons.upload_file),
-                                            label: const Text(
-                                              "Volver a subir",
-                                              overflow:
-                                                  TextOverflow
-                                                      .ellipsis, // 👈 evita desbordar
-                                              softWrap: false,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      LinearProgressIndicator(
+                                        value: _progresoPractica,
+                                        minHeight: 8,
+                                        backgroundColor: Colors.grey[300],
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Color.fromRGBO(165, 209, 241, 1),
+                                            ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        '${(_progresoPractica * 100).toStringAsFixed(0)}%',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black87,
+                                          fontFamily: 'Montserrat',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              SizedBox(height: 24),
+                              Text(
+                                'Tu entrega',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              tema.intentosConsumidos > 0
+                                  ? Card(
+                                    elevation: 3,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Color.fromRGBO(86, 66, 148, 1),
+                                            Color.fromRGBO(165, 209, 241, 1),
+                                          ],
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                        ),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            ListTile(
+                                              contentPadding: EdgeInsets.zero,
+                                              leading: Icon(
+                                                Icons.file_present,
+                                                color: Colors.white,
+                                              ),
+                                              title: Text(
+                                                'Archivo subido',
+                                                style: TextStyle(
+                                                  fontFamily: 'Montserrat',
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Flexible(
+                                                  child: ElevatedButton.icon(
+                                                    onPressed:
+                                                        descargarPracticaSubida,
+                                                    icon: const Icon(
+                                                      Icons.file_download,
+                                                    ),
+                                                    label: const Text(
+                                                      "Evidencia",
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Montserrat',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Flexible(
+                                                  child: ElevatedButton.icon(
+                                                    onPressed: subirPractica,
+                                                    icon: const Icon(
+                                                      Icons.upload_file,
+                                                    ),
+                                                    label: const Text(
+                                                      "Volver a subir",
+                                                      overflow:
+                                                          TextOverflow
+                                                              .ellipsis, // 👈 evita desbordar
+                                                      softWrap: false,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Montserrat',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  : ElevatedButton.icon(
+                                    onPressed: subirPractica,
+                                    icon: const Icon(Icons.upload_file),
+                                    label: const Text(
+                                      "Subir práctica",
+                                      style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ),
+                              SizedBox(height: 5),
+                              if (_descargandoSubida)
+                                Container(
+                                  width: 250,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                        blurRadius: 10,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      LinearProgressIndicator(
+                                        value: _progresoSubida,
+                                        minHeight: 8,
+                                        backgroundColor: Colors.grey[300],
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Color.fromRGBO(165, 209, 241, 1),
+                                            ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        '${(_progresoSubida * 100).toStringAsFixed(0)}%',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black87,
+                                          fontFamily: 'Montserrat',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              const SizedBox(height: 24),
+                              if (tema.resultado > 0)
+                                Row(
+                                  children: [
+                                    Spacer(), // Empuja el contenido hacia la derecha
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment
+                                              .end, // Alinea los textos a la derecha
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment
+                                                  .end, // Todo a la derecha
+                                          children: [
+                                            Text(
+                                              "Calificación:",
                                               style: TextStyle(
+                                                fontSize: 15,
                                                 fontFamily: 'Montserrat',
                                               ),
                                             ),
-                                          ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ), // Espacio entre el texto y el chip
+                                            Chip(
+                                              label: Text(
+                                                "${tema.resultado} / 100",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Montserrat',
+                                                  color:
+                                                      tema.resultado >= 80
+                                                          ? const Color.fromRGBO(
+                                                            50,
+                                                            101,
+                                                            53,
+                                                            1,
+                                                          )
+                                                          : const Color.fromRGBO(
+                                                            134,
+                                                            26,
+                                                            30,
+                                                            1,
+                                                          ),
+                                                ),
+                                              ),
+                                              backgroundColor:
+                                                  tema.resultado >= 80
+                                                      ? const Color.fromRGBO(
+                                                        221,
+                                                        232,
+                                                        202,
+                                                        1,
+                                                      )
+                                                      : const Color.fromRGBO(
+                                                        222,
+                                                        179,
+                                                        178,
+                                                        1,
+                                                      ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
-                              ),
-                            ),
-                          )
-                          : ElevatedButton.icon(
-                            onPressed: subirPractica,
-                            icon: const Icon(Icons.upload_file),
-                            label: const Text(
-                              "Subir práctica",
-                              style: TextStyle(fontFamily: 'Montserrat'),
-                            ),
-                          ),
-                      SizedBox(height: 5),
-                      if (_descargandoSubida)
-                        Container(
-                          width: 250,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              LinearProgressIndicator(
-                                value: _progresoSubida,
-                                minHeight: 8,
-                                backgroundColor: Colors.grey[300],
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color.fromRGBO(165, 209, 241, 1),
+                              const SizedBox(height: 24),
+                              if (tema.observaciones.isNotEmpty) ...[
+                                Text(
+                                  "Comentarios:",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontFamily: 'Montserrat',
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                '${(_progresoSubida * 100).toStringAsFixed(0)}%',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black87,
-                                  fontFamily: 'Montserrat',
+                                const SizedBox(height: 8),
+                                Card(
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Text(
+                                      tema.observaciones,
+                                      style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
+                              //COMENTARIOS
                             ],
                           ),
                         ),
-                      const SizedBox(height: 24),
-                      if (tema.resultado > 0)
-                        Row(
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Spacer(), // Empuja el contenido hacia la derecha
-                            Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment
-                                      .end, // Alinea los textos a la derecha
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment
-                                          .end, // Todo a la derecha
+                            ConstrainedBox(
+                              constraints: BoxConstraints(minWidth: 150),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  NavegacionTemas.atrasarAdelantarTema(
+                                    context,
+                                    0,
+                                    tema.idTema,
+                                  );
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
+                                    Icon(Icons.arrow_back_ios_new_rounded),
                                     Text(
-                                      "Calificación:",
+                                      'Atras',
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontFamily: 'Montserrat',
                                       ),
                                     ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ), // Espacio entre el texto y el chip
-                                    Chip(
-                                      label: Text(
-                                        "${tema.resultado} / 100",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'Montserrat',
-                                          color:
-                                              tema.resultado >= 80
-                                                  ? const Color.fromRGBO(
-                                                    50,
-                                                    101,
-                                                    53,
-                                                    1,
-                                                  )
-                                                  : const Color.fromRGBO(
-                                                    134,
-                                                    26,
-                                                    30,
-                                                    1,
-                                                  ),
-                                        ),
-                                      ),
-                                      backgroundColor:
-                                          tema.resultado >= 80
-                                              ? const Color.fromRGBO(
-                                                221,
-                                                232,
-                                                202,
-                                                1,
-                                              )
-                                              : const Color.fromRGBO(
-                                                222,
-                                                179,
-                                                178,
-                                                1,
-                                              ),
-                                    ),
                                   ],
                                 ),
-                              ],
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(minWidth: 150),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  NavegacionTemas.atrasarAdelantarTema(
+                                    context,
+                                    1,
+                                    tema.idTema,
+                                  );
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Adelante',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                    Icon(Icons.arrow_forward_ios_rounded),
+                                  ],
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      const SizedBox(height: 24),
-                      if (tema.observaciones.isNotEmpty) ...[
-                        Text(
-                          "Comentarios:",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontFamily: 'Montserrat',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Card(
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Text(
-                              tema.observaciones,
-                              style: TextStyle(fontFamily: 'Montserrat'),
-                            ),
-                          ),
-                        ),
-                      ],
-                      //COMENTARIOS
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).padding.bottom + 16,
+                      ),
                     ],
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: 150),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          NavegacionTemas.atrasarAdelantarTema(
-                            context,
-                            0,
-                            tema.idTema,
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.arrow_back_ios_new_rounded),
-                            Text(
-                              'Atras',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 5),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: 150),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          NavegacionTemas.atrasarAdelantarTema(
-                            context,
-                            1,
-                            tema.idTema,
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Adelante',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                            Icon(Icons.arrow_forward_ios_rounded),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),

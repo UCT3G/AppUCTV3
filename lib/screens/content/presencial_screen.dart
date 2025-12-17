@@ -157,86 +157,101 @@ class _PresencialScreenState extends State<PresencialScreen> {
               ),
             ),
           ),
-          Column(
-            children: [
-              BreadcrumbNav(
-                paths: [
-                  competenciaProvider.competencia!.titulo ?? 'Competencia',
-                  currentUnidad.titulo,
-                  tema.titulo ?? 'Titulo',
-                ],
-              ),
-              Expanded(
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Image.asset(
-                      'assets/images/Presencial.png',
-                      fit: BoxFit.contain,
-                      width: size.width * 0.9,
-                    ),
+          SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: size.height - kToolbarHeight,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      BreadcrumbNav(
+                        paths: [
+                          competenciaProvider.competencia!.titulo ??
+                              'Competencia',
+                          currentUnidad.titulo,
+                          tema.titulo ?? 'Titulo',
+                        ],
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Image.asset(
+                            'assets/images/Presencial.png',
+                            fit: BoxFit.contain,
+                            width: size.width * 0.9,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ConstrainedBox(
+                              constraints: BoxConstraints(minWidth: 150),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  NavegacionTemas.atrasarAdelantarTema(
+                                    context,
+                                    0,
+                                    tema.idTema,
+                                  );
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.arrow_back_ios_new_rounded),
+                                    Text(
+                                      'Atras',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(minWidth: 150),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  NavegacionTemas.atrasarAdelantarTema(
+                                    context,
+                                    1,
+                                    tema.idTema,
+                                  );
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Adelante',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                    Icon(Icons.arrow_forward_ios_rounded),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).padding.bottom + 16,
+                      ),
+                    ],
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: 150),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          NavegacionTemas.atrasarAdelantarTema(
-                            context,
-                            0,
-                            tema.idTema,
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.arrow_back_ios_new_rounded),
-                            Text(
-                              'Atras',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 5),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: 150),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          NavegacionTemas.atrasarAdelantarTema(
-                            context,
-                            1,
-                            tema.idTema,
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Adelante',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                            Icon(Icons.arrow_forward_ios_rounded),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),

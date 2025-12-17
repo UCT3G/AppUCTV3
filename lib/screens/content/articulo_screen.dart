@@ -262,89 +262,125 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
               ),
             ),
           ),
-          Column(
-            children: [
-              BreadcrumbNav(
-                paths: [
-                  competenciaProvider.competencia!.titulo ?? 'Competencia',
-                  currentUnidad.titulo,
-                  tema.titulo ?? 'Titulo',
-                ],
-              ),
-              Expanded(
-                child: Center(
+          SafeArea(
+            child: Column(
+              children: [
+                BreadcrumbNav(
+                  paths: [
+                    competenciaProvider.competencia!.titulo ?? 'Competencia',
+                    currentUnidad.titulo,
+                    tema.titulo ?? 'Titulo',
+                  ],
+                ),
+                Expanded(
                   child: SingleChildScrollView(
-                    child: GestureDetector(
-                      onTap: () => abrirURL(context, tema.rutaRecurso),
-                      child: Image.asset(
-                        'assets/images/Recurso.png',
-                        fit: BoxFit.contain,
-                        width: size.width * 0.9,
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: () => abrirURL(context, tema.rutaRecurso),
+                        child: Image.asset(
+                          'assets/images/Recurso.png',
+                          fit: BoxFit.contain,
+                          width: size.width * 0.9,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: 150),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          NavegacionTemas.atrasarAdelantarTema(
-                            context,
-                            0,
-                            tema.idTema,
-                          );
-                        },
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ConstrainedBox(
+                        constraints: BoxConstraints(minWidth: 150),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            NavegacionTemas.atrasarAdelantarTema(
+                              context,
+                              0,
+                              tema.idTema,
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_back_ios_new_rounded),
+                              Text(
+                                'Atrás',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.arrow_back_ios_new_rounded),
-                            Text(
-                              'Atras',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Montserrat',
+                            ConstrainedBox(
+                              constraints: BoxConstraints(minWidth: 150),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  NavegacionTemas.atrasarAdelantarTema(
+                                    context,
+                                    0,
+                                    tema.idTema,
+                                  );
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.arrow_back_ios_new_rounded),
+                                    Text(
+                                      'Atras',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(minWidth: 150),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  NavegacionTemas.atrasarAdelantarTema(
+                                    context,
+                                    1,
+                                    tema.idTema,
+                                  );
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Adelante',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                    Icon(Icons.arrow_forward_ios_rounded),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    SizedBox(width: 5),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: 150),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          NavegacionTemas.atrasarAdelantarTema(
-                            context,
-                            1,
-                            tema.idTema,
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Adelante',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                            Icon(Icons.arrow_forward_ios_rounded),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

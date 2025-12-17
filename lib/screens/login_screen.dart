@@ -653,332 +653,120 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
           Center(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    "assets/images/UCT.svg",
-                    width: isLandscape ? screenWidth * 0.15 : screenWidth * 0.3,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white,
-                      BlendMode.srcIn,
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  20,
+                  20,
+                  MediaQuery.of(context).padding.bottom + 16,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      "assets/images/UCT.svg",
+                      width:
+                          isLandscape ? screenWidth * 0.15 : screenWidth * 0.3,
+                      colorFilter: ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: screenHeight * 0.06),
-                  if (authProvider.username == null) ...[
-                    FractionallySizedBox(
-                      widthFactor: 0.8,
-                      child: TextFormField(
-                        controller: _usernameController,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Montserrat',
-                        ),
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.transparent,
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.white30,
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.white30,
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          prefixIcon: Icon(
-                            Icons.person,
-                            color: Color.fromRGBO(128, 185, 204, 1),
-                          ),
-                          hintText: 'Usuario',
-                          hintStyle: TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
+                    SizedBox(height: screenHeight * 0.06),
+                    if (authProvider.username == null) ...[
+                      FractionallySizedBox(
+                        widthFactor: 0.8,
+                        child: TextFormField(
+                          controller: _usernameController,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
                             fontFamily: 'Montserrat',
                           ),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.transparent,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.white30,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.white30,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            prefixIcon: Icon(
+                              Icons.person,
+                              color: Color.fromRGBO(128, 185, 204, 1),
+                            ),
+                            hintText: 'Usuario',
+                            hintStyle: TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Montserrat',
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
-                    FractionallySizedBox(
-                      widthFactor: 0.8,
-                      child: TextFormField(
-                        controller: _passwordController,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Montserrat',
-                        ),
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.transparent,
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.white30,
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.white30,
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          prefixIcon: Icon(
-                            Icons.password,
-                            color: Color.fromRGBO(128, 185, 204, 1),
-                          ),
-                          hintText: 'Contraseña',
-                          hintStyle: TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
+                      SizedBox(height: screenHeight * 0.02),
+                      FractionallySizedBox(
+                        widthFactor: 0.8,
+                        child: TextFormField(
+                          controller: _passwordController,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
                             fontFamily: 'Montserrat',
                           ),
-                        ),
-                        obscureText: true,
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.04),
-                    ElevatedButton(
-                      onPressed:
-                          _isLoadingCredentials
-                              ? null
-                              : () => login(
-                                _usernameController.text,
-                                _passwordController.text,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.transparent,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.white30,
+                                width: 2.0,
                               ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 40,
-                          vertical: 10,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child:
-                          _isLoadingCredentials
-                              ? CircularProgressIndicator()
-                              : Text(
-                                'Ingresar',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 20,
-                                  fontFamily: 'Montserrat',
-                                ),
-                              ),
-                    ),
-                  ] else if (_passwordIncorrect) ...[
-                    SizedBox(
-                      width: double.infinity, // ocupa todo el ancho
-                      child: Text(
-                        'BIENVENIDA/O DE NUEVO:',
-                        textAlign: TextAlign.center, // ahora sí se centra bien
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat',
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      authProvider.username ?? 'Usuario',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Montserrat',
-                        fontSize: 18,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    FractionallySizedBox(
-                      widthFactor: 0.8,
-                      child: TextFormField(
-                        controller: _passwordController,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Montserrat',
-                        ),
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.transparent,
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.white30,
-                              width: 2.0,
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.white30,
-                              width: 2.0,
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.white30,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          prefixIcon: Icon(
-                            Icons.password,
-                            color: Color.fromRGBO(128, 185, 204, 1),
-                          ),
-                          hintText: 'Contraseña',
-                          hintStyle: TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Montserrat',
-                          ),
-                        ),
-                        obscureText: true,
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.04),
-                    ElevatedButton(
-                      onPressed:
-                          _isLoadingCredentials
-                              ? null
-                              : () => login(
-                                authProvider.username ?? '',
-                                _passwordController.text,
-                              ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 40,
-                          vertical: 10,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child:
-                          _isLoadingCredentials
-                              ? CircularProgressIndicator()
-                              : Text(
-                                'Ingresar',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 20,
-                                  fontFamily: 'Montserrat',
-                                ),
-                              ),
-                    ),
-                  ] else ...[
-                    SizedBox(
-                      width: double.infinity, // ocupa todo el ancho
-                      child: Text(
-                        'BIENVENIDA/O DE NUEVO:',
-                        textAlign: TextAlign.center, // ahora sí se centra bien
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat',
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      authProvider.username ?? 'Usuario',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Montserrat',
-                        fontSize: 18,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    if (_biometricsAvailable) ...[
-                      _biometricType != null
-                          ? ElevatedButton(
-                            onPressed:
-                                _isLoadingBiometrics
-                                    ? null
-                                    : () => loginWithBiometrics(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              padding: EdgeInsets.all(10),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                            prefixIcon: Icon(
+                              Icons.password,
+                              color: Color.fromRGBO(128, 185, 204, 1),
                             ),
-                            child:
-                                _isLoadingBiometrics
-                                    ? CircularProgressIndicator()
-                                    : Column(
-                                      children: [
-                                        Icon(
-                                          _biometricType == BiometricType.face
-                                              ? Icons.face
-                                              : _biometricType ==
-                                                  BiometricType.iris
-                                              ? Icons.remove_red_eye
-                                              : Icons.fingerprint,
-                                          color: Colors.black,
-                                          size: screenHeight * 0.08,
-                                        ),
-                                        SizedBox(height: 5),
-                                        Text(
-                                          _biometricType == BiometricType.face
-                                              ? 'Face ID'
-                                              : _biometricType ==
-                                                  BiometricType.iris
-                                              ? 'Iris'
-                                              : 'Huella dactilar',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                            fontFamily: 'Montserrat',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                          )
-                          : CircularProgressIndicator(),
-                    ] else if (_lockAvailable) ...[
-                      ElevatedButton(
-                        onPressed:
-                            _isLoadingBiometrics
-                                ? null
-                                : () => loginWithDeviceLock(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 40,
-                            vertical: 10,
+                            hintText: 'Contraseña',
+                            hintStyle: TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Montserrat',
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
+                          obscureText: true,
                         ),
-                        child:
-                            _isLoadingBiometrics
-                                ? CircularProgressIndicator()
-                                : Icon(
-                                  Icons.lock,
-                                  color: Colors.black45,
-                                  size: screenHeight * 0.05,
-                                ),
                       ),
-                    ] else ...[
+                      SizedBox(height: screenHeight * 0.04),
                       ElevatedButton(
                         onPressed:
                             _isLoadingCredentials
                                 ? null
-                                : () => loginWithCredentials(),
+                                : () => login(
+                                  _usernameController.text,
+                                  _passwordController.text,
+                                ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           padding: EdgeInsets.symmetric(
@@ -993,7 +781,7 @@ class _LoginScreenState extends State<LoginScreen>
                             _isLoadingCredentials
                                 ? CircularProgressIndicator()
                                 : Text(
-                                  'Ingresar nuevamente',
+                                  'Ingresar',
                                   style: TextStyle(
                                     color: Colors.black87,
                                     fontSize: 20,
@@ -1001,9 +789,232 @@ class _LoginScreenState extends State<LoginScreen>
                                   ),
                                 ),
                       ),
+                    ] else if (_passwordIncorrect) ...[
+                      SizedBox(
+                        width: double.infinity, // ocupa todo el ancho
+                        child: Text(
+                          'BIENVENIDA/O DE NUEVO:',
+                          textAlign:
+                              TextAlign.center, // ahora sí se centra bien
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        authProvider.username ?? 'Usuario',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      FractionallySizedBox(
+                        widthFactor: 0.8,
+                        child: TextFormField(
+                          controller: _passwordController,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: 'Montserrat',
+                          ),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.transparent,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.white30,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.white30,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            prefixIcon: Icon(
+                              Icons.password,
+                              color: Color.fromRGBO(128, 185, 204, 1),
+                            ),
+                            hintText: 'Contraseña',
+                            hintStyle: TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Montserrat',
+                            ),
+                          ),
+                          obscureText: true,
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.04),
+                      ElevatedButton(
+                        onPressed:
+                            _isLoadingCredentials
+                                ? null
+                                : () => login(
+                                  authProvider.username ?? '',
+                                  _passwordController.text,
+                                ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 10,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child:
+                            _isLoadingCredentials
+                                ? CircularProgressIndicator()
+                                : Text(
+                                  'Ingresar',
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 20,
+                                    fontFamily: 'Montserrat',
+                                  ),
+                                ),
+                      ),
+                    ] else ...[
+                      SizedBox(
+                        width: double.infinity, // ocupa todo el ancho
+                        child: Text(
+                          'BIENVENIDA/O DE NUEVO:',
+                          textAlign:
+                              TextAlign.center, // ahora sí se centra bien
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        authProvider.username ?? 'Usuario',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      if (_biometricsAvailable) ...[
+                        _biometricType != null
+                            ? ElevatedButton(
+                              onPressed:
+                                  _isLoadingBiometrics
+                                      ? null
+                                      : () => loginWithBiometrics(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                padding: EdgeInsets.all(10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              child:
+                                  _isLoadingBiometrics
+                                      ? CircularProgressIndicator()
+                                      : Column(
+                                        children: [
+                                          Icon(
+                                            _biometricType == BiometricType.face
+                                                ? Icons.face
+                                                : _biometricType ==
+                                                    BiometricType.iris
+                                                ? Icons.remove_red_eye
+                                                : Icons.fingerprint,
+                                            color: Colors.black,
+                                            size: screenHeight * 0.08,
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(
+                                            _biometricType == BiometricType.face
+                                                ? 'Face ID'
+                                                : _biometricType ==
+                                                    BiometricType.iris
+                                                ? 'Iris'
+                                                : 'Huella dactilar',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                              fontFamily: 'Montserrat',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                            )
+                            : CircularProgressIndicator(),
+                      ] else if (_lockAvailable) ...[
+                        ElevatedButton(
+                          onPressed:
+                              _isLoadingBiometrics
+                                  ? null
+                                  : () => loginWithDeviceLock(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 10,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child:
+                              _isLoadingBiometrics
+                                  ? CircularProgressIndicator()
+                                  : Icon(
+                                    Icons.lock,
+                                    color: Colors.black45,
+                                    size: screenHeight * 0.05,
+                                  ),
+                        ),
+                      ] else ...[
+                        ElevatedButton(
+                          onPressed:
+                              _isLoadingCredentials
+                                  ? null
+                                  : () => loginWithCredentials(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 10,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child:
+                              _isLoadingCredentials
+                                  ? CircularProgressIndicator()
+                                  : Text(
+                                    'Ingresar nuevamente',
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 20,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                  ),
+                        ),
+                      ],
                     ],
                   ],
-                ],
+                ),
               ),
             ),
           ),

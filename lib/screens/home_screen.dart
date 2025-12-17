@@ -1078,50 +1078,58 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         )
-                        : SingleChildScrollView(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            children: [
-                              listCompetenciasRecientes.isEmpty
-                                  ? Text(
-                                    'No hay competencias recientes disponibles.',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontFamily: 'Montserrat',
-                                    ),
-                                  )
-                                  : SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: IntrinsicHeight(
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children:
-                                            listCompetenciasRecientes.map((
-                                              competencia,
-                                            ) {
-                                              return CompetenciaCardHorizontal(
-                                                idCompetencia:
-                                                    competencia.idCurso ?? 0,
-                                              );
-                                            }).toList(),
+                        : SafeArea(
+                          top: false,
+                          child: SingleChildScrollView(
+                            controller: _scrollController,
+                            padding: EdgeInsets.fromLTRB(
+                              12,
+                              12,
+                              12,
+                              MediaQuery.of(context).padding.bottom + 16,
+                            ),
+                            child: Column(
+                              children: [
+                                listCompetenciasRecientes.isEmpty
+                                    ? Text(
+                                      'No hay competencias recientes disponibles.',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    )
+                                    : SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: IntrinsicHeight(
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children:
+                                              listCompetenciasRecientes.map((
+                                                competencia,
+                                              ) {
+                                                return CompetenciaCardHorizontal(
+                                                  idCompetencia:
+                                                      competencia.idCurso ?? 0,
+                                                );
+                                              }).toList(),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: listCompetencias.length,
-                                itemBuilder: (context, index) {
-                                  final competencia = listCompetencias[index];
-                                  return CompetenciaCard(
-                                    idCompetencia: competencia.idCurso ?? 0,
-                                  );
-                                },
-                              ),
-                            ],
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: listCompetencias.length,
+                                  itemBuilder: (context, index) {
+                                    final competencia = listCompetencias[index];
+                                    return CompetenciaCard(
+                                      idCompetencia: competencia.idCurso ?? 0,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
               ),

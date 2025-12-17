@@ -56,67 +56,81 @@ class RecursoScreen extends StatelessWidget {
               ),
             ),
           ),
-          Column(
-            children: [
-              BreadcrumbNav(
-                paths: [
-                  competenciaProvider.competencia!.titulo ?? 'Competencia',
-                  currentUnidad.titulo,
-                  tema.titulo ?? 'Titulo',
-                ],
-              ),
-              Expanded(
-                child: Center(
-                  child: Card(
-                    elevation: 50,
-                    shadowColor: Colors.black,
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: SizedBox(
-                      width: 300,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                'assets/images/YowiError.png',
-                                height: size.height * 0.3,
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                'Estimado usuario.',
-                                style: const TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontSize: 20,
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.w500,
+          SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: size.height - kToolbarHeight,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      BreadcrumbNav(
+                        paths: [
+                          competenciaProvider.competencia!.titulo ??
+                              'Competencia',
+                          currentUnidad.titulo,
+                          tema.titulo ?? 'Titulo',
+                        ],
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Card(
+                            elevation: 50,
+                            shadowColor: Colors.black,
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: SizedBox(
+                              width: 300,
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/YowiError.png',
+                                      height: size.height * 0.3,
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Text(
+                                      'Estimado usuario.',
+                                      style: const TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 20,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      'Por el momento, este tipo de recurso no está disponible en la aplicación móvil. Puedes consultarlo desde nuestra versión web. Estamos trabajando para incorporar todos los recursos en la app próximamente. Agradecemos tu comprensión.',
+                                      style: const TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 15,
+                                        color: Colors.black,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
                                 ),
-                                textAlign: TextAlign.center,
                               ),
-                              const SizedBox(height: 10),
-                              Text(
-                                'Por el momento, este tipo de recurso no está disponible en la aplicación móvil. Puedes consultarlo desde nuestra versión web. Estamos trabajando para incorporar todos los recursos en la app próximamente. Agradecemos tu comprensión.',
-                                style: const TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontSize: 15,
-                                  color: Colors.black,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      SizedBox(
+                        height: MediaQuery.of(context).padding.bottom + 16,
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
+            ),
           ),
         ],
       ),

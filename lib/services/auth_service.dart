@@ -35,6 +35,8 @@ class AuthService {
 
       if (response.statusCode == 200) {
         await prefs.setString('last-request', DateTime.now().toIso8601String());
+        final responseData = json.decode(response.body);
+        prefs.setInt('id_login', responseData['id_login']);
         return {'success': true, 'data': json.decode(response.body)};
       }
       if (response.statusCode == 401) {
@@ -134,7 +136,12 @@ class AuthService {
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $accessToken',
         },
-        body: json.encode({'motivo': 'logout', 'fuente': 'manual'}),
+        body: json.encode({
+          'motivo': 'logout',
+          'fuente': 'manual',
+          'administrador': prefs.getBool('administrador'),
+          'id_login': prefs.getInt('id_login'),
+        }),
       );
 
       await _storage.delete(key: 'access_token');
@@ -154,11 +161,15 @@ class AuthService {
 
   // METODO PARA RENOVAR EL ACCESS TOKEN
   static Future<String?> refreshAccessToken(String refreshToken) async {
+    final prefs = await SharedPreferences.getInstance();
     try {
       final response = await http.post(
         Uri.parse('${ApiService.baseURL}/USUARIO/RefreshToken'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'token': refreshToken}),
+        body: json.encode({
+          'token': refreshToken,
+          'id_login': prefs.getInt('id_login'),
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -202,14 +213,21 @@ class AuthService {
           final difference = now.difference(lastDate);
 
           if (difference >= Duration(hours: 2)) {
-            await http.post(
+            final response = await http.post(
               Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
               headers: {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Authorization': 'Bearer $accessToken',
               },
-              body: json.encode({'motivo': 'timeout', 'fuente': 'recolector'}),
+              body: json.encode({
+                'motivo': 'timeout',
+                'fuente': 'recolector',
+                'administrador': prefs.getBool('administrador'),
+                'id_login': prefs.getInt('id_login'),
+              }),
             );
+            final responseData = json.decode(response.body);
+            prefs.setInt('id_login', responseData['id_login']);
           }
         } catch (e) {
           log('No se pudo parsear last-request: $lastRequest -> $e');

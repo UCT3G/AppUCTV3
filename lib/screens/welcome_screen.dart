@@ -225,222 +225,228 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             left: 20,
             right: 20,
             bottom: 0,
-            child: SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight:
-                      screenSize.height *
-                      0.3, // Asegura que se vea centrado en pantallas grandes
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 10),
-                      Text(
-                        "BIENVENIDO",
-                        style: TextStyle(
-                          color: Color(0xFF574293),
-                          fontSize: screenSize.width * 0.09,
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.w900,
-                          height: 1.0,
-                          fontFamily: 'Montserrat',
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight:
+                        screenSize.height *
+                        0.3, // Asegura que se vea centrado en pantallas grandes
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 10),
+                        Text(
+                          "BIENVENIDO",
+                          style: TextStyle(
+                            color: Color(0xFF574293),
+                            fontSize: screenSize.width * 0.09,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w900,
+                            height: 1.0,
+                            fontFamily: 'Montserrat',
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        "a la app de",
-                        style: TextStyle(
-                          color: Color(0xFF574293),
-                          fontSize: screenSize.width * 0.07,
-                          height: 1.0,
-                          fontFamily: 'Montserrat',
+                        Text(
+                          "a la app de",
+                          style: TextStyle(
+                            color: Color(0xFF574293),
+                            fontSize: screenSize.width * 0.07,
+                            height: 1.0,
+                            fontFamily: 'Montserrat',
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        "UCT",
-                        style: TextStyle(
-                          color: Color(0xFF574293),
-                          fontSize: screenSize.width * 0.1,
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.w900,
-                          height: 1.0,
-                          fontFamily: 'Montserrat',
+                        Text(
+                          "UCT",
+                          style: TextStyle(
+                            color: Color(0xFF574293),
+                            fontSize: screenSize.width * 0.1,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w900,
+                            height: 1.0,
+                            fontFamily: 'Montserrat',
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 15),
-                      if (_comentario == 'No hay competencias pendientes.')
-                        Column(
-                          children: [
-                            Text(
-                              "¡FELICIDADES! No tienes competencias pendientes.",
-                              style: TextStyle(
-                                color: Color(0xFF4D4D4D),
-                                fontSize: screenSize.width * 0.06,
-                                height: 1.0,
-                                fontFamily: 'Montserrat',
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            Text(
-                              'Tu aprendizaje no termina aquí. Revisa la app periódicamente para nuevos contenidos.',
-                              style: TextStyle(
-                                color: Color(0xFF4D4D4D),
-                                fontSize: screenSize.width * 0.06,
-                                fontStyle: FontStyle.italic,
-                                height: 1.2,
-                                fontFamily: 'Montserrat',
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: 50),
-                          ],
-                        ),
-                      if (_comentario ==
-                              'Curso actual obtenido correctamente.' ||
-                          _comentario == 'Curso nuevo obtenido correctamente.')
-                        Column(
-                          children: [
-                            Text(
-                              _comentario ==
-                                      'Curso actual obtenido correctamente.'
-                                  ? "Estás trabajando en:"
-                                  : "Tienes una competencia pendiente:",
-                              style: TextStyle(
-                                color: Color(0xFF4D4D4D),
-                                fontSize: screenSize.width * 0.06,
-                                height: 1.0,
-                                fontFamily: 'Montserrat',
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                              ), // Para evitar que se corte el texto
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth: screenSize.width * 0.8,
+                        SizedBox(height: 15),
+                        if (_comentario == 'No hay competencias pendientes.')
+                          Column(
+                            children: [
+                              Text(
+                                "¡FELICIDADES! No tienes competencias pendientes.",
+                                style: TextStyle(
+                                  color: Color(0xFF4D4D4D),
+                                  fontSize: screenSize.width * 0.06,
+                                  height: 1.0,
+                                  fontFamily: 'Montserrat',
                                 ),
-                                child: Text(
-                                  competencia?.titulo ?? '',
-                                  style: TextStyle(
-                                    color: Color(0xFF4D4D4D),
-                                    fontSize: screenSize.width * 0.06,
-                                    fontStyle: FontStyle.italic,
-                                    height: 1.2,
-                                    fontFamily: 'Montserrat',
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'Tu aprendizaje no termina aquí. Revisa la app periódicamente para nuevos contenidos.',
+                                style: TextStyle(
+                                  color: Color(0xFF4D4D4D),
+                                  fontSize: screenSize.width * 0.06,
+                                  fontStyle: FontStyle.italic,
+                                  height: 1.2,
+                                  fontFamily: 'Montserrat',
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 50),
+                            ],
+                          ),
+                        if (_comentario ==
+                                'Curso actual obtenido correctamente.' ||
+                            _comentario ==
+                                'Curso nuevo obtenido correctamente.')
+                          Column(
+                            children: [
+                              Text(
+                                _comentario ==
+                                        'Curso actual obtenido correctamente.'
+                                    ? "Estás trabajando en:"
+                                    : "Tienes una competencia pendiente:",
+                                style: TextStyle(
+                                  color: Color(0xFF4D4D4D),
+                                  fontSize: screenSize.width * 0.06,
+                                  height: 1.0,
+                                  fontFamily: 'Montserrat',
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                ), // Para evitar que se corte el texto
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: screenSize.width * 0.8,
                                   ),
-                                  textAlign: TextAlign.center,
-                                  maxLines: 4,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 50),
-                            SizedBox(
-                              width: screenSize.width * 0.5,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    AppRoutes.temario,
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                                  child: Text(
+                                    competencia?.titulo ?? '',
+                                    style: TextStyle(
+                                      color: Color(0xFF4D4D4D),
+                                      fontSize: screenSize.width * 0.06,
+                                      fontStyle: FontStyle.italic,
+                                      height: 1.2,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 4,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Ink(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Color(0xFF86CBC8),
-                                          Color(0xFF574293),
-                                        ],
-                                      ),
+                              ),
+                              SizedBox(height: 50),
+                              SizedBox(
+                                width: screenSize.width * 0.5,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      AppRoutes.temario,
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20),
                                     ),
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 12,
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Ink(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Color(0xFF86CBC8),
+                                            Color(0xFF574293),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Continuar',
-                                        style: TextStyle(
-                                          fontFamily: 'Montserrat',
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'Continuar',
+                                          style: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 10),
-                          ],
-                        ),
-                      Align(
-                        alignment:
-                            Alignment
-                                .center, // el botón no se estira a todo el ancho
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minWidth:
-                                screenSize.width *
-                                0.5, // ✅ mínimo 50% del ancho
+                              SizedBox(height: 10),
+                            ],
                           ),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushNamedAndRemoveUntil(
-                                context,
-                                AppRoutes.home,
-                                (route) => false,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.black,
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 16,
-                              ),
+                        Align(
+                          alignment:
+                              Alignment
+                                  .center, // el botón no se estira a todo el ancho
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth:
+                                  screenSize.width *
+                                  0.5, // ✅ mínimo 50% del ancho
                             ),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Icon(
-                                    Icons.remove_red_eye_outlined,
-                                    size: 18,
-                                    color: Colors.black,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Competencias',
-                                    style: TextStyle(fontFamily: 'Montserrat'),
-                                  ),
-                                ],
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  AppRoutes.home,
+                                  (route) => false,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.black,
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 16,
+                                ),
+                              ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Icon(
+                                      Icons.remove_red_eye_outlined,
+                                      size: 18,
+                                      color: Colors.black,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Competencias',
+                                      style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: screenSize.height * 0.1),
-                    ],
+                        SizedBox(height: screenSize.height * 0.1),
+                      ],
+                    ),
                   ),
                 ),
               ),
