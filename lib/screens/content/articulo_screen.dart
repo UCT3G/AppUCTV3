@@ -287,7 +287,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -306,7 +306,7 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                             children: [
                               Icon(Icons.arrow_back_ios_new_rounded),
                               Text(
-                                'Atrás',
+                                'Atras',
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontFamily: 'Montserrat',
@@ -316,64 +316,30 @@ class _ArticuloScreenState extends State<ArticuloScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ConstrainedBox(
-                              constraints: BoxConstraints(minWidth: 150),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  NavegacionTemas.atrasarAdelantarTema(
-                                    context,
-                                    0,
-                                    tema.idTema,
-                                  );
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.arrow_back_ios_new_rounded),
-                                    Text(
-                                      'Atras',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: 'Montserrat',
-                                      ),
-                                    ),
-                                  ],
+                      SizedBox(width: 5),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(minWidth: 150),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            NavegacionTemas.atrasarAdelantarTema(
+                              context,
+                              1,
+                              tema.idTema,
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Adelante',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 5),
-                            ConstrainedBox(
-                              constraints: BoxConstraints(minWidth: 150),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  NavegacionTemas.atrasarAdelantarTema(
-                                    context,
-                                    1,
-                                    tema.idTema,
-                                  );
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Adelante',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: 'Montserrat',
-                                      ),
-                                    ),
-                                    Icon(Icons.arrow_forward_ios_rounded),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
+                              Icon(Icons.arrow_forward_ios_rounded),
+                            ],
+                          ),
                         ),
                       ),
                     ],
