@@ -4,8 +4,8 @@
 class ApiService {
   // static const String baseURL = 'http://192.168.1.20:8007';
   // static const String baseURL = 'http://192.168.1.198:8007';
-  // static const String baseURL = 'http://10.10.31.24:8005';
-  static const String baseURL = 'https://uct.tresguerras.com.mx:8004';
+  static const String baseURL = 'http://10.10.31.41:8005';
+  // static const String baseURL = 'https://uct.tresguerras.com.mx:8004';
 
   // METODO PARA HACER SOLICITUDES GET
   // static Future<http.Response> get(String endpoint) async {

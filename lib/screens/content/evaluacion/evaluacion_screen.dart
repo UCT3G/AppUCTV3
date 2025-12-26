@@ -437,6 +437,77 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
     super.dispose();
   }
 
+  Future<bool> confirmExitDialog() async {
+    final evaluacionProvider = Provider.of<EvaluacionProvider>(
+      context,
+      listen: false,
+    );
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        final screenSize = MediaQuery.of(dialogContext).size;
+        final isLandscape = screenSize.width > screenSize.height;
+        return DialogNavegacionTemas(
+          title: '¿Salir de la evaluación?',
+          message:
+              'Si sales ahora, tus respuestas se perderán. ¿Deseas salir sin guardar?',
+          imagePath: 'assets/images/yowi_perfil.png',
+          heightFactor: isLandscape ? 0.2 : 0.4,
+          actions: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext, false),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey.shade600,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: Text(
+                      'Cancelar',
+                      style: TextStyle(fontFamily: 'Montserrat'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      evaluacionProvider.clearRespuestas();
+                      Navigator.pop(dialogContext, true);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(dialogContext).primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: Text(
+                      'Salir',
+                      style: TextStyle(fontFamily: 'Montserrat'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final evaluacionProvider = Provider.of<EvaluacionProvider>(context);
@@ -493,9 +564,11 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
           ),
         ),
         leading: IconButton(
-          onPressed: () {
-            evaluacionProvider.clearRespuestas();
-            Navigator.pop(context);
+          onPressed: () async {
+            final exit = await confirmExitDialog();
+            if (exit && context.mounted) {
+              Navigator.pop(context);
+            }
           },
           icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),

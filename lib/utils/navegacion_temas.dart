@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/dialogs/dialog_error_connection.dart';
@@ -22,6 +24,10 @@ class NavegacionTemas {
 
     final screenSize = MediaQuery.of(parentContext).size;
     final isLandscape = screenSize.width > screenSize.height;
+
+    log(
+      'Tema actual: ${tema.idTema}, nombre: ${tema.titulo}, orden: ${tema.orden}',
+    );
 
     try {
       final response = await competenciaProvider.adelantarAtrasarTemas(
