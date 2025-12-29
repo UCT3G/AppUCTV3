@@ -96,6 +96,18 @@ class _QuestionCardState extends State<QuestionCard> {
                                       ),
                                       textAlign: TextAlign.justify,
                                     ),
+                                  if (reactivo.idInput == 11) ...[
+                                    SizedBox(height: 10),
+                                    Text(
+                                      'Nota: Manten presionada la opción hasta que se ilumine y arrastra para reordenar.',
+                                      style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 13,
+                                        color: Colors.white70,
+                                      ),
+                                      textAlign: TextAlign.justify,
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),

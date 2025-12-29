@@ -67,6 +67,36 @@ class _InputDraggableWidgetState extends State<InputDraggableWidget> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _ordenUsuario.length,
+          proxyDecorator: (
+            Widget child,
+            int index,
+            Animation<double> animation,
+          ) {
+            return AnimatedBuilder(
+              animation: animation,
+              builder: (context, _) {
+                return Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withValues(alpha: 0.85), // ✨ glow
+                        blurRadius: 18,
+                        spreadRadius: 2,
+                        offset: Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    elevation: 8,
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    child: child,
+                  ),
+                );
+              },
+            );
+          },
           itemBuilder: (context, index) {
             final item = _ordenUsuario[index];
 
