@@ -26,6 +26,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
   int _currentPage = 0;
   bool calificado = false;
   bool _hasConnectionError = false;
+  bool _isSubmitting = false;
 
   Future<void> getFormularioEvaluacion() async {
     final competenciaProvider = Provider.of<CompetenciaProvider>(
@@ -546,6 +547,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
+        if (_isSubmitting) return;
         final exit = await confirmExitDialog();
         if (exit && context.mounted) {
           Navigator.of(context).pop(result);
@@ -575,6 +577,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
           ),
           leading: IconButton(
             onPressed: () async {
+              if (_isSubmitting) return;
               final exit = await confirmExitDialog();
               if (exit && context.mounted) {
                 evaluacionProvider.clearRespuestas();
@@ -764,6 +767,8 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                               final response = await evaluacionProvider
                                   .guardarEvaluacion(jsonEvaluacion);
 
+                              _isSubmitting = true;
+
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -793,6 +798,7 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
                               );
                             } catch (e) {
                               _currentPage = 0;
+                              _isSubmitting = false;
                               if (e.toString().contains('Sesión expirada.')) {
                                 if (context.mounted) {
                                   Navigator.pushReplacementNamed(
