@@ -890,7 +890,7 @@ class _RoadSegmentState extends State<RoadSegment> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 30,
-                    vertical: 15,
+                    vertical: 10,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
