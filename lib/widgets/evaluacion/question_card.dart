@@ -233,11 +233,9 @@ class _QuestionCardState extends State<QuestionCard> {
         if (valor.contains('type=radio')) {
           return InputRadioWidget(idReactivo: reactivo.idReactivo);
         } else if (valor.contains('type=checkbox')) {
-          if (reactivo.idInput == 11) {
-            return InputDraggableWidget(idReactivo: reactivo.idReactivo);
-          } else {
-            return InputCheckboxWidget(idReactivo: reactivo.idReactivo);
-          }
+          return InputCheckboxWidget(idReactivo: reactivo.idReactivo);
+        } else if (valor.contains('type=ordenamiento')) {
+          return InputDraggableWidget(idReactivo: reactivo.idReactivo);
         }
         break;
       case 'div-rela':
