@@ -50,9 +50,7 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
 
     if (tema.recursoBasicoTipo == 'INTERACTIVO') {
       url =
-          Uri.parse(
-                'https://uct.tresguerras.com.mx:8000/static/interactive.html',
-              )
+          Uri.parse('https://uct.tresguerras.com.mx/static/interactive.html')
               .replace(
                 queryParameters: {
                   'materia': tema.idCurso.toString(),
@@ -86,7 +84,7 @@ class _InteractiveScreenState extends State<InteractiveScreen> {
       final userEncoded = Uri.encodeComponent(userJson);
 
       url =
-          Uri.parse('https://uct.tresguerras.com.mx:8002/templateContainer')
+          Uri.parse('https://uct.tresguerras.com.mx/uct_tmp/templateContainer')
               .replace(
                 queryParameters: {
                   'user': userEncoded,
