@@ -619,6 +619,9 @@ class CourseService {
     int accion,
     String accessToken,
   ) async {
+    log(
+      'Adelantar/Atrasar - idCurso: $idCurso, idUnidad: $idUnidad, ordenTema: $ordenTema, ordenUnidad: $ordenUnidad, accion: $accion',
+    );
     final url = Uri.parse(
       '${ApiService.baseURL}/CURSOS_MOVIL/siguienteAtrasTema',
     );

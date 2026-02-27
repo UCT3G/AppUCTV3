@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_uct/provider/auth_provider.dart';
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/provider/evaluacion_provider.dart';
@@ -547,7 +549,15 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
-        if (_isSubmitting) return;
+        if (_isSubmitting) {
+          evaluacionProvider.clearRespuestas();
+          if (context.mounted) {
+            Navigator.of(context).pop(result);
+          }
+          _isSubmitting = false;
+          return;
+        }
+
         final exit = await confirmExitDialog();
         if (exit && context.mounted) {
           Navigator.of(context).pop(result);
@@ -577,7 +587,14 @@ class _EvaluacionScreenState extends State<EvaluacionScreen> {
           ),
           leading: IconButton(
             onPressed: () async {
-              if (_isSubmitting) return;
+              if (_isSubmitting) {
+                evaluacionProvider.clearRespuestas();
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+                _isSubmitting = false;
+                return;
+              }
               final exit = await confirmExitDialog();
               if (exit && context.mounted) {
                 evaluacionProvider.clearRespuestas();

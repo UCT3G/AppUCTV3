@@ -25,10 +25,6 @@ class NavegacionTemas {
     final screenSize = MediaQuery.of(parentContext).size;
     final isLandscape = screenSize.width > screenSize.height;
 
-    log(
-      'Tema actual: ${tema.idTema}, nombre: ${tema.titulo}, orden: ${tema.orden}',
-    );
-
     try {
       final response = await competenciaProvider.adelantarAtrasarTemas(
         tema.idCurso,
@@ -313,7 +309,7 @@ class NavegacionTemas {
               return;
             }
             if (parentContext.mounted) {
-              Navigator.pushNamed(
+              Navigator.pushReplacementNamed(
                 parentContext,
                 AppRoutes.evaluacionIntro,
                 arguments: nuevoTema.idTema,
