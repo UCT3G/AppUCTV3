@@ -14,6 +14,7 @@ import 'package:app_uct/screens/content/video_screen.dart';
 import 'package:app_uct/screens/home_screen.dart';
 import 'package:app_uct/screens/login_screen.dart';
 import 'package:app_uct/screens/onboarding_screen.dart';
+import 'package:app_uct/screens/reforzamiento_screen.dart';
 import 'package:app_uct/screens/splash_screen.dart';
 import 'package:app_uct/screens/temario_screen.dart';
 import 'package:app_uct/screens/welcome_screen.dart';
@@ -40,6 +41,7 @@ class AppRoutes {
   static const String recurso = '/recurso';
   static const String encuesta = '/encuesta';
   static const String onboarding = '/onboarding';
+  static const String reforzamiento = '/reforzamiento';
 
   static final routes = {
     root: (context) => SplashScreen(isInitialLoad: false),
@@ -109,5 +111,6 @@ class AppRoutes {
       return EncuestaScreen(idTema: idTema);
     },
     onboarding: (context) => OnboardingScreen(),
+    reforzamiento: (context) => ReforzamientoScreen(),
   };
 }

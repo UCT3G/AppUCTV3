@@ -1,4 +1,4 @@
-package com.example.app_uct
+package com.appuctdemodev.app_uct
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
