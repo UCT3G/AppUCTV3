@@ -9,12 +9,12 @@ import 'package:app_uct/widgets/breadcrumb_nav.dart';
 import 'package:app_uct/widgets/connection_error_widget.dart';
 import 'package:app_uct/widgets/dialogs/dialog_error_connection.dart';
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:media_store_plus/media_store_plus.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ArchivoScreen extends StatefulWidget {
   final int idTema;
@@ -30,19 +30,24 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
   bool _descargando = false;
   bool _hasConnectionError = false;
 
-  Future<SaveInfo?> guardarEnDownloads(
-    String filePath,
+  Future<String?> guardarEnDownloads(
+    String tempPath,
     String nombreArchivo,
   ) async {
-    final mediaStore = MediaStore();
-
-    final savedFile = await mediaStore.saveFile(
-      tempFilePath: filePath,
-      dirType: DirType.download,
-      dirName: DirName.download,
+    // FilePicker.saveFile requiere bytes en Android/iOS y falla al usarlo solo para obtener una ruta.
+    // En su lugar pedimos carpeta al usuario y copiamos el archivo temporal allá.
+    final directoryPath = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: 'Guardar archivo en',
     );
 
-    return savedFile;
+    if (directoryPath != null) {
+      final destPath = '$directoryPath/$nombreArchivo';
+      final file = File(tempPath);
+      await file.copy(destPath);
+      return destPath;
+    }
+
+    return null;
   }
 
   Future<void> descargarArchivo() async {
@@ -86,7 +91,7 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
             backgroundColor: Colors.teal,
             behavior: SnackBarBehavior.floating,
             content: Text(
-              'Archivo guardado en: Downloads/App UCT/$composedNombre',
+              'Archivo guardado.',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -98,28 +103,24 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
       }
 
       if (rutaFinal != null) {
-        final mediaStore = MediaStore();
+        final Uri uri = Uri.file(rutaFinal);
         try {
-          // Try to get a direct file path for the content URI
-          final filePath = await mediaStore.getFilePathFromUri(
-            uriString: rutaFinal.uri.toString(),
-          );
-
-          if (filePath != null) {
-            await OpenFilex.open(filePath);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
           } else {
-            // If there's no direct path, copy to a temporary file and open
-            final tempDir2 = await getTemporaryDirectory();
-            final tempPath2 = '${tempDir2.path}/$composedNombre';
-            await mediaStore.readFileUsingUri(
-              uriString: rutaFinal.uri.toString(),
-              tempFilePath: tempPath2,
-            );
-            await OpenFilex.open(tempPath2);
+            // Si por alguna razón no puede abrirlo directamente
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Archivo guardado. Ábrelo desde tu administrador de archivos.',
+                  ),
+                ),
+              );
+            }
           }
         } catch (e) {
-          debugPrint('Error al abrir archivo desde MediaStore: $e');
-          // Fallback: show toast/snackbar already handled below
+          debugPrint('Error al abrir el archivo: $e');
         }
       }
     } catch (e) {

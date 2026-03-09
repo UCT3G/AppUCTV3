@@ -6,15 +6,9 @@ import 'package:app_uct/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:media_store_plus/media_store_plus.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Inicializa MediaStore (necesario para media_store_plus). Llamar solo una vez.
-  await MediaStore.ensureInitialized();
-  // Establece la carpeta pública de la app dentro de MediaStore (p. ej. Download/App UCT)
-  MediaStore.appFolder = 'App UCT';
 
   final authProvider = AuthProvider();
   await authProvider.loadTokens();
