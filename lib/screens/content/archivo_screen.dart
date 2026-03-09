@@ -11,9 +11,9 @@ import 'package:app_uct/widgets/dialogs/dialog_error_connection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:media_store_plus/media_store_plus.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class ArchivoScreen extends StatefulWidget {
@@ -30,31 +30,19 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
   bool _descargando = false;
   bool _hasConnectionError = false;
 
-  Future<String> obtenerDirectorioDescarga() async {
-    if (Platform.isAndroid) {
-      var status = await Permission.manageExternalStorage.status;
-      if (status.isDenied || status.isRestricted) {
-        status = await Permission.manageExternalStorage.request();
-      }
-      if (!status.isGranted) {
-        openAppSettings();
-        throw Exception('Permiso de almacenamiento completo denegado.');
-      }
+  Future<SaveInfo?> guardarEnDownloads(
+    String filePath,
+    String nombreArchivo,
+  ) async {
+    final mediaStore = MediaStore();
 
-      Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
+    final savedFile = await mediaStore.saveFile(
+      tempFilePath: filePath,
+      dirType: DirType.download,
+      dirName: DirName.download,
+    );
 
-      if (!await downloadsDirectory.exists()) {
-        downloadsDirectory =
-            await getExternalStorageDirectory() ?? downloadsDirectory;
-      }
-
-      return downloadsDirectory.path;
-    } else if (Platform.isIOS) {
-      final directory = await getApplicationDocumentsDirectory();
-      return directory.path;
-    } else {
-      throw Exception('Plataforma no soportada');
-    }
+    return savedFile;
   }
 
   Future<void> descargarArchivo() async {
@@ -70,15 +58,17 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
     });
 
     try {
-      final nombreArchivo = tema.rutaRecurso.split('/').last;
+      final originalNombre = tema.rutaRecurso.split('/').last;
+      final composedNombre = '${tema.idTema}_$originalNombre';
       final descargableURL =
-          '${ApiService.baseURL}/descargar_movil/${tema.idCurso}/${tema.idUnidad}/${tema.idTema}/$nombreArchivo';
-      final saveDirectory = await obtenerDirectorioDescarga();
-      final savePath = '$saveDirectory/${tema.idTema}_$nombreArchivo';
+          '${ApiService.baseURL}/descargar_movil/${tema.idCurso}/${tema.idUnidad}/${tema.idTema}/$originalNombre';
+
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = "${tempDir.path}/$composedNombre";
 
       await Dio().download(
         descargableURL,
-        savePath,
+        tempPath,
         onReceiveProgress: (count, total) {
           if (total != -1) {
             setState(() {
@@ -88,13 +78,15 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
         },
       );
 
+      final rutaFinal = await guardarEnDownloads(tempPath, composedNombre);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.teal,
             behavior: SnackBarBehavior.floating,
             content: Text(
-              'Archivo guardado en: $savePath',
+              'Archivo guardado en: Downloads/App UCT/$composedNombre',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -105,7 +97,31 @@ class _ArchivoScreenState extends State<ArchivoScreen> {
         );
       }
 
-      await OpenFilex.open(savePath);
+      if (rutaFinal != null) {
+        final mediaStore = MediaStore();
+        try {
+          // Try to get a direct file path for the content URI
+          final filePath = await mediaStore.getFilePathFromUri(
+            uriString: rutaFinal.uri.toString(),
+          );
+
+          if (filePath != null) {
+            await OpenFilex.open(filePath);
+          } else {
+            // If there's no direct path, copy to a temporary file and open
+            final tempDir2 = await getTemporaryDirectory();
+            final tempPath2 = '${tempDir2.path}/$composedNombre';
+            await mediaStore.readFileUsingUri(
+              uriString: rutaFinal.uri.toString(),
+              tempFilePath: tempPath2,
+            );
+            await OpenFilex.open(tempPath2);
+          }
+        } catch (e) {
+          debugPrint('Error al abrir archivo desde MediaStore: $e');
+          // Fallback: show toast/snackbar already handled below
+        }
+      }
     } catch (e) {
       if (mounted) {
         showDialog(

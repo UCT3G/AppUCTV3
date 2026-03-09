@@ -12,9 +12,10 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:media_store_plus/media_store_plus.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class PracticaScreen extends StatefulWidget {
@@ -32,31 +33,19 @@ class _PracticaScreenState extends State<PracticaScreen> {
   bool _descargandoSubida = false;
   bool _hasConnectionError = false;
 
-  Future<String> obtenerDirectorioDescarga() async {
-    if (Platform.isAndroid) {
-      var status = await Permission.manageExternalStorage.status;
-      if (status.isDenied || status.isRestricted) {
-        status = await Permission.manageExternalStorage.request();
-      }
-      if (!status.isGranted) {
-        openAppSettings();
-        throw Exception('Permiso de almacenamiento denegado');
-      }
+  Future<SaveInfo?> guardarEnDownloads(
+    String filePath,
+    String nombreArchivo,
+  ) async {
+    final mediaStore = MediaStore();
 
-      Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
+    final savedFile = await mediaStore.saveFile(
+      tempFilePath: filePath,
+      dirType: DirType.download,
+      dirName: DirName.download,
+    );
 
-      if (!await downloadsDirectory.exists()) {
-        downloadsDirectory =
-            await getExternalStorageDirectory() ?? downloadsDirectory;
-      }
-
-      return downloadsDirectory.path;
-    } else if (Platform.isIOS) {
-      final directory = await getApplicationDocumentsDirectory();
-      return directory.path;
-    } else {
-      throw Exception('Plataforma no soportada');
-    }
+    return savedFile;
   }
 
   Future<void> descargarPractica() async {
@@ -72,15 +61,17 @@ class _PracticaScreenState extends State<PracticaScreen> {
     });
 
     try {
-      final nombreArchivo = tema.rutaRecurso.split('/').last;
+      final originalNombre = tema.rutaRecurso.split('/').last;
+      final composedNombre = 'practica_${tema.idTema}_$originalNombre';
       final descargableURL =
-          '${ApiService.baseURL}/descargar_movil/${tema.idCurso}/${tema.idUnidad}/${tema.idTema}/$nombreArchivo';
-      final saveDirectory = await obtenerDirectorioDescarga();
-      final savePath = '$saveDirectory/practica_${tema.idTema}_$nombreArchivo';
+          '${ApiService.baseURL}/descargar_movil/${tema.idCurso}/${tema.idUnidad}/${tema.idTema}/$originalNombre';
+
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = "${tempDir.path}/$composedNombre";
 
       await Dio().download(
         descargableURL,
-        savePath,
+        tempPath,
         onReceiveProgress: (count, total) {
           if (total != -1) {
             setState(() {
@@ -90,13 +81,15 @@ class _PracticaScreenState extends State<PracticaScreen> {
         },
       );
 
+      final rutaFinal = await guardarEnDownloads(tempPath, composedNombre);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.teal,
             behavior: SnackBarBehavior.floating,
             content: Text(
-              'Practica guardada en: $savePath',
+              'Practica guardada en: Downloads/App UCT/$composedNombre',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -107,7 +100,31 @@ class _PracticaScreenState extends State<PracticaScreen> {
         );
       }
 
-      await OpenFilex.open(savePath);
+      if (rutaFinal != null) {
+        final mediaStore = MediaStore();
+        try {
+          // Try to get a direct file path for the content URI
+          final filePath = await mediaStore.getFilePathFromUri(
+            uriString: rutaFinal.uri.toString(),
+          );
+
+          if (filePath != null) {
+            await OpenFilex.open(filePath);
+          } else {
+            // If there's no direct path, copy to a temporary file and open
+            final tempDir2 = await getTemporaryDirectory();
+            final tempPath2 = '${tempDir2.path}/$composedNombre';
+            await mediaStore.readFileUsingUri(
+              uriString: rutaFinal.uri.toString(),
+              tempFilePath: tempPath2,
+            );
+            await OpenFilex.open(tempPath2);
+          }
+        } catch (e) {
+          debugPrint('Error al abrir archivo desde MediaStore: $e');
+          // Fallback: show toast/snackbar already handled below
+        }
+      }
     } catch (e) {
       debugPrint('Error al descargar: $e');
       if (mounted) {
@@ -177,16 +194,17 @@ class _PracticaScreenState extends State<PracticaScreen> {
     });
 
     try {
-      final nombreArchivo = 'practica_tema${tema.idTema}.pdf';
+      final originalNombre = tema.rutaRecurso.split('/').last;
+      final composedNombre = 'practica_${tema.idTema}_$originalNombre';
       final descargableURL =
-          '${ApiService.baseURL}/descargar_practica_movil/${authProvider.currentUsuario!.idUsuario}/$nombreArchivo';
-      final saveDirectory = await obtenerDirectorioDescarga();
-      final savePath =
-          '$saveDirectory/practicaSubida_${tema.idTema}_$nombreArchivo';
+          '${ApiService.baseURL}/descargar_practica_movil/${authProvider.currentUsuario!.idUsuario}/$originalNombre';
+
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = "${tempDir.path}/$composedNombre";
 
       await Dio().download(
         descargableURL,
-        savePath,
+        tempPath,
         onReceiveProgress: (count, total) {
           if (total != -1) {
             setState(() {
@@ -196,13 +214,15 @@ class _PracticaScreenState extends State<PracticaScreen> {
         },
       );
 
+      final rutaFinal = await guardarEnDownloads(tempPath, composedNombre);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.teal,
             behavior: SnackBarBehavior.floating,
             content: Text(
-              'Practica subida guardada en: $savePath',
+              'Practica subida guardada en: $rutaFinal',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -213,7 +233,31 @@ class _PracticaScreenState extends State<PracticaScreen> {
         );
       }
 
-      await OpenFilex.open(savePath);
+      if (rutaFinal != null) {
+        final mediaStore = MediaStore();
+        try {
+          // Try to get a direct file path for the content URI
+          final filePath = await mediaStore.getFilePathFromUri(
+            uriString: rutaFinal.uri.toString(),
+          );
+
+          if (filePath != null) {
+            await OpenFilex.open(filePath);
+          } else {
+            // If there's no direct path, copy to a temporary file and open
+            final tempDir2 = await getTemporaryDirectory();
+            final tempPath2 = '${tempDir2.path}/$composedNombre';
+            await mediaStore.readFileUsingUri(
+              uriString: rutaFinal.uri.toString(),
+              tempFilePath: tempPath2,
+            );
+            await OpenFilex.open(tempPath2);
+          }
+        } catch (e) {
+          debugPrint('Error al abrir archivo desde MediaStore: $e');
+          // Fallback: show toast/snackbar already handled below
+        }
+      }
     } catch (e) {
       debugPrint('Error al descargar: $e');
       if (mounted) {

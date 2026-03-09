@@ -195,100 +195,87 @@ class _PdfScreenState extends State<PdfScreen> {
           ),
           SafeArea(
             top: false,
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: size.height - kToolbarHeight,
+            child: Column(
+              children: [
+                BreadcrumbNav(
+                  paths: [
+                    competenciaProvider.competencia!.titulo ?? 'Competencia',
+                    currentUnidad.titulo,
+                    tema.titulo ?? 'Titulo',
+                  ],
                 ),
-                child: IntrinsicHeight(
-                  child: Column(
+                Expanded(
+                  child: Center(
+                    child:
+                        pdfUrl == null
+                            ? CircularProgressIndicator()
+                            : SfPdfViewer.network(
+                              pdfUrl!,
+                              enableTextSelection: false,
+                            ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      BreadcrumbNav(
-                        paths: [
-                          competenciaProvider.competencia!.titulo ??
-                              'Competencia',
-                          currentUnidad.titulo,
-                          tema.titulo ?? 'Titulo',
-                        ],
-                      ),
-                      Expanded(
-                        child: Center(
-                          child:
-                              pdfUrl == null
-                                  ? CircularProgressIndicator()
-                                  : SfPdfViewer.network(
-                                    pdfUrl!,
-                                    enableTextSelection: false,
-                                  ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: isSmall ? 8 : 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ConstrainedBox(
-                              constraints: BoxConstraints(minWidth: 150),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  NavegacionTemas.atrasarAdelantarTema(
-                                    context,
-                                    0,
-                                    tema.idTema,
-                                  );
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.arrow_back_ios_new_rounded),
-                                    Text(
-                                      'Atras',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: 'Montserrat',
-                                      ),
-                                    ),
-                                  ],
+                      ConstrainedBox(
+                        constraints: BoxConstraints(minWidth: 150),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            NavegacionTemas.atrasarAdelantarTema(
+                              context,
+                              0,
+                              tema.idTema,
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_back_ios_new_rounded),
+                              Text(
+                                'Atras',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 5),
-                            ConstrainedBox(
-                              constraints: BoxConstraints(minWidth: 150),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  NavegacionTemas.atrasarAdelantarTema(
-                                    context,
-                                    1,
-                                    tema.idTema,
-                                  );
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Adelante',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: 'Montserrat',
-                                      ),
-                                    ),
-                                    Icon(Icons.arrow_forward_ios_rounded),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                      SizedBox(
-                        height: MediaQuery.of(context).padding.bottom + 16,
+                      SizedBox(width: 5),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(minWidth: 150),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            NavegacionTemas.atrasarAdelantarTema(
+                              context,
+                              1,
+                              tema.idTema,
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Adelante',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                              Icon(Icons.arrow_forward_ios_rounded),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
+                SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+              ],
             ),
           ),
         ],
