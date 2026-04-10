@@ -424,6 +424,64 @@ class CourseService {
     }
   }
 
+  static Future<Map<String, dynamic>> getCursosReforzamientoUsuario(
+    String accessToken,
+  ) async {
+    final url = Uri.parse(
+      '${ApiService.baseURL}/CURSOS_MOVIL/getCompetenciaUsuarioReforzamiento',
+    );
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      final lastRequest = prefs.getString('last-request') ?? '';
+      if (lastRequest.isNotEmpty) {
+        try {
+          final lastDate = DateTime.parse(lastRequest);
+          final now = DateTime.now();
+          final difference = now.difference(lastDate);
+
+          if (difference >= Duration(hours: 2)) {
+            final response = await http.post(
+              Uri.parse('${ApiService.baseURL}/USUARIO/cerrarSesion'),
+              headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $accessToken',
+              },
+              body: json.encode({
+                'motivo': 'timeout',
+                'fuente': 'recolector',
+                'administrador': prefs.getBool('administrador'),
+                'id_login': prefs.getInt('id_login'),
+              }),
+            );
+            final responseData = json.decode(response.body);
+            prefs.setInt('id_login', responseData['id_login']);
+          }
+        } catch (e) {
+          log('No se pudo parsear last-request: $lastRequest -> $e');
+        }
+      }
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        prefs.setString('last-request', DateTime.now().toIso8601String());
+        final data = json.decode(response.body);
+        return data;
+      } else if (response.statusCode == 401) {
+        throw Exception('Token expirado o inválido');
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error de conexión: $e');
+    }
+  }
+
   static Future<Map<String, dynamic>> validarUnidadAnterior(
     int idCurso,
     int orden,

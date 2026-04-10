@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/dialogs/dialog_error_connection.dart';

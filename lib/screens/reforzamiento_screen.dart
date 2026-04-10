@@ -34,7 +34,8 @@ class _ReforzamientoScreenState extends State<ReforzamientoScreen> {
     });
 
     try {
-      final response = await competenciaProvider.fetchCompetencias();
+      final response =
+          await competenciaProvider.fetchCompetenciasReforzamiento();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -151,7 +152,7 @@ class _ReforzamientoScreenState extends State<ReforzamientoScreen> {
       );
     }
 
-    final listCompetencias = competenciaProvider.competencias;
+    final listCompetencias = competenciaProvider.competenciasReforzamiento;
 
     return Scaffold(
       key: _scaffoldKey,

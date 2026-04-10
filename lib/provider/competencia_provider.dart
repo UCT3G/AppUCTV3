@@ -23,6 +23,7 @@ class CompetenciaProvider with ChangeNotifier {
   bool _loading = false;
   bool _loadingDialog = false;
   List<Competencia> _competencias = [];
+  List<Competencia> _competenciasReforzamiento = [];
   List<Competencia> _competenciasFiltradas = [];
   List<Competencia> _competenciasRecientes = [];
   int _idEvaluacion = 0;
@@ -32,6 +33,7 @@ class CompetenciaProvider with ChangeNotifier {
   bool get loading => _loading;
   bool get loadingDialog => _loadingDialog;
   List<Competencia> get competencias => _competencias;
+  List<Competencia> get competenciasReforzamiento => _competenciasReforzamiento;
   List<Competencia> get competenciasFiltradas => _competenciasFiltradas;
   List<Competencia> get competenciasRecientes => _competenciasRecientes;
   int get idEvaluacion => _idEvaluacion;
@@ -53,8 +55,14 @@ class CompetenciaProvider with ChangeNotifier {
   }
 
   Competencia? getCompetenciaById(int idCurso) {
-    for (final c in _competencias) {
-      if (c.idCurso == idCurso) return c;
+    if (_competencias.isNotEmpty) {
+      for (final c in _competencias) {
+        if (c.idCurso == idCurso) return c;
+      }
+    } else if (_competenciasReforzamiento.isNotEmpty) {
+      for (final c in _competenciasReforzamiento) {
+        if (c.idCurso == idCurso) return c;
+      }
     }
     return null;
   }
@@ -496,6 +504,53 @@ class CompetenciaProvider with ChangeNotifier {
       }
       throw Exception(
         'Error al cargar las competencias recientes del usuario: ${e.toString()}',
+      );
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchCompetenciasReforzamiento() async {
+    try {
+      final response = await CourseService.getCursosReforzamientoUsuario(
+        _authProvider.accessToken!,
+      );
+      final competenciasJson = response['cursos_usuario'] as List;
+      _competenciasReforzamiento =
+          competenciasJson.map((json) => Competencia.fromJson(json)).toList();
+      return response;
+    } catch (e) {
+      if (e.toString().contains('Token expirado o inválido')) {
+        final tokenRefreshValid = await AuthService.checkTokenValidity(
+          _authProvider.refreshToken ?? '',
+        );
+        if (tokenRefreshValid) {
+          final newAccessToken = await AuthService.refreshAccessToken(
+            _authProvider.refreshToken ?? '',
+          );
+          if (newAccessToken != null) {
+            await _authProvider.updateAccessToken(newAccessToken);
+            try {
+              final response = await CourseService.getCursosUsuario(
+                _authProvider.accessToken!,
+              );
+              final competenciasJson = response['cursos_usuario'] as List;
+              _competenciasReforzamiento =
+                  competenciasJson
+                      .map((json) => Competencia.fromJson(json))
+                      .toList();
+              return response;
+            } catch (e) {
+              throw Exception(
+                'Error al reintentar con token renovado: ${e.toString()}',
+              );
+            }
+          }
+        } else {
+          await _authProvider.logout();
+          throw Exception('Sesión expirada.');
+        }
+      }
+      throw Exception(
+        'Error al cargar las competencias de refuerzo del usuario: ${e.toString()}',
       );
     }
   }

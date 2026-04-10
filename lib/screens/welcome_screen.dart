@@ -1,5 +1,7 @@
 // import 'dart:developer';
 
+import 'dart:developer';
+
 import 'package:app_uct/provider/competencia_provider.dart';
 import 'package:app_uct/routes/app_routes.dart';
 import 'package:app_uct/widgets/connection_error_widget.dart';
@@ -22,6 +24,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   late AnimationController _controller2;
   late Animation<double> _animation2;
   String _comentario = "";
+  int _no_registros = 0;
 
   bool _hasConnectionError = false;
 
@@ -38,9 +41,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     try {
       final competenciaData =
           await competenciaProvider.fetchCompetenciaActual();
+      log(competenciaData.toString());
 
       setState(() {
         _comentario = competenciaData['comentario'];
+        _no_registros = competenciaData['no_registros'] ?? 0;
       });
 
       if (mounted) {
@@ -275,38 +280,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 15),
-                        // if (_comentario == 'No hay competencias pendientes.')
-                        //   Column(
-                        //     children: [
-                        //       Text(
-                        //         "¡FELICIDADES! No tienes competencias pendientes.",
-                        //         style: TextStyle(
-                        //           color: Color(0xFF4D4D4D),
-                        //           fontSize: screenSize.width * 0.06,
-                        //           height: 1.0,
-                        //           fontFamily: 'Montserrat',
-                        //         ),
-                        //         textAlign: TextAlign.center,
-                        //       ),
-                        //       Text(
-                        //         'Tu aprendizaje no termina aquí. Revisa la app periódicamente para nuevos contenidos.',
-                        //         style: TextStyle(
-                        //           color: Color(0xFF4D4D4D),
-                        //           fontSize: screenSize.width * 0.06,
-                        //           fontStyle: FontStyle.italic,
-                        //           height: 1.2,
-                        //           fontFamily: 'Montserrat',
-                        //         ),
-                        //         textAlign: TextAlign.center,
-                        //       ),
-                        //       SizedBox(height: 50),
-                        //     ],
-                        //   ),
                         if (_comentario == 'No hay competencias pendientes.')
                           Column(
                             children: [
                               Text(
-                                "¡Estimado usuario! Tienes reforzamientos pendientes.",
+                                "¡FELICIDADES! No tienes competencias pendientes.",
                                 style: TextStyle(
                                   color: Color(0xFF4D4D4D),
                                   fontSize: screenSize.width * 0.06,
@@ -316,7 +294,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 textAlign: TextAlign.center,
                               ),
                               Text(
-                                'Para continuar tu aprendizaje, revisa la sección de reforzamientos para reforzar tus conocimientos.',
+                                'Tu aprendizaje no termina aquí. Revisa la app periódicamente para nuevos contenidos.',
                                 style: TextStyle(
                                   color: Color(0xFF4D4D4D),
                                   fontSize: screenSize.width * 0.06,
@@ -326,7 +304,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              SizedBox(height: 30),
+                              SizedBox(height: 50),
                             ],
                           ),
                         if (_comentario ==
@@ -419,46 +397,77 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               SizedBox(height: 10),
                             ],
                           ),
-                        SizedBox(
-                          width: screenSize.width * 0.5,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                context,
-                                AppRoutes.reforzamiento,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                        if (_no_registros > 0 &&
+                            _comentario == 'No hay competencias pendientes.')
+                          Column(
+                            children: [
+                              Text(
+                                "¡Estimado usuario! Tienes reforzamientos pendientes.",
+                                style: TextStyle(
+                                  color: Color(0xFF4D4D4D),
+                                  fontSize: screenSize.width * 0.06,
+                                  height: 1.0,
+                                  fontFamily: 'Montserrat',
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Ink(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Color(0xFF86CBC8),
-                                      Color(0xFF574293),
-                                    ],
-                                  ),
+                              Text(
+                                'Revisa la sección de reforzamientos para fortalecer tus conocimientos.',
+                                style: TextStyle(
+                                  color: Color(0xFF4D4D4D),
+                                  fontSize: screenSize.width * 0.06,
+                                  fontStyle: FontStyle.italic,
+                                  height: 1.2,
+                                  fontFamily: 'Montserrat',
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 30),
+                            ],
+                          ),
+                        if (_no_registros > 0)
+                          SizedBox(
+                            width: screenSize.width * 0.5,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  AppRoutes.reforzamiento,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                 ),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 12),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    'Reforzamientos',
-                                    style: TextStyle(fontFamily: 'Montserrat'),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Ink(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Color(0xFF86CBC8),
+                                        Color(0xFF574293),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(vertical: 12),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Reforzamientos',
+                                      style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
                         SizedBox(height: 10),
                         Align(
                           alignment:
