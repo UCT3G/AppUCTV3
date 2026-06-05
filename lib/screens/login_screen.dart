@@ -308,6 +308,7 @@ class _LoginScreenState extends State<LoginScreen>
         }
       }
     } catch (e) {
+      debugPrint('Error al iniciar sesión con bloqueo de pantalla: $e');
       Navigator.of(context, rootNavigator: true).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
