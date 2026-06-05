@@ -857,6 +857,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+
+      //AQUIIIIII TAMBIEEEEN
       endDrawer: Drawer(
         child: Container(
           color: Colors.white,
@@ -1063,6 +1065,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
+              //AQUIIIIII
               Expanded(
                 child:
                     listCompetencias.isEmpty
